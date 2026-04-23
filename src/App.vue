@@ -1,5 +1,6 @@
 <template>
   <div class="scada-app">
+    <ParticleBackground />
     <header class="app-header">
       <div class="header-left">
         <span class="logo-icon">◆</span>
@@ -29,6 +30,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import ParticleBackground from '@/components/ParticleBackground.vue'
 
 const connectionStatus = ref('ONLINE')
 const systemTime = ref('')
