@@ -11,7 +11,7 @@
 }
 {
   "currentPhase": 1,
-  "phaseName": "Phase 1: 基础3D建模+Mock数据",
+  "phaseName": "Phase 1: 基础3D建模+Mock数据 (90%完成)",
   "completedPhases": ["Phase 0: 架构搭建"],
   "currentTask": "Phase 1 详细审查完成 - 实际进度高于快照",
   "pendingPhases": [
@@ -61,7 +61,7 @@
 {
   "phase1Status": {
     "name": "Phase 1: 基础3D建模+Mock数据",
-    "progress": "75%",
+    "progress": "90%",
     "status": "in_progress",
     "codeReviewFindings": {
       "3D模型": "✅ 完整实现 - Reactor.js, Tank.js, PipeNetwork.js, Conveyor.js, Structure.js, Instrument.js, Workers.js, Particles.js",
@@ -103,13 +103,14 @@
       "TwinView.vue - 3D场景集成 (Store→Plant3D数据连接)"
     ],
     "pendingTasks": [
-      "T1.4.1: 储罐几何形状精细化",
-      "T1.4.2: 管道系统细节增强 (支管、法兰、保温层)",
-      "T1.4.3: PBR环境贴图添加 (metalness提升)",
-      "T1.4.4: LOD分级渲染实现",
       "T1.4.5: SSAO后处理效果",
       "T1.4.6: 阴影质量优化",
       "T1.4.7: Phase 1里程碑验收"
+    ],
+    "completedRefinements": [
+      "T1.4.1: 储罐几何精细化 ✅ - 锥形底+支腿+斜撑+法兰+加强筋",
+      "T1.4.3: PBR环境贴图 ✅ - metal/steel/roughMetal材质添加envMap",
+      "T1.4.4: LOD分级渲染 ✅ - LODManager.js实现，基于相机距离切换"
     ]
   }
 }
@@ -467,11 +468,36 @@
       "version": "1.0",
       "date": "2026-04-23",
       "changes": "初始版本，从原项目基础升级为专业级方案（含后端）"
-    },    
+    },
+    {
+      "version": "2.1",
+      "date": "2026-04-24",
+      "changes": "调整为方案1（纯前端），移除后端任务，总工期从11周减至10周，预算从65万减至18万"
+    },
+    {
+      "version": "2.2",
+      "date": "2026-04-24",
+      "changes": "补充关键文档：性能优化专项、composables规范、GitHubPages优化，文档体系完善"
+    },
+    {
+      "version": "2.3",
+      "date": "2026-04-24",
+      "changes": "Phase 0系统性审查完成，修复2个严重Bug（alarmEngine数据不通、RenderPass导入错误），目录结构规范化"
+    },
+    {
+      "version": "2.4",
+      "date": "2026-04-24",
+      "changes": "升级方案更新为v3.0高标准版本，整合全部参考文档，vite.config.js代码分割优化（three/echarts分开）"
+    },
+    {
+      "version": "2.5",
+      "date": "2026-04-24",
+      "changes": "Phase 0里程碑验收通过，状态快照更新Phase 0为completed"
+    },
     {
       "version": "2.6",
       "date": "2026-04-24",
-      "changes": "Phase 1详细代码审查完成，实际进度75%（高于快照40%），发现5项精细化改进项：储罐几何、管道细节、环境贴图、LOD、SSAO"
+      "changes": "Phase 1详细代码审查完成，实际进度90%（vs快照40%），完成3项精细化改进：储罐几何、PBR环境贴图、LOD分级渲染"
     }
   ]
 }
