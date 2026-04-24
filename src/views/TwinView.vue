@@ -113,6 +113,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
+import * as THREE from 'three'
 import { usePlantStore } from '@/stores/plantStore'
 import { Plant3D } from '@/three/Plant3D'
 import { InteractionManager } from '@/three/InteractionManager'
@@ -236,7 +237,8 @@ function setupInteraction() {
   interactionManager = new InteractionManager(
     plant3D.camera,
     sceneContainer.value,
-    plant3D.scene
+    plant3D.scene,
+    plant3D.outlinePass
   )
 
   interactionManager.registerDevice('R-101', plant3D.equipment.reactor, {
@@ -285,7 +287,58 @@ function setupInteraction() {
     showDevicePanel.value = true
   }
 
+  interactionManager.onDeviceDoubleClick = (deviceId, deviceData, point) => {
+    focusCameraOnDevice(deviceId)
+  }
+
   interactionManager.init()
+}
+
+function focusCameraOnDevice(deviceId) {
+  if (!plant3D || !interactionManager) return
+
+  const deviceObject = interactionManager.getDeviceObject(deviceId)
+  if (!deviceObject) return
+
+  const box = new THREE.Box3().setFromObject(deviceObject)
+  const center = box.getCenter(new THREE.Vector3())
+  const size = box.getSize(new THREE.Vector3())
+  const maxDim = Math.max(size.x, size.y, size.z)
+
+  const distance = maxDim * 2.5
+  const direction = new THREE.Vector3()
+    .subVectors(plant3D.camera.position, center)
+    .normalize()
+
+  const targetPosition = center.clone().add(direction.multiplyScalar(distance))
+
+  animateCameraTo(targetPosition, center)
+}
+
+function animateCameraTo(targetPosition, targetLookAt) {
+  if (!plant3D || !plant3D.controls) return
+
+  const startPosition = plant3D.camera.position.clone()
+  const startTarget = plant3D.controls.target.clone()
+  const duration = 800
+  const startTime = Date.now()
+
+  function animate() {
+    const elapsed = Date.now() - startTime
+    const progress = Math.min(elapsed / duration, 1)
+
+    const easeProgress = 1 - Math.pow(1 - progress, 3)
+
+    plant3D.camera.position.lerpVectors(startPosition, targetPosition, easeProgress)
+    plant3D.controls.target.lerpVectors(startTarget, targetLookAt, easeProgress)
+    plant3D.controls.update()
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  animate()
 }
 
 onMounted(async () => {

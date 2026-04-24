@@ -3,6 +3,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js'
+import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js'
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js'
 
 import { POSITIONS, ANIMATION } from './constants.js'
 import { materials } from './materials.js'
@@ -116,6 +118,18 @@ export class Plant3D {
     this.ssaoPass.minDistance = 0.005
     this.ssaoPass.maxDistance = 0.1
     this.composer.addPass(this.ssaoPass)
+
+    this.outlinePass = new OutlinePass(width, height, this.scene, this.camera)
+    this.outlinePass.edgeStrength = 3.0
+    this.outlinePass.edgeGlow = 0.5
+    this.outlinePass.edgeThickness = 1.0
+    this.outlinePass.pulsePeriod = 0
+    this.outlinePass.visibleEdgeColor.set(0x00aaff)
+    this.outlinePass.hiddenEdgeColor.set(0x004488)
+    this.composer.addPass(this.outlinePass)
+
+    const outputPass = new OutputPass()
+    this.composer.addPass(outputPass)
   }
 
   createIndustrialPlant() {

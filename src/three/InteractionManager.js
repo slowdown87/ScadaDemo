@@ -1,39 +1,50 @@
 import * as THREE from 'three'
 
 export class InteractionManager {
-  constructor(camera, domElement, scene) {
+  constructor(camera, domElement, scene, outlinePass = null) {
     this.camera = camera
     this.domElement = domElement
     this.scene = scene
+    this.outlinePass = outlinePass
 
     this.raycaster = new THREE.Raycaster()
     this.mouse = new THREE.Vector2()
 
     this.selectedObject = null
     this.hoveredObject = null
-    this.highlightMaterial = null
 
     this.deviceRegistry = new Map()
 
     this.onDeviceClick = null
     this.onDeviceHover = null
     this.onDeviceLeave = null
+    this.onDeviceDoubleClick = null
 
     this._boundOnClick = this.onClick.bind(this)
+    this._boundOnDoubleClick = this.onDoubleClick.bind(this)
     this._boundOnMouseMove = this.onMouseMove.bind(this)
     this._boundOnTouchStart = this.onTouchStart.bind(this)
+
+    this.lastClickTime = 0
+    this.doubleClickDelay = 300
 
     this.enabled = true
   }
 
+  setOutlinePass(outlinePass) {
+    this.outlinePass = outlinePass
+  }
+
   init() {
     this.domElement.addEventListener('click', this._boundOnClick)
+    this.domElement.addEventListener('dblclick', this._boundOnDoubleClick)
     this.domElement.addEventListener('mousemove', this._boundOnMouseMove)
     this.domElement.addEventListener('touchstart', this._boundOnTouchStart, { passive: false })
   }
 
   dispose() {
     this.domElement.removeEventListener('click', this._boundOnClick)
+    this.domElement.removeEventListener('dblclick', this._boundOnDoubleClick)
     this.domElement.removeEventListener('mousemove', this._boundOnMouseMove)
     this.domElement.removeEventListener('touchstart', this._boundOnTouchStart)
     this.clearHighlight()
@@ -82,6 +93,12 @@ export class InteractionManager {
     if (!this.enabled) return
     this.updateMouse(event)
 
+    const now = Date.now()
+    const isDoubleClick = now - this.lastClickTime < this.doubleClickDelay
+    this.lastClickTime = now
+
+    if (isDoubleClick) return
+
     const hit = this.raycast()
     if (hit) {
       this.selectDevice(hit.deviceId)
@@ -90,6 +107,18 @@ export class InteractionManager {
       }
     } else {
       this.deselectDevice()
+    }
+  }
+
+  onDoubleClick(event) {
+    if (!this.enabled) return
+    this.updateMouse(event)
+
+    const hit = this.raycast()
+    if (hit) {
+      if (this.onDeviceDoubleClick) {
+        this.onDeviceDoubleClick(hit.deviceId, hit.object.userData.deviceData, hit.point)
+      }
     }
   }
 
@@ -109,6 +138,9 @@ export class InteractionManager {
       }
     } else {
       this.clearHover()
+      if (this.hoveredObject && this.onDeviceLeave) {
+        this.onDeviceLeave()
+      }
     }
   }
 
@@ -131,25 +163,40 @@ export class InteractionManager {
 
   setHoverHighlight(object) {
     if (!object || object === this.selectedObject) return
+    if (!this.outlinePass) return
 
-    const originalMaterial = object.userData.originalMaterial
-    if (!originalMaterial && object.material) {
-      object.userData.originalMaterial = object.material
-      object.material = object.material.clone()
-      object.material.emissive = new THREE.Color(0x00aaff)
-      object.material.emissiveIntensity = 0.3
-    }
+    const deviceObjects = this.getDeviceMeshes(object)
+    this.outlinePass.selectedObjects = deviceObjects
+    this.outlinePass.visibleEdgeColor.set(0x00aaff)
   }
 
   clearHover() {
     if (this.hoveredObject && this.hoveredObject !== this.selectedObject) {
-      const original = this.hoveredObject.userData.originalMaterial
-      if (original) {
-        this.hoveredObject.material = original
-        this.hoveredObject.userData.originalMaterial = null
-      }
       this.hoveredObject = null
+      if (this.outlinePass && !this.selectedObject) {
+        this.outlinePass.selectedObjects = []
+      }
     }
+  }
+
+  getDeviceMeshes(object) {
+    const meshes = []
+    const visited = new Set()
+
+    const collectMeshes = (obj) => {
+      if (visited.has(obj)) return
+      visited.add(obj)
+
+      if (obj.isMesh && obj.material) {
+        meshes.push(obj)
+      }
+      if (obj.children) {
+        obj.children.forEach(collectMeshes)
+      }
+    }
+
+    collectMeshes(object)
+    return meshes
   }
 
   selectDevice(deviceId) {
@@ -162,25 +209,16 @@ export class InteractionManager {
 
     this.selectedObject = device.object
 
-    const originalMaterial = device.object.userData.originalMaterial
-    if (!originalMaterial && device.object.material) {
-      device.object.userData.originalMaterial = device.object.material
-      device.object.material = device.object.material.clone()
-    }
-
-    if (device.object.material) {
-      device.object.material.emissive = new THREE.Color(0xffcc00)
-      device.object.material.emissiveIntensity = 0.5
+    if (this.outlinePass) {
+      const meshes = this.getDeviceMeshes(device.object)
+      this.outlinePass.selectedObjects = meshes
+      this.outlinePass.visibleEdgeColor.set(0xffcc00)
     }
 
     device.object.traverse((child) => {
-      if (child !== device.object && child.material) {
-        if (!child.userData.selectedOriginalMaterial) {
-          child.userData.selectedOriginalMaterial = child.material
-          child.material = child.material.clone()
-        }
-        child.material.emissive = new THREE.Color(0xffcc00)
-        child.material.emissiveIntensity = 0.3
+      if (child.isMesh && child !== device.object) {
+        child.userData.wasClickable = child.userData.clickable
+        child.userData.clickable = true
       }
     })
   }
@@ -192,28 +230,16 @@ export class InteractionManager {
 
   clearHighlight() {
     if (this.selectedObject) {
-      const device = this.deviceRegistry.get(this.selectedObject.userData.deviceId)
-      if (device) {
-        this.restoreMaterial(device.object)
-        device.object.traverse((child) => {
-          if (child !== device.object) {
-            const original = child.userData.selectedOriginalMaterial
-            if (original) {
-              child.material = original
-              child.userData.selectedOriginalMaterial = null
-            }
-          }
-        })
-      }
+      this.selectedObject.traverse((child) => {
+        if (child.isMesh) {
+          child.userData.clickable = child.userData.wasClickable
+        }
+      })
       this.selectedObject = null
     }
-  }
 
-  restoreMaterial(object) {
-    const original = object.userData.originalMaterial
-    if (original) {
-      object.material = original
-      object.userData.originalMaterial = null
+    if (this.outlinePass) {
+      this.outlinePass.selectedObjects = []
     }
   }
 

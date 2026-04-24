@@ -15,9 +15,22 @@
           </span>
         </div>
       </div>
-      <button class="ack-all-btn" @click="$emit('acknowledgeAll')" v-if="hasAlarms">
-        全部确认
-      </button>
+      <div class="header-actions">
+        <button class="sound-btn" @click="$emit('toggleSound')" :class="{ muted: !soundEnabled }">
+          <svg v-if="soundEnabled" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M3,9H7L12,4V20L7,15H3V9M16.5,12A4.5,4.5 0 0,1 12,16.5A4.5,4.5 0 0,1 7.5,12A4.5,4.5 0 0,1 12,7.5A4.5,4.5 0 0,1 16.5,12M16.5,15A1.5,1.5 0 0,1 15,13.5A1.5,1.5 0 0,1 16.5,12A1.5,1.5 0 0,1 18,13.5A1.5,1.5 0 0,1 16.5,15Z"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M12,4L9.91,6.09L12,8.18M4.27,3L3,4.27L7.73,9H3V15H7L12,20V13.27L16.25,17.53C15.58,18.04 14.83,18.45 14,18.7V20.77C15.38,20.45 16.63,19.81 17.68,18.95L19.73,21L21,19.73L12,10.73M19,12C19,12.94 18.8,13.87 18.46,14.73L19.97,16.24C20.62,14.91 21,13.5 21,12C21,7.72 18,4.14 14,3.23V5.29C16.89,6.15 19,8.83 19,12M16.5,12A4.5,4.5 0 0,1 12,16.5A4.5,4.5 0 0,1 7.5,12A4.5,4.5 0 0,1 12,7.5A4.5,4.5 0 0,1 16.5,12Z"/>
+          </svg>
+        </button>
+        <button class="export-btn" @click="$emit('exportHistory')" v-if="alarmHistory.length > 0">
+          导出
+        </button>
+        <button class="ack-all-btn" @click="$emit('acknowledgeAll')" v-if="hasAlarms">
+          全部确认
+        </button>
+      </div>
     </div>
 
     <div class="alarms-list" v-if="hasAlarms">
@@ -75,10 +88,11 @@ import { computed } from 'vue'
 
 const props = defineProps({
   alarms: { type: Array, default: () => [] },
-  alarmHistory: { type: Array, default: () => [] }
+  alarmHistory: { type: Array, default: () => [] },
+  soundEnabled: { type: Boolean, default: true }
 })
 
-defineEmits(['acknowledge', 'acknowledgeAll'])
+defineEmits(['acknowledge', 'acknowledgeAll', 'toggleSound', 'exportHistory'])
 
 const hasAlarms = computed(() => props.alarms.length > 0)
 
@@ -171,6 +185,54 @@ const recentHistory = computed(() =>
 
 .count-num {
   font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sound-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  color: #00aaff;
+  padding: 6px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sound-btn:hover {
+  background: rgba(0, 170, 255, 0.1);
+}
+
+.sound-btn.muted {
+  color: #5a6a8a;
+  border-color: rgba(90, 106, 138, 0.3);
+}
+
+.sound-btn.muted:hover {
+  background: rgba(90, 106, 138, 0.1);
+}
+
+.export-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  color: #00aaff;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.export-btn:hover {
+  background: rgba(0, 170, 255, 0.1);
 }
 
 .ack-all-btn {

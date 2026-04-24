@@ -13,6 +13,8 @@ export const useAlarmStore = defineStore('alarm', () => {
   const activeAlarms = ref([])
   const alarmHistory = ref([])
   const maxHistory = 100
+  const soundEnabled = ref(true)
+  const onAlarmCallback = ref(null)
 
   const unacknowledgedCount = computed(() =>
     activeAlarms.value.filter(a => !a.acknowledged).length
@@ -25,6 +27,14 @@ export const useAlarmStore = defineStore('alarm', () => {
   const hasWarning = computed(() =>
     activeAlarms.value.some(a => (a.level === 4 || a.level === 3) && !a.acknowledged)
   )
+
+  function setSoundEnabled(enabled) {
+    soundEnabled.value = enabled
+  }
+
+  function setOnAlarmCallback(callback) {
+    onAlarmCallback.value = callback
+  }
 
   function generateAlarmId() {
     return `ALM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
@@ -51,6 +61,13 @@ export const useAlarmStore = defineStore('alarm', () => {
       alarmHistory.value.pop()
     }
     alarmHistory.value.unshift({ ...newAlarm })
+
+    if (soundEnabled.value && onAlarmCallback.value) {
+      const levelConfig = ALARM_LEVELS[alarm.level]
+      if (levelConfig?.sound) {
+        onAlarmCallback.value(alarm.level)
+      }
+    }
 
     return newAlarm
   }
@@ -109,12 +126,30 @@ export const useAlarmStore = defineStore('alarm', () => {
     return activeAlarms.value.filter(a => !a.acknowledged)
   }
 
+  function exportHistory() {
+    return alarmHistory.value.map(alarm => ({
+      id: alarm.id,
+      deviceId: alarm.deviceId,
+      level: alarm.level,
+      levelName: ALARM_LEVELS[alarm.level]?.name || '未知',
+      code: alarm.code,
+      message: alarm.message,
+      value: alarm.value,
+      threshold: alarm.threshold,
+      timestamp: alarm.timestamp,
+      acknowledged: alarm.acknowledged,
+      acknowledgedBy: alarm.acknowledgedBy,
+      acknowledgedAt: alarm.acknowledgedAt
+    }))
+  }
+
   return {
     activeAlarms,
     alarmHistory,
     unacknowledgedCount,
     hasCritical,
     hasWarning,
+    soundEnabled,
     addAlarm,
     acknowledgeAlarm,
     acknowledgeAll,
@@ -122,6 +157,9 @@ export const useAlarmStore = defineStore('alarm', () => {
     clearAll,
     getAlarmByDevice,
     getUnacknowledgedAlarms,
+    setSoundEnabled,
+    setOnAlarmCallback,
+    exportHistory,
     ALARM_LEVELS
   }
 })

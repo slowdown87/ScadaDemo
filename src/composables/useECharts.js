@@ -2,7 +2,7 @@ import { ref, shallowRef, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 
 export function useECharts(containerRef, options = {}) {
-  const { renderer = 'canvas', autoresize = true } = options
+  const { renderer = 'canvas', autoresize = true, manualUpdate = true } = options
 
   const chartInstance = shallowRef(null)
   const isReady = ref(false)
@@ -19,12 +19,50 @@ export function useECharts(containerRef, options = {}) {
       height: autoresize ? undefined : containerRef.value.clientHeight
     })
 
+    if (manualUpdate) {
+      chartInstance.value.setOption({ series: [] })
+    }
+
     isReady.value = true
   }
 
   function setOption(option, notMerge = false) {
     if (!chartInstance.value) return
-    chartInstance.value.setOption(option, { notMerge })
+
+    if (manualUpdate) {
+      chartInstance.value.setOption(option, { notMerge: false, replaceMerge: ['series'] })
+    } else {
+      chartInstance.value.setOption(option, { notMerge })
+    }
+  }
+
+  function appendData(seriesIndex, data) {
+    if (!chartInstance.value) return
+
+    try {
+      chartInstance.value.appendData({
+        seriesIndex,
+        data
+      })
+    } catch (e) {
+      chartInstance.value.setOption({
+        series: [{ data }]
+      }, { notMerge: true })
+    }
+  }
+
+  function updateSeriesData(seriesIndex, newData) {
+    if (!chartInstance.value) return
+
+    try {
+      chartInstance.value.setOption({
+        series: [{
+          data: newData
+        }]
+      }, { notMerge: false, replaceMerge: ['series'] })
+    } catch (e) {
+      console.warn('[useECharts] updateSeriesData failed:', e)
+    }
   }
 
   function resize() {
@@ -58,6 +96,8 @@ export function useECharts(containerRef, options = {}) {
     chartInstance,
     isReady,
     setOption,
+    appendData,
+    updateSeriesData,
     resize,
     dispose
   }

@@ -121,8 +121,9 @@ const controlValues = ref({
   valve: 0
 })
 
-const { chartInstance, setOption, resize } = useECharts(chartContainer, {
-  autoresize: true
+const { chartInstance, setOption, appendData, updateSeriesData, resize } = useECharts(chartContainer, {
+  autoresize: true,
+  manualUpdate: true
 })
 
 const deviceConfig = {
@@ -289,39 +290,43 @@ function updateChartData() {
 
   const history = props.device.history || []
 
-  setOption({
-    grid: { top: 10, right: 10, bottom: 20, left: 40 },
-    xAxis: {
-      type: 'category',
-      data: history.map((_, i) => i.toString()),
-      axisLine: { lineStyle: { color: '#2a3a5a' } },
-      axisLabel: { color: '#5a7a9a', fontSize: 10 },
-      show: false
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: '#1a2a4a', type: 'dashed' } },
-      axisLabel: { color: '#5a7a9a', fontSize: 10 }
-    },
-    series: [{
-      data: history,
-      type: 'line',
-      smooth: true,
-      symbol: 'none',
-      lineStyle: { color: '#00aaff', width: 2 },
-      areaStyle: {
-        color: {
-          type: 'linear',
-          x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(0, 170, 255, 0.3)' },
-            { offset: 1, color: 'rgba(0, 170, 255, 0.05)' }
-          ]
+  if (history.length <= 1) {
+    setOption({
+      grid: { top: 10, right: 10, bottom: 20, left: 40 },
+      xAxis: {
+        type: 'category',
+        data: history.map((_, i) => i.toString()),
+        axisLine: { lineStyle: { color: '#2a3a5a' } },
+        axisLabel: { color: '#5a7a9a', fontSize: 10 },
+        show: false
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: { show: false },
+        splitLine: { lineStyle: { color: '#1a2a4a', type: 'dashed' } },
+        axisLabel: { color: '#5a7a9a', fontSize: 10 }
+      },
+      series: [{
+        data: history,
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { color: '#00aaff', width: 2 },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(0, 170, 255, 0.3)' },
+              { offset: 1, color: 'rgba(0, 170, 255, 0.05)' }
+            ]
+          }
         }
-      }
-    }]
-  })
+      }]
+    })
+  } else {
+    updateSeriesData(0, history)
+  }
 }
 
 watch(() => props.device?.data, () => {
