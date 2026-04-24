@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, onUnmounted } from 'vue'
 import { plantSimulator } from '@/mock/plantMock'
+import { getAlarmEngine } from '@/alarmEngine'
 
 export const usePlantStore = defineStore('plant', () => {
   const running = ref(false)
@@ -43,6 +44,7 @@ export const usePlantStore = defineStore('plant', () => {
 
   let timeInterval = null
   let initialized = false
+  let alarmEngineInitialized = false
 
   function syncFromSimulator(state) {
     running.value = state.running
@@ -66,6 +68,18 @@ export const usePlantStore = defineStore('plant', () => {
 
   function handleUpdate(type, data, state) {
     syncFromSimulator(state)
+    syncAlarms()
+  }
+
+  let alarmEngine = null
+
+  function syncAlarms() {
+    if (!alarmEngine) {
+      alarmEngine = getAlarmEngine()
+    }
+    const engineAlarms = alarmEngine.getActiveAlarms()
+    alarms.value = engineAlarms
+    alarmHistory.value = alarmEngine.getAlarmHistory()
   }
 
   function initStore() {
@@ -83,6 +97,12 @@ export const usePlantStore = defineStore('plant', () => {
       systemDate.value = state.systemDate
     }, 1000)
 
+    if (!alarmEngineInitialized) {
+      alarmEngine = getAlarmEngine()
+      alarmEngine.init()
+      alarmEngineInitialized = true
+    }
+
     initialized = true
   }
 
@@ -90,6 +110,7 @@ export const usePlantStore = defineStore('plant', () => {
     plantSimulator.start()
     const state = plantSimulator.getState()
     syncFromSimulator(state)
+    alarmEngine.init()
   }
 
   function stop() {
@@ -108,18 +129,20 @@ export const usePlantStore = defineStore('plant', () => {
     plantSimulator.reset()
     const state = plantSimulator.getState()
     syncFromSimulator(state)
+    alarmEngine.dispose()
+    alarms.value = []
+    alarmHistory.value = []
+    alarmEngineInitialized = false
   }
 
   function acknowledgeAlarm(alarmId) {
-    plantSimulator.acknowledgeAlarm(alarmId)
-    const state = plantSimulator.getState()
-    syncFromSimulator(state)
+    alarmEngine.acknowledgeAlarm(alarmId)
+    syncAlarms()
   }
 
   function acknowledgeAll() {
-    plantSimulator.acknowledgeAll()
-    const state = plantSimulator.getState()
-    syncFromSimulator(state)
+    alarmEngine.acknowledgeAll()
+    syncAlarms()
   }
 
   function cleanup() {
@@ -129,7 +152,9 @@ export const usePlantStore = defineStore('plant', () => {
     }
     plantSimulator.removeListener(handleUpdate)
     plantSimulator.stopTimers()
+    alarmEngine.dispose()
     initialized = false
+    alarmEngineInitialized = false
   }
 
   return {

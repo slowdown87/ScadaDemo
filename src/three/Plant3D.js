@@ -1,5 +1,21 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
+
+import { POSITIONS, ANIMATION } from './constants.js'
+import { materials } from './materials.js'
+import { geometries } from './geometries.js'
+import { setupLights, updateLightShadow, disposeLights } from './lighting/Lights.js'
+import { createGround } from './environment/Ground.js'
+import { createReactor } from './equipment/Reactor.js'
+import { createTanks } from './equipment/Tank.js'
+import { createPipeNetwork } from './equipment/PipeNetwork.js'
+import { createConveyor } from './equipment/Conveyor.js'
+import { createPlatforms, createSupportStructures } from './equipment/Structure.js'
+import { createInstrumentPanel } from './equipment/Instrument.js'
+import { createWorkers } from './equipment/Workers.js'
+import { createFlowParticles, createDustParticles, updateParticles, updateFlowParticles } from './equipment/Particles.js'
 
 export class Plant3D {
   constructor(container) {
@@ -8,9 +24,13 @@ export class Plant3D {
     this.camera = null
     this.renderer = null
     this.controls = null
+    this.composer = null
+    this.lights = null
+
     this.equipment = {}
+    this.particles = {}
     this.animationId = null
-    this.isRunning = false
+
     this.data = {
       tankLevel: 50,
       flowRate: 0,
@@ -19,6 +39,10 @@ export class Plant3D {
       motorSpeed: 0,
       productCount: 0
     }
+
+    this.needsRender = true
+    this.needsShadowUpdate = false
+    this.isRunning = false
   }
 
   init() {
@@ -26,452 +50,338 @@ export class Plant3D {
     this.setupCamera()
     this.setupRenderer()
     this.setupControls()
-    this.setupLights()
-    this.createFactory()
+    this.lights = setupLights(this.scene, {
+      shadowMapSize: 2048,
+      shadowAutoUpdate: false
+    })
+    this.setupPostProcessing()
+
+    this.createIndustrialPlant()
+    this.createParticles()
     this.animate()
+
+    return this
   }
 
   setupScene() {
     this.scene = new THREE.Scene()
-    this.scene.background = new THREE.Color(0x0a0e17)
-    this.scene.fog = new THREE.Fog(0x0a0e17, 50, 150)
+    this.scene.background = new THREE.Color(0x8090a0)
+    this.scene.fog = new THREE.FogExp2(0x8090a0, 0.004)
   }
 
   setupCamera() {
     const aspect = this.container.clientWidth / this.container.clientHeight
-    this.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000)
-    this.camera.position.set(30, 25, 40)
-    this.camera.lookAt(0, 0, 0)
+    this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 500)
+    this.camera.position.set(50, 40, 60)
+    this.camera.lookAt(0, 8, 0)
   }
 
   setupRenderer() {
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true
+      powerPreference: 'high-performance'
     })
     this.renderer.setSize(this.container.clientWidth, this.container.clientHeight)
-    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    this.renderer.shadowMap.autoUpdate = false
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    this.renderer.toneMappingExposure = 1.2
     this.container.appendChild(this.renderer.domElement)
   }
 
   setupControls() {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.enableDamping = true
-    this.controls.dampingFactor = 0.05
-    this.controls.maxDistance = 100
-    this.controls.minDistance = 15
+    this.controls.dampingFactor = 0.03
+    this.controls.maxDistance = 120
+    this.controls.minDistance = 20
     this.controls.maxPolarAngle = Math.PI / 2.1
+    this.controls.target.set(0, 8, 0)
   }
 
-  setupLights() {
-    const ambientLight = new THREE.AmbientLight(0x404060, 0.5)
-    this.scene.add(ambientLight)
-
-    const mainLight = new THREE.DirectionalLight(0x00aaff, 1)
-    mainLight.position.set(20, 30, 20)
-    mainLight.castShadow = true
-    mainLight.shadow.mapSize.width = 2048
-    mainLight.shadow.mapSize.height = 2048
-    this.scene.add(mainLight)
-
-    const fillLight = new THREE.DirectionalLight(0x00ffee, 0.3)
-    fillLight.position.set(-10, 10, -10)
-    this.scene.add(fillLight)
-
-    const pointLight1 = new THREE.PointLight(0x00aaff, 0.5, 50)
-    pointLight1.position.set(0, 15, 0)
-    this.scene.add(pointLight1)
-
-    const pointLight2 = new THREE.PointLight(0xff4757, 0.3, 30)
-    pointLight2.position.set(-15, 5, 10)
-    this.scene.add(pointLight2)
+  setupPostProcessing() {
+    this.composer = new EffectComposer(this.renderer)
+    const renderPass = new RenderPass(this.scene, this.camera)
+    this.composer.addPass(renderPass)
   }
 
-  createFactory() {
-    this.createFloor()
-    this.createReactor()
-    this.createTanks()
-    this.createPipes()
-    this.createConveyor()
-    this.createGrid()
+  createIndustrialPlant() {
+    createGround(this.scene)
+
+    const reactor = createReactor(this.scene)
+    this.equipment.reactor = reactor.group
+    this.equipment.stirrer = reactor.stirrer
+    this.equipment.reactorIndicator = reactor.indicator
+
+    const tanks = createTanks(this.scene)
+    this.equipment.tanks = tanks.group
+    this.equipment.tankLevel1 = tanks.tanks[0].children.find(
+      c => c.type === 'Mesh' && c.geometry.type === 'CylinderGeometry'
+    )
+
+    const pipes = createPipeNetwork(this.scene)
+    this.equipment.pipes = pipes.group
+    this.equipment.valve1 = pipes.valves[0]?.group
+    this.equipment.valve2 = pipes.valves[1]?.group
+    this.equipment.valve3 = pipes.valves[2]?.group
+    this.equipment.valve4 = pipes.valves[3]?.group
+
+    const conveyor = createConveyor(this.scene)
+    this.equipment.conveyor = conveyor.group
+    this.equipment.rollerStart = conveyor.rollerStart
+    this.equipment.rollerEnd = conveyor.rollerEnd
+    this.equipment.conveyorProducts = conveyor.products
+
+    const platforms = createPlatforms(this.scene)
+    this.equipment.platforms = platforms
+
+    const structures = createSupportStructures(this.scene)
+    this.equipment.structures = structures
+
+    const instrument = createInstrumentPanel(this.scene)
+    this.equipment.instruments = instrument
+
+    const workers = createWorkers(this.scene)
+    this.equipment.workers = workers.workers
   }
 
-  createFloor() {
-    const floorGeometry = new THREE.PlaneGeometry(100, 100)
-    const floorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x121826,
-      roughness: 0.8,
-      metalness: 0.2
-    })
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial)
-    floor.rotation.x = -Math.PI / 2
-    floor.position.y = 0
-    floor.receiveShadow = true
-    this.scene.add(floor)
+  createParticles() {
+    this.equipment.flowParticles = createFlowParticles(this.scene)
+    this.particles.dust = createDustParticles(this.scene)
   }
 
-  createGrid() {
-    const gridHelper = new THREE.GridHelper(100, 50, 0x00aaff, 0x1a2535)
-    gridHelper.position.y = 0.01
-    this.scene.add(gridHelper)
-  }
+  animate() {
+    this.isRunning = true
+    this.animationId = requestAnimationFrame(() => this.animate())
 
-  createReactor() {
-    const reactorGroup = new THREE.Group()
-    reactorGroup.position.set(0, 0, 0)
-
-    const bodyGeometry = new THREE.CylinderGeometry(6, 6, 12, 32)
-    const bodyMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3a4f6f,
-      roughness: 0.3,
-      metalness: 0.7
-    })
-    const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-    body.position.y = 6
-    body.castShadow = true
-    reactorGroup.add(body)
-
-    const topGeometry = new THREE.SphereGeometry(6, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
-    const top = new THREE.Mesh(topGeometry, bodyMaterial)
-    top.position.y = 12
-    top.castShadow = true
-    reactorGroup.add(top)
-
-    const bottomGeometry = new THREE.SphereGeometry(6, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2)
-    const bottom = new THREE.Mesh(bottomGeometry, bodyMaterial)
-    bottom.position.y = 0
-    bottom.castShadow = true
-    reactorGroup.add(bottom)
-
-    const rimGeometry = new THREE.TorusGeometry(6, 0.3, 16, 32)
-    const rimMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00aaff,
-      emissive: 0x00aaff,
-      emissiveIntensity: 0.3
-    })
-    const rim = new THREE.Mesh(rimGeometry, rimMaterial)
-    rim.position.y = 12
-    rim.rotation.x = Math.PI / 2
-    reactorGroup.add(rim)
-
-    const stirrerGroup = new THREE.Group()
-    stirrerGroup.position.y = 10
-    this.equipment.stirrer = stirrerGroup
-    reactorGroup.add(stirrerGroup)
-
-    const bladeGeometry = new THREE.BoxGeometry(8, 0.3, 1)
-    const bladeMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00ffee,
-      emissive: 0x00ffee,
-      emissiveIntensity: 0.5
-    })
-    const blade1 = new THREE.Mesh(bladeGeometry, bladeMaterial)
-    stirrerGroup.add(blade1)
-
-    const blade2 = new THREE.Mesh(bladeGeometry, bladeMaterial)
-    blade2.rotation.y = Math.PI / 2
-    stirrerGroup.add(blade2)
-
-    const indicatorGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
-    const indicatorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x36d399,
-      emissive: 0x36d399,
-      emissiveIntensity: 0.8
-    })
-    const indicator = new THREE.Mesh(indicatorGeometry, indicatorMaterial)
-    indicator.position.set(7, 8, 0)
-    reactorGroup.add(indicator)
-    this.equipment.reactorIndicator = indicator
-
-    this.scene.add(reactorGroup)
-    this.equipment.reactor = reactorGroup
-  }
-
-  createTanks() {
-    const tankGroup = new THREE.Group()
-    tankGroup.position.set(-20, 0, 0)
-
-    const tankGeometry = new THREE.CylinderGeometry(4, 4, 10, 32)
-    const tankMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2a3f5f,
-      roughness: 0.3,
-      metalness: 0.6
-    })
-
-    const tank1 = new THREE.Mesh(tankGeometry, tankMaterial)
-    tank1.position.set(0, 5, 0)
-    tank1.castShadow = true
-    tankGroup.add(tank1)
-
-    const tank2 = new THREE.Mesh(tankGeometry, tankMaterial.clone())
-    tank2.position.set(15, 5, 0)
-    tank2.castShadow = true
-    tankGroup.add(tank2)
-
-    const tank3 = new THREE.Mesh(tankGeometry.clone(), tankMaterial.clone())
-    tank3.position.set(30, 5, 0)
-    tank3.castShadow = true
-    tankGroup.add(tank3)
-
-    const capGeometry = new THREE.SphereGeometry(4, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2)
-    const capMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3a4f6f,
-      roughness: 0.3,
-      metalness: 0.7
-    })
-
-    const cap1 = new THREE.Mesh(capGeometry, capMaterial)
-    cap1.position.set(0, 10, 0)
-    tankGroup.add(cap1)
-
-    const cap2 = new THREE.Mesh(capGeometry.clone(), capMaterial.clone())
-    cap2.position.set(15, 10, 0)
-    tankGroup.add(cap2)
-
-    const cap3 = new THREE.Mesh(capGeometry.clone(), capMaterial.clone())
-    cap3.position.set(30, 10, 0)
-    tankGroup.add(cap3)
-
-    const levelGeometry = new THREE.CylinderGeometry(3.5, 3.5, 6, 32, 1, true)
-    const levelMaterial = new THREE.MeshStandardMaterial({
-      color: 0x00aaff,
-      transparent: true,
-      opacity: 0.4,
-      side: THREE.DoubleSide
-    })
-    const level1 = new THREE.Mesh(levelGeometry, levelMaterial)
-    level1.position.set(0, 4, 0)
-    tankGroup.add(level1)
-    this.equipment.tankLevel1 = level1
-
-    const level2 = new THREE.Mesh(levelGeometry.clone(), levelMaterial.clone())
-    level2.position.set(15, 4, 0)
-    tankGroup.add(level2)
-    this.equipment.tankLevel2 = level2
-
-    const level3 = new THREE.Mesh(levelGeometry.clone(), levelMaterial.clone())
-    level3.position.set(30, 4, 0)
-    tankGroup.add(level3)
-    this.equipment.tankLevel3 = level3
-
-    this.scene.add(tankGroup)
-    this.equipment.tanks = tankGroup
-  }
-
-  createPipes() {
-    const pipeGroup = new THREE.Group()
-
-    const pipeMaterial = new THREE.MeshStandardMaterial({
-      color: 0x4a5568,
-      roughness: 0.4,
-      metalness: 0.6
-    })
-
-    const pipeGeometry = new THREE.CylinderGeometry(0.3, 0.3, 15, 16)
-    const pipe1 = new THREE.Mesh(pipeGeometry, pipeMaterial)
-    pipe1.rotation.z = Math.PI / 2
-    pipe1.position.set(-10, 8, 0)
-    pipeGroup.add(pipe1)
-
-    const pipe2 = new THREE.Mesh(pipeGeometry.clone(), pipeMaterial.clone())
-    pipe2.rotation.z = Math.PI / 2
-    pipe2.position.set(7.5, 8, 0)
-    pipeGroup.add(pipe2)
-
-    const pipe3 = new THREE.Mesh(pipeGeometry.clone(), pipeMaterial.clone())
-    pipe3.rotation.z = Math.PI / 2
-    pipe3.position.set(22.5, 8, 0)
-    pipeGroup.add(pipe3)
-
-    const verticalPipeGeometry = new THREE.CylinderGeometry(0.3, 0.3, 6, 16)
-    const verticalPipe1 = new THREE.Mesh(verticalPipeGeometry, pipeMaterial.clone())
-    verticalPipe1.position.set(-10, 2, 0)
-    pipeGroup.add(verticalPipe1)
-
-    const verticalPipe2 = new THREE.Mesh(verticalPipeGeometry.clone(), pipeMaterial.clone())
-    verticalPipe2.position.set(7.5, 2, 0)
-    pipeGroup.add(verticalPipe2)
-
-    const verticalPipe3 = new THREE.Mesh(verticalPipeGeometry.clone(), pipeMaterial.clone())
-    verticalPipe3.position.set(22.5, 2, 0)
-    pipeGroup.add(verticalPipe3)
-
-    const valveGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5)
-    const valveMaterial = new THREE.MeshStandardMaterial({
-      color: 0xf39c12,
-      emissive: 0xf39c12,
-      emissiveIntensity: 0.3
-    })
-
-    const valve1 = new THREE.Mesh(valveGeometry, valveMaterial)
-    valve1.position.set(-10, 5, 0)
-    pipeGroup.add(valve1)
-    this.equipment.valve1 = valve1
-
-    const valve2 = new THREE.Mesh(valveGeometry.clone(), valveMaterial.clone())
-    valve2.position.set(7.5, 5, 0)
-    pipeGroup.add(valve2)
-    this.equipment.valve2 = valve2
-
-    const valve3 = new THREE.Mesh(valveGeometry.clone(), valveMaterial.clone())
-    valve3.position.set(22.5, 5, 0)
-    pipeGroup.add(valve3)
-    this.equipment.valve3 = valve3
-
-    this.scene.add(pipeGroup)
-    this.equipment.pipes = pipeGroup
-  }
-
-  createConveyor() {
-    const conveyorGroup = new THREE.Group()
-    conveyorGroup.position.set(15, 0, 15)
-
-    const beltGeometry = new THREE.BoxGeometry(20, 0.5, 3)
-    const beltMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1a2535,
-      roughness: 0.9
-    })
-    const belt = new THREE.Mesh(beltGeometry, beltMaterial)
-    belt.position.y = 2
-    conveyorGroup.add(belt)
-
-    const legGeometry = new THREE.BoxGeometry(0.5, 2, 0.5)
-    const legMaterial = new THREE.MeshStandardMaterial({
-      color: 0x4a5568
-    })
-
-    const positions = [[-9, 1, 0], [9, 1, 0], [-9, 1, 2], [9, 1, 2]]
-    positions.forEach(pos => {
-      const leg = new THREE.Mesh(legGeometry, legMaterial)
-      leg.position.set(...pos)
-      conveyorGroup.add(leg)
-    })
-
-    const rollerGeometry = new THREE.CylinderGeometry(0.4, 0.4, 3, 16)
-    const rollerMaterial = new THREE.MeshStandardMaterial({
-      color: 0x3a4f6f,
-      metalness: 0.8
-    })
-
-    for (let i = -8; i <= 8; i += 2) {
-      const roller = new THREE.Mesh(rollerGeometry, rollerMaterial)
-      roller.rotation.x = Math.PI / 2
-      roller.position.set(i, 2.5, 0)
-      conveyorGroup.add(roller)
-      if (i === -8 || i === 8) {
-        this.equipment[`roller${i === -8 ? 'Start' : 'End'}`] = roller
-      }
+    if (!this.needsRender) {
+      return
     }
 
-    const productGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5)
-    const productMaterial = new THREE.MeshStandardMaterial({
-      color: 0x36d399,
-      emissive: 0x36d399,
-      emissiveIntensity: 0.3
-    })
-    const product = new THREE.Mesh(productGeometry, productMaterial)
-    product.position.set(-8, 4, 0)
-    product.castShadow = true
-    conveyorGroup.add(product)
-    this.equipment.product = product
+    this.controls.update()
 
-    this.scene.add(conveyorGroup)
-    this.equipment.conveyor = conveyorGroup
+    if (this.needsShadowUpdate) {
+      this.renderer.shadowMap.update()
+      this.needsShadowUpdate = false
+    }
+
+    this.composer.render()
+    this.needsRender = false
+
+    const time = Date.now() * 0.001
+    this.updateAnimations(time)
+  }
+
+  updateAnimations(time) {
+    if (this.equipment.stirrer && this.data.motorSpeed > 0) {
+      const speed = this.data.motorSpeed / ANIMATION.stirrer.maxSpeedRatio
+      this.equipment.stirrer.rotation.y += ANIMATION.stirrer.baseSpeed * speed
+      this.needsRender = true
+    }
+
+    if (this.equipment.rollerStart && this.data.motorSpeed > 0) {
+      const speed = this.data.motorSpeed / ANIMATION.roller.maxSpeedRatio
+      this.equipment.rollerStart.rotation.z += ANIMATION.roller.baseSpeed * speed
+      this.equipment.rollerEnd.rotation.z += ANIMATION.roller.baseSpeed * speed
+      this.needsRender = true
+    }
+
+    if (this.equipment.conveyorProducts && this.data.motorSpeed > 0) {
+      const speed = this.data.motorSpeed / ANIMATION.conveyor.maxSpeedRatio
+      this.equipment.conveyorProducts.forEach(product => {
+        product.position.x += ANIMATION.conveyor.baseSpeed * speed
+        if (product.position.x > ANIMATION.conveyor.productResetX) {
+          product.position.x = ANIMATION.conveyor.productStartX
+        }
+      })
+      this.needsRender = true
+    }
+
+    if (this.equipment.workers) {
+      const workerCount = this.equipment.workers.length
+      this.equipment.workers.forEach((worker, index) => {
+        const offset = index * Math.PI * 2 / workerCount
+        const radius = ANIMATION.worker.speed * 25
+        worker.position.x = Math.cos(time * ANIMATION.worker.speed + offset) * radius + 10
+        worker.position.z = Math.sin(time * ANIMATION.worker.speed + offset) * radius
+        worker.rotation.y = time * ANIMATION.worker.rotationSpeed + offset
+      })
+      this.needsRender = true
+    }
+
+    if (this.equipment.flowParticles) {
+      updateFlowParticles(this.equipment.flowParticles, this.data.flowRate)
+      this.needsRender = true
+    }
+
+    if (this.particles.dust) {
+      updateParticles(this.particles.dust, this.data)
+      this.needsRender = true
+    }
   }
 
   updateData(data) {
+    const oldData = { ...this.data }
     this.data = { ...this.data, ...data }
     this.updateVisuals()
+
+    if (this.data.motorSpeed !== oldData.motorSpeed && this.data.motorSpeed > 0) {
+      this.needsRender = true
+    }
   }
 
   updateVisuals() {
     if (this.equipment.tankLevel1) {
-      const levelScale = this.data.tankLevel / 100
+      const levelScale = Math.max(0.1, this.data.tankLevel / 100)
       this.equipment.tankLevel1.scale.y = levelScale
-      this.equipment.tankLevel1.position.y = 1 + 6 * levelScale / 2
+      this.equipment.tankLevel1.position.y = 1 + 7.2 * levelScale / 2
     }
 
     if (this.equipment.reactorIndicator) {
       const temp = this.data.reactorTemp
       let color = 0x36d399
       let intensity = 0.8
+
       if (temp > 80) {
         color = 0xff4757
         intensity = 1.5
       } else if (temp > 60) {
         color = 0xff9f43
+        intensity = 1.2
+      } else if (temp > 40) {
+        color = 0xffdd00
         intensity = 1
       }
+
       this.equipment.reactorIndicator.material.color.setHex(color)
       this.equipment.reactorIndicator.material.emissive.setHex(color)
       this.equipment.reactorIndicator.material.emissiveIntensity = intensity
+      this.needsRender = true
     }
 
     if (this.equipment.valve1) {
       const isOpen = this.data.flowRate > 0
-      this.equipment.valve1.material.emissiveIntensity = isOpen ? 0.8 : 0.2
-      this.equipment.valve2.material.emissiveIntensity = isOpen ? 0.8 : 0.2
-      this.equipment.valve3.material.emissiveIntensity = isOpen ? 0.8 : 0.2
+      const valveIntensity = isOpen ? 1 : 0.2
+      for (let i = 1; i <= 4; i++) {
+        const valve = this.equipment[`valve${i}`]
+        if (valve && valve.children[0]) {
+          valve.children[0].material.emissiveIntensity = valveIntensity
+        }
+      }
+      this.needsRender = true
     }
-
-    if (this.equipment.product && this.data.motorSpeed > 0) {
-      const pos = this.equipment.product.position.x
-      const newPos = pos > 8 ? -8 : pos + 0.02
-      this.equipment.product.position.x = newPos
-    }
-  }
-
-  animate() {
-    this.animationId = requestAnimationFrame(() => this.animate())
-
-    if (this.equipment.stirrer && this.data.motorSpeed > 0) {
-      this.equipment.stirrer.rotation.y += 0.05 * (this.data.motorSpeed / 1500)
-    }
-
-    if (this.equipment.rollerStart && this.data.motorSpeed > 0) {
-      this.equipment.rollerStart.rotation.z += 0.1 * (this.data.motorSpeed / 1500)
-      this.equipment.rollerEnd.rotation.z += 0.1 * (this.data.motorSpeed / 1500)
-    }
-
-    this.controls.update()
-    this.renderer.render(this.scene, this.camera)
   }
 
   setCameraView(view) {
-    const views = {
-      front: { pos: [0, 15, 50], target: [0, 5, 0] },
-      top: { pos: [0, 60, 0.1], target: [0, 0, 0] },
-      side: { pos: [50, 15, 0], target: [0, 5, 0] },
-      iso: { pos: [30, 25, 40], target: [0, 5, 0] }
-    }
-
-    if (views[view]) {
-      const { pos, target } = views[view]
+    const viewConfigs = POSITIONS.camera.views
+    if (viewConfigs[view]) {
+      const { pos, target } = viewConfigs[view]
       this.camera.position.set(...pos)
       this.controls.target.set(...target)
       this.controls.update()
+      this.needsRender = true
+      this.needsShadowUpdate = true
     }
   }
 
   resize() {
     if (!this.container) return
+
     const width = this.container.clientWidth
     const height = this.container.clientHeight
+
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)
+    this.composer.setSize(width, height)
+
+    this.needsRender = true
+    this.needsShadowUpdate = true
   }
 
   dispose() {
+    this.isRunning = false
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId)
+      this.animationId = null
     }
+
+    if (this.controls) {
+      this.controls.dispose()
+      this.controls = null
+    }
+
+    if (this.lights) {
+      disposeLights(this.lights)
+      this.lights = null
+    }
+
+    if (this.composer) {
+      this.composer.dispose()
+      this.composer = null
+    }
+
     if (this.renderer) {
       this.renderer.dispose()
-      this.container.removeChild(this.renderer.domElement)
+      this.renderer.forceContextLoss()
+      if (this.container && this.renderer.domElement) {
+        this.container.removeChild(this.renderer.domElement)
+      }
+      this.renderer = null
     }
+
+    if (this.scene) {
+      this.disposeSceneObjects()
+      this.scene.clear()
+      this.scene = null
+    }
+
+    materials.dispose()
+    geometries.dispose()
+
+    this.equipment = {}
+    this.particles = {}
+  }
+
+  disposeSceneObjects() {
+    const disposeObject = (obj) => {
+      if (obj instanceof THREE.Mesh) {
+        if (obj.geometry) {
+          obj.geometry.dispose()
+        }
+        if (obj.material) {
+          if (Array.isArray(obj.material)) {
+            obj.material.forEach(m => m.dispose())
+          } else {
+            obj.material.dispose()
+          }
+        }
+      }
+    }
+
+    const traverseAndDispose = (obj) => {
+      if (obj.userData && obj.userData.dispose) {
+        obj.userData.dispose()
+      }
+
+      if (obj.traverse) {
+        obj.traverse(disposeObject)
+      } else if (obj.children) {
+        obj.children.forEach(child => {
+          disposeObject(child)
+          if (child.dispose) child.dispose()
+        })
+      }
+
+      if (obj.dispose) {
+        obj.dispose()
+      }
+    }
+
+    traverseAndDispose(this.scene)
   }
 }
 

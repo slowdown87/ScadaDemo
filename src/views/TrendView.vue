@@ -1,21 +1,30 @@
 <template>
-  <div class="trend-view">
-    <div class="view-header">
-      <h2>◆ 温度历史趋势</h2>
-      <div class="header-info">
-        <span class="info-item">实时数据 | 更新间隔: 2s</span>
+  <div class="trend-container">
+    <SideNav />
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="header-left">
+          <h1 class="page-title">◆ 趋势分析</h1>
+          <span class="page-subtitle">温度历史趋势</span>
+        </div>
+        <div class="header-right">
+          <div class="system-info">
+            <span class="info-item">实时数据 | 更新间隔: 2s</span>
+          </div>
+        </div>
+      </header>
+      <div class="chart-container">
+        <div ref="chartRef" class="chart"></div>
       </div>
-    </div>
-    <div class="chart-container">
-      <div ref="chartRef" class="chart"></div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 import { usePlcStore } from '@/stores/plcStore'
+import SideNav from '@/components/SideNav.vue'
 
 const store = usePlcStore()
 const chartRef = ref(null)
@@ -193,35 +202,64 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.trend-view {
-  height: 100%;
+.trend-container {
   display: flex;
-  flex-direction: column;
-  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
 }
 
-.view-header {
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: auto;
+}
+
+.top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(0, 170, 255, 0.3);
 }
 
-.view-header h2 {
-  color: var(--color-primary);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
-  margin: 0;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.header-info {
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  letter-spacing: 1px;
+}
+
+.header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+}
+
+.system-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 15px;
+  background: rgba(26, 34, 53, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 170, 255, 0.2);
 }
 
 .info-item {

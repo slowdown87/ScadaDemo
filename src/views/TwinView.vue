@@ -27,6 +27,12 @@
             <div class="loader"></div>
             <span>加载3D场景...</span>
           </div>
+          <DevicePanel
+            :visible="showDevicePanel"
+            :device="selectedDevice"
+            @close="closeDevicePanel"
+            @control="handleDeviceControl"
+          />
         </div>
 
         <div class="data-sidebar">
@@ -79,6 +85,14 @@
             </div>
           </div>
 
+          <AlarmPanel
+            v-if="hasAlarms || alarmHistory.length > 0"
+            :alarms="alarms"
+            :alarm-history="alarmHistory"
+            @acknowledge="handleAcknowledge"
+            @acknowledge-all="handleAcknowledgeAll"
+          />
+
           <div class="info-panel">
             <div class="panel-header">
               <span>◆ 操作提示</span>
@@ -88,6 +102,7 @@
               <li>鼠标右键：平移视角</li>
               <li>滚轮：缩放</li>
               <li>点击右上角按钮：切换视角</li>
+              <li class="tip-highlight">点击设备：查看详情</li>
             </ul>
           </div>
         </div>
@@ -100,6 +115,9 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { usePlantStore } from '@/stores/plantStore'
 import { Plant3D } from '@/three/Plant3D'
+import { InteractionManager } from '@/three/InteractionManager'
+import DevicePanel from '@/components/DevicePanel.vue'
+import AlarmPanel from '@/components/AlarmPanel.vue'
 import SideNav from '@/components/SideNav.vue'
 
 const store = usePlantStore()
@@ -107,7 +125,11 @@ const sceneContainer = ref(null)
 const loading = ref(true)
 const currentView = ref('iso')
 
+const showDevicePanel = ref(false)
+const selectedDevice = ref(null)
+
 let plant3D = null
+let interactionManager = null
 let dataUpdateInterval = null
 
 const viewOptions = [
@@ -124,6 +146,9 @@ const reactorTemp = computed(() => store.reactorTemp.toFixed(1))
 const reactorPressure = computed(() => store.reactorPressure.toFixed(2))
 const motorSpeed = computed(() => store.motorSpeed)
 const productCount = computed(() => store.productCount)
+const alarms = computed(() => store.alarms)
+const alarmHistory = computed(() => store.alarmHistory)
+const hasAlarms = computed(() => store.hasAlarms)
 
 function setView(view) {
   currentView.value = view
@@ -144,6 +169,29 @@ function handleReset() {
   store.reset()
 }
 
+function handleAcknowledge(alarmId) {
+  store.acknowledgeAlarm(alarmId)
+}
+
+function handleAcknowledgeAll() {
+  store.acknowledgeAll()
+}
+
+function closeDevicePanel() {
+  showDevicePanel.value = false
+  if (interactionManager) {
+    interactionManager.deselectDevice()
+  }
+}
+
+function handleDeviceControl(control) {
+  if (control.type === 'start') {
+    store.start()
+  } else if (control.type === 'stop') {
+    store.stop()
+  }
+}
+
 function update3DScene() {
   if (plant3D) {
     plant3D.updateData({
@@ -155,9 +203,94 @@ function update3DScene() {
       productCount: store.productCount
     })
   }
+
+  if (showDevicePanel.value && selectedDevice.value) {
+    const deviceId = selectedDevice.value.id
+    let history = []
+
+    if (deviceId === 'R-101') {
+      history = store.temperatureHistory.slice(-30)
+    } else if (deviceId.startsWith('TK')) {
+      history = store.levelHistory.slice(-30)
+    }
+
+    selectedDevice.value = {
+      ...selectedDevice.value,
+      data: {
+        temp: store.reactorTemp,
+        pressure: store.reactorPressure,
+        level: store.tankLevel,
+        speed: store.motorSpeed,
+        products: store.productCount,
+        running: store.running,
+        alarm: store.alarms.some(a => a.level === 'critical')
+      },
+      history
+    }
+  }
+}
+
+function setupInteraction() {
+  if (!plant3D || !sceneContainer.value) return
+
+  interactionManager = new InteractionManager(
+    plant3D.camera,
+    sceneContainer.value,
+    plant3D.scene
+  )
+
+  interactionManager.registerDevice('R-101', plant3D.equipment.reactor, {
+    type: 'reactor',
+    name: '反应釜 R-101'
+  })
+
+  interactionManager.registerDevice('TK-101', plant3D.equipment.tanks, {
+    type: 'tank',
+    name: '储罐 TK-101'
+  })
+
+  interactionManager.registerDevice('CONV-01', plant3D.equipment.conveyor, {
+    type: 'conveyor',
+    name: '传送带'
+  })
+
+  interactionManager.onDeviceClick = (deviceId, deviceData, point) => {
+    let history = []
+    let type = 'reactor'
+
+    if (deviceId === 'R-101') {
+      history = store.temperatureHistory.slice(-30)
+      type = 'reactor'
+    } else if (deviceId.startsWith('TK')) {
+      history = store.levelHistory.slice(-30)
+      type = 'tank'
+    } else if (deviceId === 'CONV-01') {
+      type = 'conveyor'
+    }
+
+    selectedDevice.value = {
+      id: deviceId,
+      type,
+      data: {
+        temp: store.reactorTemp,
+        pressure: store.reactorPressure,
+        level: store.tankLevel,
+        speed: store.motorSpeed,
+        products: store.productCount,
+        running: store.running,
+        alarm: store.alarms.some(a => a.level === 'critical')
+      },
+      history
+    }
+    showDevicePanel.value = true
+  }
+
+  interactionManager.init()
 }
 
 onMounted(async () => {
+  store.initStore()
+
   await new Promise(resolve => setTimeout(resolve, 100))
 
   if (sceneContainer.value) {
@@ -165,6 +298,7 @@ onMounted(async () => {
     plant3D.init()
     loading.value = false
 
+    setupInteraction()
     dataUpdateInterval = setInterval(update3DScene, 100)
   }
 })
@@ -172,6 +306,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (dataUpdateInterval) {
     clearInterval(dataUpdateInterval)
+  }
+  if (interactionManager) {
+    interactionManager.dispose()
   }
   if (plant3D) {
     plant3D.dispose()
@@ -458,5 +595,15 @@ onUnmounted(() => {
 .tips-list li::before {
   content: '▸ ';
   color: var(--color-primary);
+}
+
+.tips-list li.tip-highlight {
+  color: #36d399;
+  font-weight: 600;
+}
+
+.tips-list li.tip-highlight::before {
+  content: '★ ';
+  color: #36d399;
 }
 </style>

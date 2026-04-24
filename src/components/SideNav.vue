@@ -13,10 +13,14 @@
         :key="item.path"
         class="nav-item"
         :class="{ active: currentPath === item.path }"
-        @click="navigate(item.path)"
       >
-        <span class="nav-icon">{{ item.icon }}</span>
-        <span class="nav-label">{{ item.label }}</span>
+        <router-link
+          :to="item.path"
+          class="nav-link"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </router-link>
         <span class="nav-badge" v-if="item.badge">{{ item.badge }}</span>
       </li>
     </ul>
@@ -161,6 +165,16 @@ function navigate(path) {
 .nav-item.active .nav-badge {
   color: var(--color-accent);
   opacity: 1;
+}
+
+.nav-link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-decoration: none;
+  width: 100%;
+  color: inherit;
 }
 
 .nav-footer {

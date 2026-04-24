@@ -1,85 +1,116 @@
 <template>
-  <div class="about-view">
-    <div class="about-header">
-      <h2>◆ 关于系统</h2>
-    </div>
-    <div class="about-content">
-      <div class="info-card">
-        <h3>项目信息</h3>
-        <div class="info-row">
-          <span class="info-label">项目名称:</span>
-          <span class="info-value">SCADA智能控制系统</span>
+  <div class="about-container">
+    <SideNav />
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="header-left">
+          <h1 class="page-title">◆ 关于系统</h1>
+          <span class="page-subtitle">项目介绍</span>
         </div>
-        <div class="info-row">
-          <span class="info-label">版本号:</span>
-          <span class="info-value">v1.0.0</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">技术栈:</span>
-          <span class="info-value">Vue3 + Vite + Element Plus + ECharts + Pinia</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">部署平台:</span>
-          <span class="info-value">GitHub Pages</span>
-        </div>
-      </div>
+      </header>
 
-      <div class="info-card">
-        <h3>功能特性</h3>
-        <ul class="feature-list">
-          <li>⚡ 电机启停控制</li>
-          <li>🌡️ 实时温度监控</li>
-          <li>📊 产量自动计数</li>
-          <li>📈 温度历史趋势图</li>
-          <li>⚠️ 高温报警系统</li>
-        </ul>
-      </div>
+      <div class="about-content">
+        <div class="info-card">
+          <h3>项目信息</h3>
+          <div class="info-row">
+            <span class="info-label">项目名称:</span>
+            <span class="info-value">SCADA智能控制系统</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">版本号:</span>
+            <span class="info-value">v1.0.0</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">技术栈:</span>
+            <span class="info-value">Vue3 + Vite + Element Plus + ECharts + Pinia</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">部署平台:</span>
+            <span class="info-value">GitHub Pages</span>
+          </div>
+        </div>
 
-      <div class="info-card">
-        <h3>配色方案</h3>
-        <div class="color-scheme">
-          <div class="color-item">
-            <div class="color-box primary"></div>
-            <span>科技蓝 #00aaff</span>
-          </div>
-          <div class="color-item">
-            <div class="color-box dark"></div>
-            <span>深灰 #121826</span>
-          </div>
-          <div class="color-item">
-            <div class="color-box accent"></div>
-            <span>荧光绿 #36d399</span>
+        <div class="info-card">
+          <h3>功能特性</h3>
+          <ul class="feature-list">
+            <li>⚡ 电机启停控制</li>
+            <li>🌡️ 实时温度监控</li>
+            <li>📊 产量自动计数</li>
+            <li>📈 温度历史趋势图</li>
+            <li>⚠️ 高温报警系统</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <h3>配色方案</h3>
+          <div class="color-scheme">
+            <div class="color-item">
+              <div class="color-box primary"></div>
+              <span>科技蓝 #00aaff</span>
+            </div>
+            <div class="color-item">
+              <div class="color-box dark"></div>
+              <span>深灰 #121826</span>
+            </div>
+            <div class="color-item">
+              <div class="color-box accent"></div>
+              <span>荧光绿 #36d399</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   </div>
 </template>
 
 <script setup>
+import SideNav from '@/components/SideNav.vue'
 </script>
 
 <style scoped>
-.about-view {
-  height: 100%;
+.about-container {
   display: flex;
-  flex-direction: column;
-  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
 }
 
-.about-header {
-  margin-bottom: 25px;
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow: auto;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
   padding-bottom: 15px;
   border-bottom: 1px solid rgba(0, 170, 255, 0.3);
 }
 
-.about-header h2 {
-  color: var(--color-primary);
-  font-size: 20px;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.page-title {
+  font-size: 22px;
   font-weight: 600;
+  color: var(--color-primary);
   letter-spacing: 3px;
-  text-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
   margin: 0;
+  text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--color-text-dim);
+  letter-spacing: 1px;
 }
 
 .about-content {
