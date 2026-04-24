@@ -164,6 +164,7 @@ body {
 .app-main {
   flex: 1;
   overflow: auto;
+  min-height: 0;
 }
 
 .app-footer {

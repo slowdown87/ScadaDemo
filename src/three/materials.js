@@ -6,27 +6,32 @@ let envMap = null
 function createEnvironmentMap() {
   if (envMap) return envMap
 
-  const pmremGenerator = new THREE.PMREMGenerator(undefined)
-  pmremGenerator.compileEquirectangularShader()
+  try {
+    const pmremGenerator = new THREE.PMREMGenerator(null)
+    pmremGenerator.compileCubemapShader()
 
-  const scene = new THREE.Scene()
-  scene.background = new THREE.Color(0x8090a0)
+    const scene = new THREE.Scene()
+    scene.background = new THREE.Color(0x8090a0)
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
-  scene.add(ambientLight)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
+    scene.add(ambientLight)
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-  directionalLight.position.set(1, 1, 1)
-  scene.add(directionalLight)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+    directionalLight.position.set(1, 1, 1)
+    scene.add(directionalLight)
 
-  const fillLight = new THREE.DirectionalLight(0x8090a0, 0.3)
-  fillLight.position.set(-1, 0.5, -1)
-  scene.add(fillLight)
+    const fillLight = new THREE.DirectionalLight(0x8090a0, 0.3)
+    fillLight.position.set(-1, 0.5, -1)
+    scene.add(fillLight)
 
-  envMap = pmremGenerator.fromScene(scene, 0.04).texture
-  pmremGenerator.dispose()
+    envMap = pmremGenerator.fromScene(scene, 0.04).texture
+    pmremGenerator.dispose()
 
-  return envMap
+    return envMap
+  } catch (error) {
+    console.warn('[MaterialLibrary] Failed to create environment map:', error)
+    return null
+  }
 }
 
 class MaterialLibrary {

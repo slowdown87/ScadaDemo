@@ -20,6 +20,7 @@ import { createInstrumentPanel } from './equipment/Instrument.js'
 import { createWorkers } from './equipment/Workers.js'
 import { createFlowParticles, createDustParticles, updateParticles, updateFlowParticles } from './equipment/Particles.js'
 import { lodManager } from './LODManager.js'
+import { MaterialTracker } from './material/MaterialTracker.js'
 
 export class Plant3D {
   constructor(container) {
@@ -33,6 +34,7 @@ export class Plant3D {
 
     this.equipment = {}
     this.particles = {}
+    this.materialTracker = null
     this.animationId = null
 
     this.data = {
@@ -62,6 +64,8 @@ export class Plant3D {
 
     this.createIndustrialPlant()
     this.createParticles()
+    this.materialTracker = new MaterialTracker(this.scene)
+    this.needsRender = true
     this.animate()
 
     return this
@@ -93,6 +97,32 @@ export class Plant3D {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.2
     this.container.appendChild(this.renderer.domElement)
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.handleResize()
+    })
+    this.resizeObserver.observe(this.container)
+  }
+
+  handleResize() {
+    const width = this.container.clientWidth
+    const height = this.container.clientHeight
+
+    if (width === 0 || height === 0) return
+
+    this.camera.aspect = width / height
+    this.camera.updateProjectionMatrix()
+    this.renderer.setSize(width, height)
+    this.composer.setSize(width, height)
+
+    if (this.ssaoPass) {
+      this.ssaoPass.setSize(width, height)
+    }
+    if (this.outlinePass) {
+      this.outlinePass.setSize(width, height)
+    }
+
+    this.needsRender = true
   }
 
   setupControls() {
@@ -256,6 +286,13 @@ export class Plant3D {
       updateParticles(this.particles.dust, this.data)
       this.needsRender = true
     }
+
+    if (this.materialTracker) {
+      if (this.materialTracker.needsUpdate) {
+        this.needsRender = true
+        this.materialTracker.needsUpdate = false
+      }
+    }
   }
 
   updateData(data) {
@@ -322,6 +359,24 @@ export class Plant3D {
     }
   }
 
+  updateMaterialTracker(materialStore) {
+    if (this.materialTracker) {
+      this.materialTracker.updateFromStore(materialStore)
+      this.needsRender = true
+    }
+  }
+
+  highlightMaterialLot(lotId) {
+    if (this.materialTracker) {
+      this.materialTracker.highlightLot(lotId)
+      this.needsRender = true
+    }
+  }
+
+  getMaterialTracker() {
+    return this.materialTracker
+  }
+
   resize() {
     if (!this.container) return
 
@@ -378,6 +433,16 @@ export class Plant3D {
     lodManager.dispose()
     materials.dispose()
     geometries.dispose()
+
+    if (this.materialTracker) {
+      this.materialTracker.dispose()
+      this.materialTracker = null
+    }
+
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+      this.resizeObserver = null
+    }
 
     this.equipment = {}
     this.particles = {}

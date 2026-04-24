@@ -85,6 +85,8 @@
             </div>
           </div>
 
+          <MaterialPanel />
+
           <AlarmPanel
             v-if="hasAlarms || alarmHistory.length > 0"
             :alarms="alarms"
@@ -119,15 +121,18 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as THREE from 'three'
 import { usePlantStore } from '@/stores/plantStore'
 import { useAlarmStore } from '@/stores/alarmStore'
+import { useMaterialStore } from '@/stores/materialStore'
 import { useAlarmSound } from '@/composables/useAlarmSound'
 import { Plant3D } from '@/three/Plant3D'
 import { InteractionManager } from '@/three/InteractionManager'
 import DevicePanel from '@/components/DevicePanel.vue'
 import AlarmPanel from '@/components/AlarmPanel.vue'
+import MaterialPanel from '@/components/MaterialPanel.vue'
 import SideNav from '@/components/SideNav.vue'
 
 const store = usePlantStore()
 const alarmStore = useAlarmStore()
+const materialStore = useMaterialStore()
 const { playCriticalAlarm, playWarningAlarm, isEnabled: soundEnabled, toggle: toggleSound } = useAlarmSound()
 const sceneContainer = ref(null)
 const loading = ref(true)
@@ -238,6 +243,7 @@ function update3DScene() {
       motorSpeed: store.motorSpeed,
       productCount: store.productCount
     })
+    plant3D.updateMaterialTracker(materialStore)
   }
 
   if (showDevicePanel.value && selectedDevice.value) {
@@ -378,6 +384,7 @@ function animateCameraTo(targetPosition, targetLookAt) {
 
 onMounted(async () => {
   store.initStore()
+  materialStore.initializeDemoLots()
 
   alarmStore.setOnAlarmCallback((level) => {
     if (level >= 5) {
@@ -416,8 +423,8 @@ onUnmounted(() => {
 <style scoped>
 .twin-container {
   display: flex;
-  width: 100%;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   background: var(--color-bg);
 }
 
@@ -499,6 +506,7 @@ onUnmounted(() => {
   display: flex;
   gap: 20px;
   overflow: hidden;
+  min-height: 0;
 }
 
 .scene-container {
