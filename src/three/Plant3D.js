@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
+import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js'
 
 import { POSITIONS, ANIMATION } from './constants.js'
 import { materials } from './materials.js'
@@ -106,6 +107,15 @@ export class Plant3D {
     this.composer = new EffectComposer(this.renderer)
     const renderPass = new RenderPass(this.scene, this.camera)
     this.composer.addPass(renderPass)
+
+    const width = this.container.clientWidth
+    const height = this.container.clientHeight
+
+    this.ssaoPass = new SSAOPass(this.scene, this.camera, width, height)
+    this.ssaoPass.kernelRadius = 16
+    this.ssaoPass.minDistance = 0.005
+    this.ssaoPass.maxDistance = 0.1
+    this.composer.addPass(this.ssaoPass)
   }
 
   createIndustrialPlant() {

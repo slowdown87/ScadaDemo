@@ -25,13 +25,15 @@ export function setupLights(scene, options = {}) {
   lights.main.castShadow = true
   lights.main.shadow.mapSize.width = shadowConfig
   lights.main.shadow.mapSize.height = shadowConfig
-  lights.main.shadow.camera.near = DIMENSIONS.scene.maxCameraDistance / 100
-  lights.main.shadow.camera.far = 300
-  lights.main.shadow.camera.left = -120
-  lights.main.shadow.camera.right = 120
-  lights.main.shadow.camera.top = 120
-  lights.main.shadow.camera.bottom = -120
-  lights.main.shadow.bias = -0.0001
+  lights.main.shadow.camera.near = 1
+  lights.main.shadow.camera.far = 200
+  lights.main.shadow.camera.left = -60
+  lights.main.shadow.camera.right = 60
+  lights.main.shadow.camera.top = 60
+  lights.main.shadow.camera.bottom = -60
+  lights.main.shadow.bias = -0.0003
+  lights.main.shadow.normalBias = 0.02
+  lights.main.shadow.radius = 4
   lights.main.shadow.autoUpdate = shadowAutoUpdate
   scene.add(lights.main)
 
