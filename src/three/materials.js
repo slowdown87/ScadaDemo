@@ -1,9 +1,45 @@
 import * as THREE from 'three'
 import { COLORS, MATERIAL_PROPS } from './constants.js'
 
+let envMap = null
+
+function createEnvironmentMap() {
+  if (envMap) return envMap
+
+  const pmremGenerator = new THREE.PMREMGenerator(undefined)
+  pmremGenerator.compileEquirectangularShader()
+
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x8090a0)
+
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
+  scene.add(ambientLight)
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+  directionalLight.position.set(1, 1, 1)
+  scene.add(directionalLight)
+
+  const fillLight = new THREE.DirectionalLight(0x8090a0, 0.3)
+  fillLight.position.set(-1, 0.5, -1)
+  scene.add(fillLight)
+
+  envMap = pmremGenerator.fromScene(scene, 0.04).texture
+  pmremGenerator.dispose()
+
+  return envMap
+}
+
 class MaterialLibrary {
   constructor() {
     this._materials = new Map()
+    this.envMap = null
+  }
+
+  getEnvMap() {
+    if (!this.envMap) {
+      this.envMap = createEnvironmentMap()
+    }
+    return this.envMap
   }
 
   get(key) {
@@ -26,6 +62,8 @@ class MaterialLibrary {
       color,
       roughness: MATERIAL_PROPS.metal.roughness,
       metalness: MATERIAL_PROPS.metal.metalness,
+      envMap: this.getEnvMap(),
+      envMapIntensity: 0.8,
       ...props
     })
     this.set(key, material)
@@ -40,6 +78,8 @@ class MaterialLibrary {
       color,
       roughness: MATERIAL_PROPS.steel.roughness,
       metalness: MATERIAL_PROPS.steel.metalness,
+      envMap: this.getEnvMap(),
+      envMapIntensity: 1.0,
       ...props
     })
     this.set(key, material)
@@ -54,6 +94,8 @@ class MaterialLibrary {
       color,
       roughness: MATERIAL_PROPS.roughMetal.roughness,
       metalness: MATERIAL_PROPS.roughMetal.metalness,
+      envMap: this.getEnvMap(),
+      envMapIntensity: 0.5,
       ...props
     })
     this.set(key, material)

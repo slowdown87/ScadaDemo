@@ -467,32 +467,7 @@
       "version": "1.0",
       "date": "2026-04-23",
       "changes": "初始版本，从原项目基础升级为专业级方案（含后端）"
-    },
-    {
-      "version": "2.1",
-      "date": "2026-04-24",
-      "changes": "调整为方案1（纯前端），移除后端任务，总工期从11周减至10周，预算从65万减至18万"
-    },
-    {
-      "version": "2.2",
-      "date": "2026-04-24",
-      "changes": "补充关键文档：性能优化专项、composables规范、GitHubPages优化，文档体系完善"
-    },
-    {
-      "version": "2.3",
-      "date": "2026-04-24",
-      "changes": "Phase 0系统性审查完成，修复2个严重Bug（alarmEngine数据不通、RenderPass导入错误），目录结构规范化，状态快照更新"
-    },
-    {
-      "version": "2.4",
-      "date": "2026-04-24",
-      "changes": "升级方案更新为v3.0高标准版本，整合全部参考文档，vite.config.js代码分割优化（three/echarts分开）"
-    },
-    {
-      "version": "2.5",
-      "date": "2026-04-24",
-      "changes": "Phase 0里程碑验收通过，状态快照更新Phase 0为completed，升级方案v3.0验收检查清单通过"
-    },
+    },    
     {
       "version": "2.6",
       "date": "2026-04-24",

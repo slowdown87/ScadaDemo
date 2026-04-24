@@ -9,13 +9,14 @@ import { geometries } from './geometries.js'
 import { setupLights, updateLightShadow, disposeLights } from './lighting/Lights.js'
 import { createGround } from './environment/Ground.js'
 import { createReactor } from './equipment/Reactor.js'
-import { createTanks } from './equipment/Tank.js'
+import { createTanks, createLowDetailTank } from './equipment/Tank.js'
 import { createPipeNetwork } from './equipment/PipeNetwork.js'
 import { createConveyor } from './equipment/Conveyor.js'
 import { createPlatforms, createSupportStructures } from './equipment/Structure.js'
 import { createInstrumentPanel } from './equipment/Instrument.js'
 import { createWorkers } from './equipment/Workers.js'
 import { createFlowParticles, createDustParticles, updateParticles, updateFlowParticles } from './equipment/Particles.js'
+import { lodManager } from './LODManager.js'
 
 export class Plant3D {
   constructor(container) {
@@ -117,6 +118,15 @@ export class Plant3D {
 
     const tanks = createTanks(this.scene)
     this.equipment.tanks = tanks.group
+
+    tanks.tanks.forEach((tank, index) => {
+      const tankId = `tank_${index}`
+      const tankLow = createLowDetailTank(tank.userData.capacity || 100, tank.userData.deviceId)
+      tankLow.visible = false
+      tank.add(tankLow)
+      lodManager.register(tankId, tank, null, tankLow)
+    })
+
     this.equipment.tankLevel1 = tanks.tanks[0].children.find(
       c => c.type === 'Mesh' && c.geometry.type === 'CylinderGeometry'
     )
@@ -161,6 +171,8 @@ export class Plant3D {
     }
 
     this.controls.update()
+
+    lodManager.update(this.camera)
 
     if (this.needsShadowUpdate) {
       this.renderer.shadowMap.update()
@@ -339,6 +351,7 @@ export class Plant3D {
       this.scene = null
     }
 
+    lodManager.dispose()
     materials.dispose()
     geometries.dispose()
 
