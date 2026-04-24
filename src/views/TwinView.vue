@@ -89,8 +89,11 @@
             v-if="hasAlarms || alarmHistory.length > 0"
             :alarms="alarms"
             :alarm-history="alarmHistory"
+            :sound-enabled="soundEnabled"
             @acknowledge="handleAcknowledge"
             @acknowledge-all="handleAcknowledgeAll"
+            @toggle-sound="toggleSound"
+            @export-history="handleExportHistory"
           />
 
           <div class="info-panel">
@@ -115,6 +118,8 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import * as THREE from 'three'
 import { usePlantStore } from '@/stores/plantStore'
+import { useAlarmStore } from '@/stores/alarmStore'
+import { useAlarmSound } from '@/composables/useAlarmSound'
 import { Plant3D } from '@/three/Plant3D'
 import { InteractionManager } from '@/three/InteractionManager'
 import DevicePanel from '@/components/DevicePanel.vue'
@@ -122,6 +127,8 @@ import AlarmPanel from '@/components/AlarmPanel.vue'
 import SideNav from '@/components/SideNav.vue'
 
 const store = usePlantStore()
+const alarmStore = useAlarmStore()
+const { playCriticalAlarm, playWarningAlarm, isEnabled: soundEnabled, toggle: toggleSound } = useAlarmSound()
 const sceneContainer = ref(null)
 const loading = ref(true)
 const currentView = ref('iso')
@@ -176,6 +183,34 @@ function handleAcknowledge(alarmId) {
 
 function handleAcknowledgeAll() {
   store.acknowledgeAll()
+}
+
+function handleExportHistory() {
+  const data = alarmStore.exportHistory()
+  const csv = [
+    ['ID', '设备', '等级', '代码', '消息', '值', '阈值', '时间', '已确认', '确认人', '确认时间'].join(','),
+    ...data.map(row => [
+      row.id,
+      row.deviceId,
+      row.levelName,
+      row.code,
+      `"${row.message}"`,
+      row.value,
+      row.threshold,
+      row.timestamp,
+      row.acknowledged ? '是' : '否',
+      row.acknowledgedBy || '',
+      row.acknowledgedAt || ''
+    ].join(','))
+  ].join('\n')
+
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `alarm_history_${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 function closeDevicePanel() {
@@ -343,6 +378,14 @@ function animateCameraTo(targetPosition, targetLookAt) {
 
 onMounted(async () => {
   store.initStore()
+
+  alarmStore.setOnAlarmCallback((level) => {
+    if (level >= 5) {
+      playCriticalAlarm()
+    } else if (level >= 4) {
+      playWarningAlarm()
+    }
+  })
 
   await new Promise(resolve => setTimeout(resolve, 100))
 
