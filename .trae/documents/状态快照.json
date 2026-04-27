@@ -1,214 +1,87 @@
 {
-  "lastUpdate": "2026-04-24T16:30:00Z",
+  "lastUpdate": "2026-04-27T00:00:00Z",
   "projectName": "ScadaDemo",
   "totalPhases": 6,
   "targetRepo": "https://github.com/slowdown87/ScadaDemo",
   "targetPages": "https://slowdown87.github.io/ScadaDemo/",
-  "version": "2.6",
+  "version": "3.0",
   "upgradePlan": "SCADA数字孪生专业级升级方案.md",
   "taskList": "History/SCADA升级任务清单.md",
-  "deploymentScheme": "方案1 - 纯前端（GitHub Pages）"
-}
-{
-  "currentPhase": 2,
-  "phaseName": "Phase 2: 交互功能 (100%完成)",
-  "completedPhases": ["Phase 0: 架构搭建", "Phase 1: 基础3D建模+Mock数据", "Phase 2: 交互功能"],
-  "currentTask": "Phase 3 准备",
-  "pendingPhases": [
-    "Phase 3: 物料追踪 (Week 6-7)",
-    "Phase 4: 仿真推演 (Week 8-9)",
-    "Phase 5: 系统集成 (Week 10)"
-  ]
-}
-{
+  "deploymentScheme": "方案1 - 纯前端（GitHub Pages）",
+  "implementationPlan": ".trae/documents/Phase4_5_Implementation_Plan.md",
+  "pendingFixes": [],
+  "completedFixes": [
+    {
+      "id": "FIX-001",
+      "issue": "MaterialTracker 未集成到 Plant3D",
+      "severity": "P0",
+      "status": "resolved",
+      "resolution": "已确认完整集成 - MaterialTracker在Plant3D.init()中创建，在animate()中更新"
+    },
+    {
+      "id": "FIX-002",
+      "issue": "仿真无物理模型循环",
+      "severity": "P0",
+      "status": "resolved",
+      "resolution": "已添加updatePhysics()方法 - 温度/压力/液位动态变化，故障持续影响"
+    },
+    {
+      "id": "FIX-003",
+      "issue": "仿真与3D场景隔离",
+      "severity": "P1",
+      "status": "resolved",
+      "resolution": "已添加syncToPlantStore() - 仿真运行时同步设备状态到plantStore"
+    },
+    {
+      "id": "FIX-004",
+      "issue": "无预置培训场景",
+      "severity": "P1",
+      "status": "resolved",
+      "resolution": "已添加PRESET_SCENARIOS - basic_operation/emergency_response/pressure_control三个场景"
+    }
+  ],
+  "currentPhase": 5,
+  "phaseName": "Phase 5: 系统集成 (100%完成)",
+  "completedPhases": [
+    "Phase 0: 架构搭建",
+    "Phase 1: 基础3D建模+Mock数据",
+    "Phase 2: 交互功能",
+    "Phase 3: 物料追踪",
+    "Phase 4: 仿真推演",
+    "Phase 5: 系统集成"
+  ],
+  "currentTask": "升级完成",
+  "pendingPhases": [],
   "phase0Status": {
     "name": "Phase 0: 架构搭建",
     "progress": "100%",
-    "status": "completed",
-    "tasks": [
-      "T0.1: 项目结构优化",
-      "T0.2: 技术验证",
-      "T0.3: GitHub Pages部署",
-      "T0.4: 里程碑检查"
-    ],
-    "completedTasks": [
-      "文档体系完善 (架构设计.md, 代码规范.md, 性能优化专项.md, composables规范.md, GitHubPages优化.md)",
-      "目录结构规范化 (mock/index.js)",
-      "样式系统完善 (CSS Variables in App.vue)",
-      "Mock数据服务架构验证",
-      "Three.js性能优化测试 (PerfView验证工具就绪)",
-      "Mock数据引擎验证 (build通过)",
-      "ECharts高频更新测试 (useECharts manual mode验证)",
-      "Vue Router Hash模式验证 (vite.config.js正确配置)",
-      "Hash路由配置 (已验证)",
-      "base路径配置 (已验证: /ScadaDemo/)",
-      "CI/CD流程完善 (.github/workflows/deploy.yml)",
-      "Bug修复: alarmEngine数据不通 (直接导入plantSimulator)",
-      "Bug修复: RenderPass导入错误 (改为直接引用)",
-      "升级方案更新为v3.0 (高标准版本)",
-      "vite.config.js代码分割优化 (three/echarts分开)",
-      "Phase 0里程碑验收通过",
-      "构建验证: npm run build成功",
-      "代码分割验证: vue-vendor/three/echarts分开",
-      "文档完整性检查: 8个文档全部就绪",
-      "GitHub Pages配置验证: deploy.yml正确"
-    ],
-    "pendingTasks": []
-  }
-}
-{
+    "status": "completed"
+  },
   "phase1Status": {
     "name": "Phase 1: 基础3D建模+Mock数据",
     "progress": "100%",
-    "status": "completed",
-    "codeReviewFindings": {
-      "3D模型": "✅ 完整实现 - Reactor.js, Tank.js, PipeNetwork.js, Conveyor.js, Structure.js, Instrument.js, Workers.js, Particles.js",
-      "材质系统": "✅ PBR材质库 - materials.js实现metal/steel/roughMetal/plastic/glass/emissive等材质，带缓存机制",
-      "灯光环境": "✅ 工业照明 - Lights.js实现AmbientLight/HemisphereLight/DirectionalLight/PointLight，带阴影优化",
-      "数据模拟": "✅ 完整实现 - plantMock.js实现PlantSimulator，100ms更新间隔，报警规则引擎",
-      "Store集成": "✅ plantStore + alarmStore + perfStore，数据流正确",
-      "TwinView": "✅ 正确集成 - Store → Plant3D数据连接，100ms轮询更新"
-    },
-    "refinementNeeded": [
-      "储罐几何形状优化 (当前用CylinderGeometry，应用专用储罐形状)",
-      "管道系统增强 (弯头、法兰、支管细节)",
-      "PBR环境贴图 (提升金属质感)",
-      "LOD分级 (远处设备降级渲染)",
-      "SSAO后处理 (增强工业场景深度感)"
-    ],
-    "tasks": [
-      "T1.1: 3D模型完善",
-      "T1.2: 材质与灯光",
-      "T1.3: 数据模拟引擎",
-      "T1.4: 收尾与高标准升级"
-    ],
-    "completedTasks": [
-      "Reactor.js - 反应釜模型 (罐体+搅拌器+液位指示器+铭牌)",
-      "Tank.js - 储罐模型 (筒体+封头+液位计+扶梯+平台+栏杆)",
-      "PipeNetwork.js - 管道网络 (主管+支管+弯头+阀门+法兰)",
-      "Conveyor.js - 传送带 (框架+滚筒+传送带+产品)",
-      "Structure.js - 平台支架 (操作平台+支撑结构)",
-      "Instrument.js - 仪表盘 (面板+屏幕+按钮+指示灯)",
-      "Workers.js - 作业人员 (人物模型+动画)",
-      "Particles.js - 粒子效果 (流动粒子+灰尘粒子)",
-      "materials.js - PBR材质库 (metal/steel/roughMetal/plastic/glass/emissive，材质缓存)",
-      "Lights.js - 工业照明 (Ambient+Hemisphere+Directional+Point+阴影优化)",
-      "plantMock.js - PlantSimulator (状态管理+定时器+报警规则)",
-      "alarmEngine.js - 报警规则引擎 (多规则+多阈值+历史记录)",
-      "plantStore.js - 工厂数据Store (与simulator同步)",
-      "alarmStore.js - 报警状态Store",
-      "perfStore.js - 性能监控Store",
-      "TwinView.vue - 3D场景集成 (Store→Plant3D数据连接)"
-    ],
-    "pendingTasks": [
-      "T1.4.7: Phase 1里程碑验收"
-    ],
-    "completedRefinements": [
-      "T1.4.1: 储罐几何精细化 ✅ - 锥形底+支腿+斜撑+法兰+加强筋",
-      "T1.4.2: 管道系统增强 ✅ - 保温层+分支管+管件法兰+螺栓+支撑+仪表管线",
-      "T1.4.3: PBR环境贴图 ✅ - metal/steel/roughMetal材质添加envMap",
-      "T1.4.4: LOD分级渲染 ✅ - LODManager.js实现，基于相机距离切换",
-      "T1.4.5: SSAO后处理 ✅ - SSAOPass添加到EffectComposer",
-      "T1.4.6: 阴影质量优化 ✅ - 阴影相机优化+normalBias+radius"
-    ]
-  }
-}
-{
+    "status": "completed"
+  },
   "phase2Status": {
     "name": "Phase 2: 交互功能",
     "progress": "100%",
-    "status": "completed",
-    "tasks": [
-      "T2.1: 3D场景交互 (Week 4)",
-      "T2.2: 设备详情面板 (Week 4)",
-      "T2.3: 控制功能 (Week 4)",
-      "T2.4: 报警规则引擎 (Week 5)",
-      "T2.5: 报警面板 (Week 5)",
-      "T2.6: 报警通知 (Week 5)"
-    ],
-    "completedTasks": [
-      "InteractionManager.js - 设备交互管理 (Raycaster点击+Hover高亮+Group穿透)",
-      "DevicePanel.vue - 设备详情面板 (数据显示+趋势图+控制按钮)",
-      "AlarmPanel.vue - 报警面板组件",
-      "alarmEngine.js - 报警规则引擎",
-      "OutlinePass - 设备高亮增强 (发光边缘)",
-      "视角聚焦动画 - focusCameraOnDevice + animateCameraTo",
-      "ECharts manual-update模式 - updateSeriesData增量更新",
-      "useAlarmSound.js - Web Audio API声音提醒",
-      "alarmStore - 声音开关+导出功能"
-    ],
-    "pendingTasks": []
-  }
-}
-{
+    "status": "completed"
+  },
   "phase3Status": {
     "name": "Phase 3: 物料追踪",
-    "progress": "0%",
-    "status": "pending",
-    "tasks": [
-      "T3.1: 批次模型设计 (Week 6)",
-      "T3.2: 位置追踪 (Week 6)",
-      "T3.3: 3D物料动画 (Week 6)",
-      "T3.4: 流程定义 (Week 7)",
-      "T3.5: 流程执行 (Week 7)",
-      "T3.6: 质量控制 (Week 7)"
-    ],
-    "completedTasks": [],
-    "pendingTasks": [
-      "批次数据结构",
-      "状态机定义",
-      "位置更新服务",
-      "历史轨迹展示",
-      "物料3D动画",
-      "工艺步骤配置",
-      "质检点设置"
-    ]
-  }
-}
-{
+    "progress": "100%",
+    "status": "completed"
+  },
   "phase4Status": {
     "name": "Phase 4: 仿真推演",
-    "progress": "0%",
-    "status": "pending",
-    "tasks": [
-      "T4.1: 仿真引擎 (Week 8)",
-      "T4.2: 场景管理 (Week 8)",
-      "T4.3: 推演控制 (Week 8)",
-      "T4.4: 培训场景 (Week 9)",
-      "T4.5: 评估系统 (Week 9)"
-    ],
-    "completedTasks": [],
-    "pendingTasks": [
-      "设备仿真模型",
-      "故障注入机制",
-      "场景编辑器",
-      "播放/暂停/回溯",
-      "培训SOP",
-      "评分系统"
-    ]
-  }
-}
-{
+    "progress": "100%",
+    "status": "completed"
+  },
   "phase5Status": {
     "name": "Phase 5: 系统集成",
-    "progress": "0%",
-    "status": "pending",
-    "tasks": [
-      "T5.1: 功能联调 (Week 10)",
-      "T5.2: 性能优化 (Week 10)",
-      "T5.3: 部署上线 (Week 10)"
-    ],
-    "completedTasks": [],
-    "pendingTasks": [
-      "模块集成",
-      "数据流验证",
-      "渲染优化",
-      "GitHub Pages发布",
-      "最终验证"
-    ]
-  }
-}
-{
+    "progress": "100%",
+    "status": "completed"
+  },
   "techStack": {
     "frontend": {
       "framework": "Vue3",
@@ -225,262 +98,83 @@
       "simulation": "随机游走+趋势生成",
       "frequency": "100ms轮询"
     }
-  }
-}
-{
+  },
   "milestones": [
     {
       "name": "Phase 0 里程碑",
-      "criteria": [
-        "技术验证全部通过",
-        "项目结构符合规范",
-        "GitHub Pages可访问"
-      ],
+      "criteria": ["技术验证全部通过", "项目结构符合规范", "GitHub Pages可访问"],
       "status": "completed"
     },
     {
       "name": "Phase 1 里程碑",
-      "criteria": [
-        "所有3D模型加载正常 ✅",
-        "模型加载时间<3秒 ✅ (TwinView 102KB)",
-        "Mock数据实时更新无卡顿 ✅ (PlantSimulator 100ms轮询)",
-        "报警触发正常 ✅ (alarmEngine规则引擎)"
-      ],
+      "criteria": ["所有3D模型加载正常", "模型加载时间<3秒", "Mock数据实时更新无卡顿", "报警触发正常"],
       "status": "completed"
     },
     {
       "name": "Phase 2 里程碑",
-      "criteria": [
-        "设备点击可查看详情 ✅ (InteractionManager + DevicePanel)",
-        "控制操作响应<500ms ✅ (TwinView事件处理)",
-        "报警及时推送 ✅ (alarmEngine 100ms检测)",
-        "操作日志完整 ✅ (alarmHistory最多100条)"
-      ],
+      "criteria": ["设备点击可查看详情", "控制操作响应<500ms", "报警及时推送", "操作日志完整"],
       "status": "completed"
     },
     {
       "name": "Phase 3 里程碑",
-      "criteria": [
-        "物料批次全流程追踪",
-        "3D动画流畅",
-        "工艺步骤可配置"
-      ],
-      "status": "pending"
+      "criteria": ["物料批次全流程追踪", "3D动画流畅", "工艺步骤可配置"],
+      "status": "completed"
     },
     {
       "name": "Phase 4 里程碑",
-      "criteria": [
-        "仿真场景可运行",
-        "培训流程完整",
-        "评估系统可用"
-      ],
-      "status": "pending"
+      "criteria": ["仿真场景可运行", "培训流程完整", "评估系统可用"],
+      "status": "completed"
     },
     {
       "name": "Phase 5 里程碑",
-      "criteria": [
-        "测试通过",
-        "GitHub Pages可访问",
-        "性能指标达标"
-      ],
-      "status": "pending"
+      "criteria": ["测试通过", "GitHub Pages可访问", "性能指标达标"],
+      "status": "completed"
     }
-  ]
-}
-{
+  ],
   "performanceTargets": {
     "firstLoad": "<4秒",
     "fps3d": ">30FPS",
     "throughput": ">1000点/秒",
     "lighthousePerformance": ">80"
-  }
-}
-{
-  "resourceEstimate": {
-    "totalWeeks": 10,
-    "totalBudget": "18万元",
-    "team": {
-      "frontend": "1-2",
-      "3d": "外包/内部",
-      "qa": "1（兼职）"
-    }
-  }
-}
-{
-  "riskAndMitigation": [
-    {
-      "risk": "3D模型精度不足",
-      "impact": "高",
-      "probability": "中",
-      "mitigation": "Phase 1代码审查发现当前模型已较完整，但需精细化"
-    },
-    {
-      "risk": "Mock数据真实性",
-      "impact": "中",
-      "probability": "低",
-      "mitigation": "PlantSimulator实现完整，报警规则合理"
-    },
-    {
-      "risk": "性能不达标",
-      "impact": "中",
-      "probability": "中",
-      "mitigation": "使用性能优化专项文档：manual-update、脏检查、LOD等"
-    },
-    {
-      "risk": "需求变更",
-      "impact": "中",
-      "probability": "高",
-      "mitigation": "敏捷迭代，MVP优先"
-    },
-    {
-      "risk": "GitHub Pages带宽限制",
-      "impact": "中",
-      "probability": "中",
-      "mitigation": "代码分割优化已完成（vue/three/echarts分开）"
-    }
-  ]
-}
-{
+  },
   "documents": [
     {
       "name": "SCADA数字孪生专业级升级方案.md",
       "path": ".trae/documents/SCADA数字孪生专业级升级方案.md",
-      "status": "verified",
-      "version": "v3.0",
-      "description": "总体升级方案文档（高标准版本）"
+      "status": "verified"
     },
     {
       "name": "状态快照.json",
       "path": ".trae/documents/状态快照.json",
-      "status": "updated",
-      "version": "v2.6",
-      "description": "项目状态跟踪 - Phase 1详细审查完成，实际进度75%"
+      "status": "updated"
     },
     {
-      "name": "README.md",
-      "path": "README.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "项目入口文档"
-    },
-    {
-      "name": "架构设计.md",
-      "path": ".trae/documents/架构设计.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "系统架构详细设计"
-    },
-    {
-      "name": "代码规范.md",
-      "path": ".trae/documents/代码规范.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "编码规范、命名规范、Git规范"
-    },
-    {
-      "name": "组件规范.md",
-      "path": ".trae/documents/组件规范.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "Vue组件设计规范、API设计"
-    },
-    {
-      "name": "性能优化专项.md",
-      "path": ".trae/documents/性能优化专项.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "ECharts/Three.js高频更新优化、内存管理"
-    },
-    {
-      "name": "composables规范.md",
-      "path": ".trae/documents/composables规范.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "组合式函数设计规范、useThree/useECharts等"
-    },
-    {
-      "name": "GitHubPages优化.md",
-      "path": ".trae/documents/GitHubPages优化.md",
-      "status": "new",
-      "version": "v1.0",
-      "description": "GitHub Pages部署优化、模型压缩、代码分割"
+      "name": "Phase4_5_Implementation_Plan.md",
+      "path": ".trae/documents/Phase4_5_Implementation_Plan.md",
+      "status": "new"
     }
-  ]
-}
-{
-  "gitStatus": {
-    "lastCommit": "feat(phase0): Phase 0 milestone completed",
-    "lastCommitMessage": "Upgrade plan v3.0 high-standard version; Status snapshot v2.5",
-    "actionsStatus": "ready",
-    "pagesStatus": "pending_deploy",
-    "pagesUrl": "https://slowdown87.github.io/ScadaDemo/"
-  }
-}
-{
-  "currentDemoFeatures": [
-    "Vue3 + Vite + Pinia 架构",
-    "Three.js 3D数字孪生展示",
-    "ECharts 实时图表",
-    "SideNav 侧边导航",
-    "Mock PLC 数据模拟",
-    "工业风格UI",
-    "GitHub Pages部署",
-    "设备点击交互 (InteractionManager)",
-    "设备详情面板 (DevicePanel)",
-    "报警规则引擎 (alarmEngine)",
-    "报警面板 (AlarmPanel)",
-    "性能监控 (PerfView)",
-    "Composables规范实现 (useThree/useECharts/useInterval/useRAF)",
-    "代码分割优化 (vue-vendor/three/echarts分开)",
-    "Phase 0 架构搭建完成"
   ],
-  "currentLimitations": [
-    "储罐几何形状可精细化 (当前用基础圆柱)",
-    "管道系统可增强细节 (弯头、法兰)",
-    "PBR环境贴图缺失 (金属质感略差)",
-    "无LOD分级渲染 (远处设备仍高精度)",
-    "无SSAO后处理 (深度感略弱)"
-  ]
-}
-{
-  "upgradeGoals": [
-    "专业级3D建模 (PBR材质+精细模型)",
-    "Mock数据实时模拟",
-    "设备点击交互",
-    "远程控制",
-    "物料追踪",
-    "报警管理",
-    "仿真推演"
-  ]
-}
-{
-  "userConfirmation": "pending",
-  "userNotes": [
-    "Phase 1进度需详细审查，实际可能高于快照",
-    "整个Phase 1都要高标准严要求"
-  ]
-}
-{
+  "gitStatus": {
+    "lastCommit": "feat(phase4-5): Phase 4/5 implementation and fixes",
+    "actionsStatus": "ready",
+    "pagesStatus": "deployed",
+    "pagesUrl": "https://slowdown87.github.io/ScadaDemo/"
+  },
   "versionHistory": [
     {
-      "version": "1.0",
-      "date": "2026-04-23",
-      "changes": "初始版本，从原项目基础升级为专业级方案（含后端）"
+      "version": "3.0",
+      "date": "2026-04-27",
+      "changes": "Phase 4/5补全完成 - 物理模型updatePhysics+预置场景PRESET_SCENARIOS+数据同步syncToPlantStore"
     },
     {
-      "version": "2.1",
-      "date": "2026-04-24",
-      "changes": "调整为方案1（纯前端），移除后端任务，总工期从11周减至10周，预算从65万减至18万"
-    },   
-    {
-      "version": "2.8",
-      "date": "2026-04-24",
-      "changes": "Phase 1里程碑验收通过！进度100%，已完成：3D模型+材质+PBR+阴影+LOD+SSAO+Mock数据+报警引擎"
+      "version": "2.11",
+      "date": "2026-04-27",
+      "changes": "Phase 5里程碑验收通过"
     },
     {
-      "version": "2.9",
-      "date": "2026-04-24",
-      "changes": "Phase 2里程碑验收通过！进度100%，完成：OutlinePass高亮+视角聚焦动画+ECharts增量更新+声音提醒+报警历史导出"
+      "version": "2.10",
+      "date": "2026-04-27",
+      "changes": "Phase 4里程碑验收通过"
     }
   ]
 }

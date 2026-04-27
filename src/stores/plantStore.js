@@ -145,6 +145,27 @@ export const usePlantStore = defineStore('plant', () => {
     syncAlarms()
   }
 
+  function updateDevice(deviceId, data) {
+    if (data.reactorTemp !== undefined) {
+      reactorTemp.value = data.reactorTemp
+    }
+    if (data.reactorPressure !== undefined) {
+      reactorPressure.value = data.reactorPressure
+    }
+    if (data.tankLevel !== undefined) {
+      tankLevel.value = data.tankLevel
+    }
+    if (data.flowRate !== undefined) {
+      flowRate.value = data.flowRate
+    }
+    if (data.motorSpeed !== undefined) {
+      motorSpeed.value = data.motorSpeed
+    }
+    if (data.productCount !== undefined) {
+      productCount.value = data.productCount
+    }
+  }
+
   function cleanup() {
     if (timeInterval) {
       clearInterval(timeInterval)
@@ -193,6 +214,7 @@ export const usePlantStore = defineStore('plant', () => {
     reset,
     acknowledgeAlarm,
     acknowledgeAll,
+    updateDevice,
     cleanup,
     simulator: plantSimulator
   }

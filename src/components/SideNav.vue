@@ -47,6 +47,7 @@ const currentPath = computed(() => route.path)
 const menuItems = [
   { path: '/home', label: '工业组态', icon: '◆', desc: '方案A' },
   { path: '/twin', label: '数字孪生', icon: '◈', desc: '方案B' },
+  { path: '/simulation', label: '仿真培训', icon: '▶', desc: '方案D' },
   { path: '/perf', label: '性能监控', icon: '◉', desc: '方案C' },
   { path: '/trend', label: '趋势分析', icon: '◇', desc: '数据分析' },
   { path: '/about', label: '关于', icon: '○', desc: '项目介绍' }
