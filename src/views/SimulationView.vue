@@ -101,7 +101,13 @@
       <div class="sim-main">
         <div class="main-content">
           <div class="plant-view">
-            <PlantView :interactive="false" :showControls="false" />
+            <div class="plant-placeholder">
+              <div class="placeholder-content">
+                <span class="placeholder-icon">◈</span>
+                <p>3D 场景</p>
+                <p class="placeholder-desc">TwinView 独立页面</p>
+              </div>
+            </div>
           </div>
 
           <div class="control-panel">
@@ -215,18 +221,13 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useSimulationStore } from '@/stores/simulationStore'
 import { createEquipment, EquipmentState, EquipmentStateLabels, EquipmentStateColors, FaultType, FaultSeverity, FaultTypeLabels } from '@/mock/simulationEngine'
-import PlantView from '@/views/TwinView.vue'
 
 const simStore = useSimulationStore()
 
 const {
-  isRunning,
-  isPaused,
-  simulationTime,
-  recordings,
-  equipment,
   faults,
   initialize,
   start,
@@ -240,6 +241,8 @@ const {
   getOperations,
   clearOperations
 } = simStore
+
+const { isRunning, isPaused, simulationTime, recordings, equipment } = storeToRefs(simStore)
 
 const speed = ref('1')
 const selectedEquipment = ref(null)
@@ -731,6 +734,32 @@ onUnmounted(() => {
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(0, 170, 255, 0.2);
+  background: rgba(10, 14, 23, 0.8);
+}
+
+.plant-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-content {
+  text-align: center;
+  color: var(--text-dim, #6c757d);
+}
+
+.placeholder-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 10px;
+  opacity: 0.5;
+}
+
+.placeholder-desc {
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 .control-panel {
