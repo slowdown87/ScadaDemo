@@ -1,88 +1,77 @@
 <template>
   <div class="home-container">
-    <SideNav />
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="header-left">
-          <h1 class="page-title">◆ SCADA 智能控制系统</h1>
-          <span class="page-subtitle">方案A - 工业组态增强版</span>
-        </div>
-        <div class="header-right">
-          <div class="system-info">
-            <span class="info-item">
-              <svg viewBox="0 0 24 24" width="14" height="14">
-                <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z"/>
-              </svg>
-              {{ systemDate }} {{ systemTime }}
-            </span>
-            <span class="info-divider">|</span>
-            <span class="info-item">
-              <span class="status-dot" :class="connectionStatus"></span>
-              {{ connectionStatus }}
-            </span>
-            <span class="info-divider">|</span>
-            <span class="info-item">v{{ softwareVersion }}</span>
-          </div>
-        </div>
-      </header>
-
-      <div class="dashboard-grid">
-        <div class="plant-section">
-          <PlantView
-            :is-running="store.running"
-            :tank-level="store.tankLevel"
-            :flow-rate="store.flowRate"
-            :reactor-temp="store.reactorTemp"
-            :reactor-pressure="store.reactorPressure"
-            :motor-speed="store.motorSpeed"
-            :product-count="store.productCount"
-            :alarms="store.alarms"
-          />
-        </div>
-
-        <div class="control-section">
-          <ControlPanel
-            :is-running="store.running"
-            :runtime="runtime"
-            :total-product="store.productTotal"
-            :alarm-count="store.alarmHistory.length"
-            @start="handleStart"
-            @stop="handleStop"
-            @reset="handleReset"
-            @toggle="handleToggle"
-          />
-        </div>
-
-        <div class="data-section">
-          <DataPanel
-            :tank-level="store.tankLevel"
-            :flow-rate="store.flowRate"
-            :reactor-temp="store.reactorTemp"
-            :reactor-pressure="store.reactorPressure"
-            :motor-speed="store.motorSpeed"
-            :product-count="store.productCount"
-            :product-rate="store.productRate"
-            :system-time="store.systemTime"
-          />
-        </div>
-
-        <div class="alarm-section">
-          <AlarmPanel
-            :alarms="store.alarms"
-            :alarm-history="store.alarmHistory"
-            @acknowledge="handleAckAlarm"
-            @acknowledge-all="handleAckAll"
-          />
+    <header class="top-bar">
+      <div class="header-left">
+        <h1 class="page-title">工艺流程监控</h1>
+        <span class="page-subtitle">实时状态 · 数据采集 · 报警管理</span>
+      </div>
+      <div class="header-right">
+        <div class="system-info">
+          <span class="info-item">
+            <svg viewBox="0 0 24 24" width="14" height="14">
+              <path fill="currentColor" d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z"/>
+            </svg>
+            {{ systemTime }}
+          </span>
         </div>
       </div>
-    </main>
+    </header>
+
+    <div class="dashboard-grid">
+      <div class="plant-section">
+        <PlantView
+          :is-running="store.running"
+          :tank-level="store.tankLevel"
+          :flow-rate="store.flowRate"
+          :reactor-temp="store.reactorTemp"
+          :reactor-pressure="store.reactorPressure"
+          :motor-speed="store.motorSpeed"
+          :product-count="store.productCount"
+          :alarms="store.alarms"
+        />
+      </div>
+
+      <div class="control-section">
+        <ControlPanel
+          :is-running="store.running"
+          :runtime="runtime"
+          :total-product="store.productTotal"
+          :alarm-count="store.alarmHistory.length"
+          @start="handleStart"
+          @stop="handleStop"
+          @reset="handleReset"
+          @toggle="handleToggle"
+        />
+      </div>
+
+      <div class="data-section">
+        <DataPanel
+          :tank-level="store.tankLevel"
+          :flow-rate="store.flowRate"
+          :reactor-temp="store.reactorTemp"
+          :reactor-pressure="store.reactorPressure"
+          :motor-speed="store.motorSpeed"
+          :product-count="store.productCount"
+          :product-rate="store.productRate"
+          :system-time="store.systemTime"
+        />
+      </div>
+
+      <div class="alarm-section">
+        <AlarmPanel
+          :alarms="store.alarms"
+          :alarm-history="store.alarmHistory"
+          @acknowledge="handleAckAlarm"
+          @acknowledge-all="handleAckAll"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { usePlantStore } from '@/stores/plantStore'
-import SideNav from '@/components/SideNav.vue'
 import PlantView from '@/components/PlantView.vue'
 import ControlPanel from '@/components/ControlPanel.vue'
 import DataPanel from '@/components/DataPanel.vue'
@@ -95,9 +84,6 @@ let runtimeInterval = null
 let startTime = null
 
 const systemTime = computed(() => store.systemTime)
-const systemDate = computed(() => store.systemDate)
-const connectionStatus = computed(() => store.connectionStatus)
-const softwareVersion = computed(() => store.softwareVersion)
 
 function handleStart() {
   store.start()
@@ -175,17 +161,10 @@ onUnmounted(() => {
 <style scoped>
 .home-container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--color-bg);
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  overflow: auto;
+  background: transparent;
 }
 
 .top-bar {
@@ -193,29 +172,50 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.3);
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  position: relative;
+}
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), transparent);
+  border-radius: 1px;
 }
 
 .header-left {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .page-title {
   font-size: 22px;
   font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: 3px;
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
   margin: 0;
-  text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title::before {
+  content: '◆';
+  color: var(--color-primary);
+  font-size: 18px;
 }
 
 .page-subtitle {
   font-size: 12px;
-  color: var(--color-text-dim);
+  color: var(--color-text-tertiary);
   letter-spacing: 1px;
+  margin-left: 28px;
 }
 
 .header-right {
@@ -227,42 +227,26 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 15px;
-  background: rgba(26, 34, 53, 0.8);
+  padding: 8px 16px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-light);
   border-radius: 20px;
-  border: 1px solid rgba(0, 170, 255, 0.2);
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 12px;
-  color: var(--color-text-dim);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 
 .info-item svg {
-  opacity: 0.7;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #36d399;
-}
-
-.status-dot.OFFLINE {
-  background: #ff4757;
-}
-
-.status-dot.CONNECTING {
-  background: #f39c12;
-  animation: pulse 1s ease-in-out infinite;
-}
-
-.info-divider {
-  color: rgba(0, 170, 255, 0.3);
+  color: var(--color-primary);
+  opacity: 0.8;
 }
 
 @keyframes pulse {
@@ -273,7 +257,7 @@ onUnmounted(() => {
 .dashboard-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 350px;
+  grid-template-columns: minmax(600px, 1fr) 380px;
   grid-template-rows: 1fr auto;
   gap: 20px;
 }
@@ -324,6 +308,21 @@ onUnmounted(() => {
   .alarm-section {
     grid-column: 1;
     grid-row: 4;
+  }
+}
+
+@media (max-width: 1024px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .system-info {
+    align-self: flex-start;
   }
 }
 </style>

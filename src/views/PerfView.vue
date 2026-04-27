@@ -1,93 +1,89 @@
 <template>
   <div class="perf-container">
-    <SideNav />
-    <main class="main-content">
-      <header class="top-bar">
-        <div class="header-left">
-          <h1 class="page-title">◆ 性能监控系统</h1>
-          <span class="page-subtitle">方案C - 高频数据实时监控</span>
-        </div>
-        <div class="header-right">
-          <div class="control-buttons">
-            <button
-              class="ctrl-btn"
-              :class="{ active: isRunning }"
-              @click="toggleMonitor"
-            >
-              {{ isRunning ? '⏸ 暂停' : '▶ 开始' }}
-            </button>
-            <button class="ctrl-btn reset" @click="resetData">
-              ↻ 重置
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div class="perf-content">
-        <div class="main-grid">
-          <div class="left-panel">
-            <MetricsPanel
-              :metrics="metrics"
-              :fps-history="fpsHistory"
-              :is-running="isRunning"
-            />
-          </div>
-
-          <div class="right-panel">
-            <RealtimeChart
-              title="温度监控"
-              :data="temperatureHistory"
-              :current-value="currentTemperature"
-              unit="°C"
-              :max-value="100"
-              color="#ff6b6b"
-            />
-            <RealtimeChart
-              title="压力监控"
-              :data="pressureHistory"
-              :current-value="currentPressure"
-              unit="atm"
-              :max-value="2.5"
-              color="#4ecdc4"
-            />
-            <RealtimeChart
-              title="流量监控"
-              :data="flowHistory"
-              :current-value="currentFlow"
-              unit="L/s"
-              :max-value="20"
-              color="#45b7d1"
-            />
-          </div>
-        </div>
-
-        <div class="stats-bar">
-          <div class="stat-item">
-            <span class="stat-label">监测时长</span>
-            <span class="stat-value">{{ duration }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">数据更新</span>
-            <span class="stat-value">{{ metrics.updateRate }} /s</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">峰值FPS</span>
-            <span class="stat-value">{{ peakFps }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">平均FPS</span>
-            <span class="stat-value">{{ averageFps }}</span>
-          </div>
+    <header class="top-bar">
+      <div class="header-left">
+        <h1 class="page-title">性能监控系统</h1>
+        <span class="page-subtitle">高频数据实时监控</span>
+      </div>
+      <div class="header-right">
+        <div class="control-buttons">
+          <button
+            class="ctrl-btn"
+            :class="{ active: isRunning }"
+            @click="toggleMonitor"
+          >
+            {{ isRunning ? '⏸ 暂停' : '▶ 开始' }}
+          </button>
+          <button class="ctrl-btn reset" @click="resetData">
+            ↻ 重置
+          </button>
         </div>
       </div>
-    </main>
+    </header>
+
+    <div class="perf-content">
+      <div class="main-grid">
+        <div class="left-panel">
+          <MetricsPanel
+            :metrics="metrics"
+            :fps-history="fpsHistory"
+            :is-running="isRunning"
+          />
+        </div>
+
+        <div class="right-panel">
+          <RealtimeChart
+            title="温度监控"
+            :data="temperatureHistory"
+            :current-value="currentTemperature"
+            unit="°C"
+            :max-value="100"
+            color="var(--color-danger)"
+          />
+          <RealtimeChart
+            title="压力监控"
+            :data="pressureHistory"
+            :current-value="currentPressure"
+            unit="atm"
+            :max-value="2.5"
+            color="var(--color-primary)"
+          />
+          <RealtimeChart
+            title="流量监控"
+            :data="flowHistory"
+            :current-value="currentFlow"
+            unit="L/s"
+            :max-value="20"
+            color="var(--color-accent)"
+          />
+        </div>
+      </div>
+
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-label">监测时长</span>
+          <span class="stat-value">{{ duration }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">数据更新</span>
+          <span class="stat-value">{{ metrics.updateRate }} /s</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">峰值FPS</span>
+          <span class="stat-value">{{ peakFps }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">平均FPS</span>
+          <span class="stat-value">{{ averageFps }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { highFreqSimulator } from '@/mock/highFreqMock'
-import SideNav from '@/components/SideNav.vue'
 import MetricsPanel from '@/components/MetricsPanel.vue'
 import RealtimeChart from '@/components/RealtimeChart.vue'
 
@@ -191,47 +187,61 @@ onUnmounted(() => {
 <style scoped>
 .perf-container {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  background: var(--color-bg);
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  overflow: auto;
+  background: transparent;
 }
 
 .top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.3);
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+  position: relative;
+}
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-primary), transparent);
+  border-radius: 1px;
 }
 
 .header-left {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .page-title {
   font-size: 22px;
   font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: 3px;
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
   margin: 0;
-  text-shadow: 0 0 20px rgba(0, 170, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-title::before {
+  content: '◆';
+  color: var(--color-primary);
+  font-size: 18px;
 }
 
 .page-subtitle {
   font-size: 12px;
-  color: var(--color-text-dim);
+  color: var(--color-text-tertiary);
   letter-spacing: 1px;
+  margin-left: 28px;
 }
 
 .header-right {
@@ -241,41 +251,47 @@ onUnmounted(() => {
 
 .control-buttons {
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  padding: 6px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-light);
+  border-radius: 10px;
 }
 
 .ctrl-btn {
-  background: rgba(0, 170, 255, 0.2);
-  border: 1px solid rgba(0, 170, 255, 0.5);
-  color: #00aaff;
-  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  padding: 10px 18px;
   border-radius: 8px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .ctrl-btn:hover {
-  background: rgba(0, 170, 255, 0.3);
-  box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+  background: rgba(0, 170, 255, 0.1);
+  color: var(--color-text-primary);
 }
 
 .ctrl-btn.active {
-  background: rgba(54, 211, 153, 0.2);
-  border-color: rgba(54, 211, 153, 0.5);
-  color: #36d399;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-600));
+  color: white;
+  box-shadow: 0 2px 8px rgba(54, 211, 153, 0.3);
 }
 
 .ctrl-btn.reset {
-  background: rgba(243, 156, 18, 0.2);
-  border-color: rgba(243, 156, 18, 0.5);
-  color: #f39c12;
+  color: var(--color-warning);
 }
 
 .ctrl-btn.reset:hover {
-  background: rgba(243, 156, 18, 0.3);
-  box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
+  background: rgba(250, 173, 20, 0.1);
 }
 
 .perf-content {
@@ -283,58 +299,87 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
 }
 
 .main-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 20px;
+  overflow: hidden;
 }
 
 .left-panel {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .right-panel {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
+  overflow: hidden;
 }
 
 .stats-bar {
   display: flex;
   justify-content: space-around;
-  padding: 15px;
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
+  padding: 16px 24px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .stat-label {
-  color: #5a6a8a;
+  color: var(--color-text-tertiary);
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .stat-value {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 18px;
   font-weight: 600;
   font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .main-grid {
     grid-template-columns: 1fr;
+  }
+
+  .left-panel {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .stats-bar {
+    flex-wrap: wrap;
+    gap: 16px;
   }
 }
 </style>

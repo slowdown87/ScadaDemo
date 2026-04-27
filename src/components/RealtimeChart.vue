@@ -2,7 +2,7 @@
   <div class="realtime-chart">
     <div class="chart-header">
       <div class="header-left">
-        <span class="chart-title">◆ {{ title }}</span>
+        <span class="chart-title">{{ title }}</span>
       </div>
       <div class="header-right">
         <span class="current-value" :style="{ color: valueColor }">
@@ -25,19 +25,37 @@ const props = defineProps({
   currentValue: { type: Number, default: 0 },
   unit: { type: String, default: '' },
   maxValue: { type: Number, default: 100 },
-  color: { type: String, default: '#00aaff' }
+  color: { type: String, default: 'var(--color-primary)' }
 })
 
 const chartCanvas = ref(null)
 let ctx = null
 let animationId = null
 
+const colorMap = {
+  'var(--color-primary)': '#00aaff',
+  'var(--color-accent)': '#36d399',
+  'var(--color-danger)': '#ff4757',
+  'var(--color-warning)': '#faad14',
+  'var(--color-primary-400)': '#40a9ff',
+  'var(--color-primary-500)': '#1890ff'
+}
+
+function resolveColor(color) {
+  return colorMap[color] || color || '#00aaff'
+}
+
+const alertColors = {
+  danger: '#ff4757',
+  warning: '#faad14'
+}
+
 const valueColor = computed(() => {
   const value = props.currentValue
   const max = props.maxValue
   const ratio = value / max
-  if (ratio > 0.8) return '#ff4757'
-  if (ratio > 0.6) return '#f39c12'
+  if (ratio > 0.8) return alertColors.danger
+  if (ratio > 0.6) return alertColors.warning
   return props.color
 })
 
@@ -55,9 +73,10 @@ function drawChart() {
 
   const maxVal = props.maxValue
   const stepX = width / (data.length - 1)
+  const resolvedColor = resolveColor(props.color)
   const gradient = ctx.createLinearGradient(0, 0, 0, height)
-  gradient.addColorStop(0, props.color + '40')
-  gradient.addColorStop(1, props.color + '00')
+  gradient.addColorStop(0, resolvedColor + '40')
+  gradient.addColorStop(1, resolvedColor + '00')
 
   ctx.beginPath()
   ctx.moveTo(0, height)
@@ -74,10 +93,10 @@ function drawChart() {
   ctx.fill()
 
   ctx.beginPath()
-  ctx.strokeStyle = props.color
+  ctx.strokeStyle = resolvedColor
   ctx.lineWidth = 2
   ctx.shadowBlur = 10
-  ctx.shadowColor = props.color
+  ctx.shadowColor = resolvedColor
 
   data.forEach((value, i) => {
     const x = i * stepX
@@ -95,9 +114,9 @@ function drawChart() {
   const lastY = height - (data[data.length - 1] / maxVal * height)
   ctx.beginPath()
   ctx.arc(lastX, lastY, 5, 0, Math.PI * 2)
-  ctx.fillStyle = props.color
+  ctx.fillStyle = resolvedColor
   ctx.shadowBlur = 15
-  ctx.shadowColor = props.color
+  ctx.shadowColor = resolvedColor
   ctx.fill()
 }
 
@@ -123,19 +142,25 @@ onUnmounted(() => {
 
 <style scoped>
 .realtime-chart {
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--shadow-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
-  background: rgba(0, 170, 255, 0.1);
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(0, 170, 255, 0.1), rgba(0, 170, 255, 0.05));
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .header-left {
@@ -145,10 +170,19 @@ onUnmounted(() => {
 }
 
 .chart-title {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-title::before {
+  content: '◆';
+  color: var(--color-primary);
+  font-size: 12px;
 }
 
 .header-right {
@@ -160,11 +194,15 @@ onUnmounted(() => {
   font-size: 20px;
   font-weight: 600;
   font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
   text-shadow: 0 0 10px currentColor;
 }
 
 .chart-container {
-  padding: 15px;
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .chart-container canvas {

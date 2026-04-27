@@ -52,10 +52,10 @@ const barWidth = computed(() => {
 
 const barColor = computed(() => {
   const t = props.temp
-  if (t < 35) return '#36d399'
-  if (t < 45) return '#ffc107'
+  if (t < 35) return 'var(--color-accent)'
+  if (t < 45) return 'var(--color-warning)'
   if (t < 50) return '#ff9800'
-  return '#ff4444'
+  return 'var(--color-danger)'
 })
 </script>
 

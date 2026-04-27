@@ -1,7 +1,7 @@
 <template>
   <div class="metrics-panel">
     <div class="panel-header">
-      <span>◆ 系统性能</span>
+      <span class="panel-title">系统性能</span>
       <span class="status-indicator" :class="{ active: isRunning }">
         {{ isRunning ? '监测中' : '已停止' }}
       </span>
@@ -103,6 +103,10 @@ const fpsClass = computed(() => {
   return 'danger'
 })
 
+const chartColors = {
+  primary: 'var(--color-primary)'
+}
+
 function drawChart() {
   if (!ctx || !chartCanvas.value) return
 
@@ -119,10 +123,10 @@ function drawChart() {
   const stepX = width / (history.length - 1)
 
   ctx.beginPath()
-  ctx.strokeStyle = '#00aaff'
+  ctx.strokeStyle = chartColors.primary
   ctx.lineWidth = 2
   ctx.shadowBlur = 5
-  ctx.shadowColor = '#00aaff'
+  ctx.shadowColor = chartColors.primary
 
   history.forEach((fps, i) => {
     const x = i * stepX
@@ -136,7 +140,7 @@ function drawChart() {
 
   ctx.stroke()
 
-  ctx.fillStyle = '#00aaff'
+  ctx.fillStyle = chartColors.primary
   history.forEach((fps, i) => {
     if (i % 10 === 0) {
       const x = i * stepX
@@ -170,39 +174,55 @@ onUnmounted(() => {
 
 <style scoped>
 .metrics-panel {
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: var(--shadow-md);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
-  background: rgba(0, 170, 255, 0.1);
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(0, 170, 255, 0.1), rgba(0, 170, 255, 0.05));
+  border-bottom: 1px solid var(--color-border-light);
 }
 
-.panel-header span:first-child {
-  color: #00aaff;
+.panel-title {
+  color: var(--color-primary);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title::before {
+  content: '◆';
+  color: var(--color-primary);
+  font-size: 12px;
 }
 
 .status-indicator {
   font-size: 11px;
-  padding: 3px 10px;
-  border-radius: 10px;
+  padding: 4px 12px;
+  border-radius: 12px;
   background: rgba(74, 85, 104, 0.3);
-  color: #4a5568;
+  color: var(--color-text-disabled);
+  transition: all var(--transition-normal);
 }
 
 .status-indicator.active {
   background: rgba(54, 211, 153, 0.2);
-  color: #36d399;
+  color: var(--color-accent);
   animation: pulse-status 1.5s ease-in-out infinite;
 }
 
@@ -214,50 +234,58 @@ onUnmounted(() => {
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 15px;
+  gap: 12px;
+  padding: 16px;
 }
 
 .metric-card {
-  background: rgba(18, 24, 38, 0.8);
-  border: 1px solid rgba(0, 170, 255, 0.2);
-  border-radius: 8px;
-  padding: 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 10px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  transition: all var(--transition-normal);
+}
+
+.metric-card:hover {
+  background: var(--color-bg-tertiary);
+  border-color: var(--color-border-hover);
 }
 
 .metric-icon {
-  color: #00aaff;
-  opacity: 0.7;
+  color: var(--color-primary);
+  opacity: 0.8;
 }
 
 .metric-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .metric-label {
-  color: #5a6a8a;
+  color: var(--color-text-tertiary);
   font-size: 10px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .metric-value {
-  color: #fff;
+  color: var(--color-text-primary);
   font-size: 18px;
   font-weight: 600;
   font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
-.metric-value.good { color: #36d399; }
-.metric-value.warning { color: #f39c12; }
-.metric-value.danger { color: #ff4757; }
+.metric-value.good { color: var(--color-accent); }
+.metric-value.warning { color: var(--color-warning); }
+.metric-value.danger { color: var(--color-danger); }
 
 .metric-bar {
-  height: 3px;
+  height: 4px;
   background: rgba(0, 170, 255, 0.1);
   border-radius: 2px;
   overflow: hidden;
@@ -269,31 +297,34 @@ onUnmounted(() => {
   transition: width 0.3s ease;
 }
 
-.bar-fill.good { background: #36d399; }
-.bar-fill.warning { background: #f39c12; }
-.bar-fill.danger { background: #ff4757; }
+.bar-fill.good { background: var(--color-accent); }
+.bar-fill.warning { background: var(--color-warning); }
+.bar-fill.danger { background: var(--color-danger); }
 
 .quick-chart {
-  margin: 0 15px 15px;
-  background: rgba(18, 24, 38, 0.8);
-  border: 1px solid rgba(0, 170, 255, 0.2);
-  border-radius: 8px;
+  margin: 0 16px 16px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: 10px;
   overflow: hidden;
+  flex: 1;
+  min-height: 100px;
 }
 
 .chart-header {
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.1);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .chart-header span {
-  color: #5a6a8a;
+  color: var(--color-text-tertiary);
   font-size: 11px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .chart-canvas {
-  padding: 10px;
+  padding: 12px;
 }
 
 .chart-canvas canvas {

@@ -285,6 +285,15 @@ function handleStop() {
   emit('control', { type: 'stop' })
 }
 
+const chartColors = {
+  axisLine: '#5a7a9a',
+  splitLine: '#1a2a4a',
+  axisLabel: '#5a7a9a',
+  line: 'var(--color-primary)',
+  areaTop: 'rgba(0, 170, 255, 0.3)',
+  areaBottom: 'rgba(0, 170, 255, 0.05)'
+}
+
 function updateChartData() {
   if (!hasChart.value || !props.device?.history) return
 
@@ -296,29 +305,29 @@ function updateChartData() {
       xAxis: {
         type: 'category',
         data: history.map((_, i) => i.toString()),
-        axisLine: { lineStyle: { color: '#2a3a5a' } },
-        axisLabel: { color: '#5a7a9a', fontSize: 10 },
+        axisLine: { lineStyle: { color: chartColors.axisLine } },
+        axisLabel: { color: chartColors.axisLabel, fontSize: 10 },
         show: false
       },
       yAxis: {
         type: 'value',
         axisLine: { show: false },
-        splitLine: { lineStyle: { color: '#1a2a4a', type: 'dashed' } },
-        axisLabel: { color: '#5a7a9a', fontSize: 10 }
+        splitLine: { lineStyle: { color: chartColors.splitLine, type: 'dashed' } },
+        axisLabel: { color: chartColors.axisLabel, fontSize: 10 }
       },
       series: [{
         data: history,
         type: 'line',
         smooth: true,
         symbol: 'none',
-        lineStyle: { color: '#00aaff', width: 2 },
+        lineStyle: { color: chartColors.line, width: 2 },
         areaStyle: {
           color: {
             type: 'linear',
             x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(0, 170, 255, 0.3)' },
-              { offset: 1, color: 'rgba(0, 170, 255, 0.05)' }
+              { offset: 0, color: chartColors.areaTop },
+              { offset: 1, color: chartColors.areaBottom }
             ]
           }
         }
@@ -398,27 +407,27 @@ watch(() => props.device?.controlValues, (val) => {
 .device-name {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-text-primary);
 }
 
 .device-id {
   font-size: 11px;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
   font-family: 'Courier New', monospace;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
   cursor: pointer;
   padding: 5px;
   border-radius: 5px;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .close-btn:hover {
-  color: #ff4757;
+  color: var(--color-danger);
   background: rgba(255, 71, 87, 0.1);
 }
 
@@ -443,18 +452,18 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .status-badge.running {
-  background: rgba(54, 211, 153, 0.2);
-  color: #36d399;
+  background: rgba(54, 211, 153, 0.15);
+  color: var(--color-accent);
 }
 
 .status-badge.stopped {
-  background: rgba(128, 128, 128, 0.2);
-  color: #888;
+  background: rgba(74, 85, 104, 0.15);
+  color: var(--color-text-tertiary);
 }
 
 .status-badge.alarm {
-  background: rgba(255, 71, 87, 0.2);
-  color: #ff4757;
+  background: rgba(255, 71, 87, 0.15);
+  color: var(--color-danger);
   animation: alarm-pulse 1s infinite;
 }
 
@@ -487,10 +496,10 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .data-item {
-  background: rgba(30, 40, 60, 0.6);
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(0, 170, 255, 0.1);
+  border: 1px solid var(--color-border-light);
 }
 
 .data-item.warning {
@@ -506,7 +515,7 @@ watch(() => props.device?.controlValues, (val) => {
 .data-label {
   display: block;
   font-size: 11px;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
   margin-bottom: 5px;
 }
 
@@ -519,13 +528,13 @@ watch(() => props.device?.controlValues, (val) => {
 .data-value {
   font-size: 20px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: 'Courier New', monospace;
 }
 
 .data-unit {
   font-size: 11px;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
 }
 
 .data-bar {
@@ -538,25 +547,25 @@ watch(() => props.device?.controlValues, (val) => {
 
 .data-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00aaff, #36d399);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   border-radius: 2px;
   transition: width 0.3s;
 }
 
 .data-item.warning .data-bar-fill {
-  background: linear-gradient(90deg, #ff9f43, #ff4757);
+  background: linear-gradient(90deg, var(--color-warning), var(--color-danger));
 }
 
 .data-item.danger .data-bar-fill {
-  background: #ff4757;
+  background: var(--color-danger);
 }
 
 .chart-section {
   margin-bottom: 15px;
-  background: rgba(30, 40, 60, 0.6);
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(0, 170, 255, 0.1);
+  border: 1px solid var(--color-border-light);
 }
 
 .chart-header {
@@ -565,7 +574,7 @@ watch(() => props.device?.controlValues, (val) => {
 
 .chart-title {
   font-size: 12px;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
 }
 
 .chart-container {
@@ -573,26 +582,22 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .control-section {
-  background: rgba(30, 40, 60, 0.6);
+  background: var(--color-bg-secondary);
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid rgba(0, 170, 255, 0.1);
+  border: 1px solid var(--color-border-light);
 }
 
 .control-header {
   margin-bottom: 12px;
   font-size: 12px;
-  color: #5a7a9a;
-}
-
-.control-item {
-  margin-bottom: 15px;
+  color: var(--color-text-tertiary);
 }
 
 .control-item label {
   display: block;
   font-size: 11px;
-  color: #5a7a9a;
+  color: var(--color-text-tertiary);
   margin-bottom: 8px;
 }
 
@@ -615,14 +620,14 @@ watch(() => props.device?.controlValues, (val) => {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  background: #00aaff;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
 }
 
 .slider-value {
   font-size: 12px;
-  color: #fff;
+  color: var(--color-text-primary);
   min-width: 70px;
   text-align: right;
   font-family: 'Courier New', monospace;
@@ -651,8 +656,8 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .ctrl-btn.start {
-  border-color: #36d399;
-  color: #36d399;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .ctrl-btn.start:hover:not(:disabled) {
@@ -660,14 +665,14 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .ctrl-btn.start:disabled {
-  border-color: #4a5568;
-  color: #4a5568;
+  border-color: var(--color-text-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
 .ctrl-btn.stop {
-  border-color: #ff4757;
-  color: #ff4757;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .ctrl-btn.stop:hover:not(:disabled) {
@@ -675,8 +680,8 @@ watch(() => props.device?.controlValues, (val) => {
 }
 
 .ctrl-btn.stop:disabled {
-  border-color: #4a5568;
-  color: #4a5568;
+  border-color: var(--color-text-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 

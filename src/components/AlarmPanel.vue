@@ -2,7 +2,7 @@
   <div class="alarm-panel" :class="{ 'has-alarms': hasAlarms }">
     <div class="panel-header">
       <div class="header-left">
-        <span class="panel-title">◆ 报警管理</span>
+        <span class="panel-title">报警管理</span>
         <div class="alarm-counts">
           <span class="count critical" v-if="criticalCount > 0">
             <span class="count-num">{{ criticalCount }}</span> 紧急
@@ -115,15 +115,17 @@ const recentHistory = computed(() =>
 
 <style scoped>
 .alarm-panel {
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
-  padding: 15px;
-  backdrop-filter: blur(10px);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
 }
 
 .alarm-panel.has-alarms {
-  border-color: rgba(255, 71, 87, 0.5);
+  border-color: var(--color-danger);
   animation: panel-pulse 2s ease-in-out infinite;
 }
 
@@ -136,9 +138,9 @@ const recentHistory = computed(() =>
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .header-left {
@@ -148,10 +150,19 @@ const recentHistory = computed(() =>
 }
 
 .panel-title {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title::before {
+  content: '◆';
+  color: var(--color-primary);
+  font-size: 12px;
 }
 
 .alarm-counts {
@@ -161,26 +172,29 @@ const recentHistory = computed(() =>
 
 .count {
   font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 10px;
+  padding: 4px 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .count.critical {
-  background: rgba(255, 71, 87, 0.2);
-  color: #ff4757;
+  background: rgba(255, 71, 87, 0.15);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 71, 87, 0.3);
 }
 
 .count.warning {
-  background: rgba(255, 159, 67, 0.2);
-  color: #ff9f43;
+  background: rgba(250, 173, 20, 0.15);
+  color: var(--color-warning);
+  border: 1px solid rgba(250, 173, 20, 0.3);
 }
 
 .count.info {
-  background: rgba(0, 170, 255, 0.2);
-  color: #00aaff;
+  background: rgba(0, 170, 255, 0.15);
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 170, 255, 0.3);
 }
 
 .count-num {
@@ -195,13 +209,13 @@ const recentHistory = computed(() =>
 
 .sound-btn {
   background: transparent;
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  color: #00aaff;
-  padding: 6px 8px;
-  border-radius: 5px;
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  padding: 6px 10px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,45 +223,49 @@ const recentHistory = computed(() =>
 
 .sound-btn:hover {
   background: rgba(0, 170, 255, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .sound-btn.muted {
-  color: #5a6a8a;
-  border-color: rgba(90, 106, 138, 0.3);
+  color: var(--color-text-disabled);
+  border-color: var(--color-border-light);
 }
 
 .sound-btn.muted:hover {
-  background: rgba(90, 106, 138, 0.1);
+  background: rgba(74, 85, 104, 0.2);
 }
 
 .export-btn {
   background: transparent;
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  color: #00aaff;
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
   padding: 6px 12px;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
 }
 
 .export-btn:hover {
   background: rgba(0, 170, 255, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .ack-all-btn {
-  background: rgba(255, 71, 87, 0.2);
-  border: 1px solid rgba(255, 71, 87, 0.5);
-  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: var(--color-danger);
   padding: 6px 12px;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
 }
 
 .ack-all-btn:hover {
-  background: rgba(255, 71, 87, 0.3);
+  background: rgba(255, 71, 87, 0.2);
 }
 
 .alarms-list {
@@ -262,9 +280,9 @@ const recentHistory = computed(() =>
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px;
-  background: rgba(18, 24, 38, 0.8);
-  border-radius: 8px;
+  padding: 12px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
   border-left: 3px solid;
   animation: slide-in 0.3s ease;
 }
@@ -281,18 +299,18 @@ const recentHistory = computed(() =>
 }
 
 .alarm-item.critical {
-  border-left-color: #ff4757;
-  background: rgba(255, 71, 87, 0.1);
+  border-left-color: var(--color-danger);
+  background: rgba(255, 71, 87, 0.08);
 }
 
 .alarm-item.warning {
-  border-left-color: #ff9f43;
-  background: rgba(255, 159, 67, 0.1);
+  border-left-color: var(--color-warning);
+  background: rgba(250, 173, 20, 0.08);
 }
 
 .alarm-item.info {
-  border-left-color: #00aaff;
-  background: rgba(0, 170, 255, 0.1);
+  border-left-color: var(--color-primary);
+  background: rgba(0, 170, 255, 0.08);
 }
 
 .alarm-indicator {
@@ -301,25 +319,25 @@ const recentHistory = computed(() =>
 
 .alarm-led {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   animation: blink 1s ease-in-out infinite;
 }
 
 .alarm-led.critical {
-  background: #ff4757;
-  box-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
+  background: var(--color-danger);
+  box-shadow: 0 0 8px var(--color-danger);
 }
 
 .alarm-led.warning {
-  background: #ff9f43;
-  box-shadow: 0 0 10px rgba(255, 159, 67, 0.6);
+  background: var(--color-warning);
+  box-shadow: 0 0 8px var(--color-warning);
 }
 
 .alarm-led.info {
-  background: #00aaff;
-  box-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary);
 }
 
 @keyframes blink {
@@ -340,18 +358,18 @@ const recentHistory = computed(() =>
 }
 
 .alarm-id {
-  color: #8892b0;
+  color: var(--color-text-tertiary);
   font-size: 10px;
   font-family: 'Courier New', monospace;
 }
 
 .alarm-time {
-  color: #5a6a8a;
+  color: var(--color-text-disabled);
   font-size: 10px;
 }
 
 .alarm-message {
-  color: #fff;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 500;
 }
@@ -359,18 +377,18 @@ const recentHistory = computed(() =>
 .alarm-ack-btn {
   flex-shrink: 0;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #8892b0;
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-tertiary);
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-fast);
 }
 
 .alarm-ack-btn:hover {
-  border-color: #00aaff;
-  color: #00aaff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .no-alarms {
@@ -379,23 +397,22 @@ const recentHistory = computed(() =>
   align-items: center;
   justify-content: center;
   padding: 30px;
-  color: #36d399;
-  gap: 10px;
+  color: var(--color-accent);
+  gap: 12px;
 }
 
 .no-alarms svg {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .no-alarms span {
   font-size: 13px;
-  opacity: 0.7;
 }
 
 .alarm-history {
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(0, 170, 255, 0.1);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .history-header {
@@ -403,7 +420,7 @@ const recentHistory = computed(() =>
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  color: #8892b0;
+  color: var(--color-text-tertiary);
   font-size: 12px;
 }
 
@@ -415,29 +432,30 @@ const recentHistory = computed(() =>
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .history-item {
   display: flex;
   gap: 10px;
   font-size: 11px;
-  padding: 5px 8px;
-  background: rgba(18, 24, 38, 0.5);
-  border-radius: 4px;
+  padding: 6px 10px;
+  background: var(--color-bg-secondary);
+  border-radius: 6px;
 }
 
-.history-item.critical .history-msg { color: #ff6b7a; }
-.history-item.warning .history-msg { color: #ffb366; }
-.history-item.info .history-msg { color: #66b3ff; }
+.history-item.critical .history-msg { color: var(--color-danger); }
+.history-item.warning .history-msg { color: var(--color-warning); }
+.history-item.info .history-msg { color: var(--color-primary); }
 
 .history-time {
-  color: #5a6a8a;
+  color: var(--color-text-disabled);
   flex-shrink: 0;
+  font-family: 'Courier New', monospace;
 }
 
 .history-msg {
-  color: #8892b0;
+  color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

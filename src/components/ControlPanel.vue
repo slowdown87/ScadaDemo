@@ -89,27 +89,35 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 
 <style scoped>
 .control-panel {
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
-  padding: 15px;
-  backdrop-filter: blur(10px);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .panel-title {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
+}
+
+.panel-title::before {
+  content: '◆ ';
+  color: var(--color-primary);
+  font-size: 12px;
 }
 
 .system-status {
@@ -117,7 +125,7 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #ff4757;
+  color: var(--color-danger);
   padding: 4px 12px;
   background: rgba(255, 71, 87, 0.1);
   border-radius: 15px;
@@ -125,7 +133,7 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .system-status.running {
-  color: #36d399;
+  color: var(--color-accent);
   background: rgba(54, 211, 153, 0.1);
   border-color: rgba(54, 211, 153, 0.3);
 }
@@ -151,7 +159,7 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-lg);
 }
 
 .ctrl-btn {
@@ -162,10 +170,10 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
   gap: 6px;
   padding: 15px 10px;
   border: 2px solid;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
 }
@@ -186,7 +194,7 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .ctrl-btn svg {
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-normal);
 }
 
 .ctrl-btn:hover svg {
@@ -204,8 +212,8 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .ctrl-btn.start {
-  border-color: #36d399;
-  color: #36d399;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .ctrl-btn.start:hover:not(:disabled) {
@@ -214,14 +222,14 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .ctrl-btn.start:disabled {
-  border-color: #4a5568;
-  color: #4a5568;
+  border-color: var(--color-text-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
 .ctrl-btn.stop {
-  border-color: #ff4757;
-  color: #ff4757;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 .ctrl-btn.stop:hover:not(:disabled) {
@@ -230,14 +238,14 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .ctrl-btn.stop:disabled {
-  border-color: #4a5568;
-  color: #4a5568;
+  border-color: var(--color-text-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
 .ctrl-btn.reset {
-  border-color: #00aaff;
-  color: #00aaff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .ctrl-btn.reset:hover {
@@ -246,31 +254,31 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 }
 
 .ctrl-btn.toggle {
-  border-color: #f39c12;
-  color: #f39c12;
+  border-color: var(--color-warning);
+  color: var(--color-warning);
 }
 
 .ctrl-btn.toggle:hover {
-  background: rgba(243, 156, 18, 0.15);
-  box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+  background: rgba(250, 173, 20, 0.15);
+  box-shadow: 0 0 20px rgba(250, 173, 20, 0.3);
 }
 
 .ctrl-btn.toggle.active {
-  background: rgba(243, 156, 18, 0.2);
+  background: rgba(250, 173, 20, 0.2);
   animation: toggle-active 1s ease-in-out infinite;
 }
 
 @keyframes toggle-active {
-  0%, 100% { box-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
-  50% { box-shadow: 0 0 25px rgba(243, 156, 18, 0.5); }
+  0%, 100% { box-shadow: 0 0 10px rgba(250, 173, 20, 0.3); }
+  50% { box-shadow: 0 0 25px rgba(250, 173, 20, 0.5); }
 }
 
 .quick-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  padding-top: 15px;
-  border-top: 1px solid rgba(0, 170, 255, 0.1);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-light);
 }
 
 .stat-item {
@@ -282,14 +290,15 @@ defineEmits(['start', 'stop', 'reset', 'toggle'])
 
 .stat-label {
   font-size: 10px;
-  color: #5a6a8a;
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
 }
 
 .stat-value {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: var(--color-text-primary);
   font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 </style>

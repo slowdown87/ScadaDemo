@@ -1,7 +1,7 @@
 <template>
   <div class="data-panel">
     <div class="panel-header">
-      <span class="panel-title">◆ 实时数据监控</span>
+      <span class="panel-title">实时数据监控</span>
       <span class="data-time">{{ systemTime }}</span>
     </div>
     <div class="data-grid">
@@ -31,7 +31,7 @@
           <span class="data-value">{{ flowRate }}<span class="data-unit">L/s</span></span>
         </div>
         <div class="data-bar">
-          <div class="data-bar-fill" :style="{ width: (flowRate / 20 * 100) + '%', background: '#00aaff' }"></div>
+          <div class="data-bar-fill" :style="{ width: (flowRate / 20 * 100) + '%', background: getFlowColor(flowRate) }"></div>
         </div>
       </div>
 
@@ -76,7 +76,7 @@
           <span class="data-value">{{ motorSpeed }}<span class="data-unit">RPM</span></span>
         </div>
         <div class="data-bar">
-          <div class="data-bar-fill" :style="{ width: (motorSpeed / 2000 * 100) + '%', background: '#00aaff' }"></div>
+          <div class="data-bar-fill" :style="{ width: (motorSpeed / 2000 * 100) + '%', background: getMotorColor(motorSpeed) }"></div>
         </div>
       </div>
 
@@ -116,83 +116,103 @@ const props = defineProps({
 })
 
 function getLevelColor(level) {
-  if (level > 90 || level < 20) return '#ff4757'
-  if (level > 80) return '#ff9f43'
-  return '#36d399'
+  if (level > 90 || level < 20) return 'var(--color-danger)'
+  if (level > 80) return 'var(--color-warning)'
+  return 'var(--color-accent)'
 }
 
 function getTempColor(temp) {
-  if (temp > 80) return '#ff4757'
-  if (temp > 60) return '#ff9f43'
-  return '#00aaff'
+  if (temp > 80) return 'var(--color-danger)'
+  if (temp > 60) return 'var(--color-warning)'
+  return 'var(--color-primary)'
 }
 
 function getPressureColor(pressure) {
-  if (pressure > 1.5) return '#ff4757'
-  if (pressure > 1.3) return '#ff9f43'
-  return '#00aaff'
+  if (pressure > 1.5) return 'var(--color-danger)'
+  if (pressure > 1.3) return 'var(--color-warning)'
+  return 'var(--color-primary)'
+}
+
+function getFlowColor(rate) {
+  if (rate > 15 || rate < 5) return 'var(--color-warning)'
+  return 'var(--color-primary)'
+}
+
+function getMotorColor(speed) {
+  if (speed > 1400) return 'var(--color-warning)'
+  return 'var(--color-primary)'
 }
 </script>
 
 <style scoped>
 .data-panel {
-  background: rgba(26, 34, 53, 0.9);
-  border: 1px solid rgba(0, 170, 255, 0.3);
-  border-radius: 10px;
-  padding: 15px;
-  backdrop-filter: blur(10px);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-md);
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .panel-title {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 1px;
 }
 
-.data-time {
-  color: #8892b0;
+.panel-title::before {
+  content: '◆ ';
+  color: var(--color-primary);
   font-size: 12px;
+}
+
+.data-time {
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .data-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: var(--space-md);
 }
 
 .data-item {
-  background: rgba(18, 24, 38, 0.8);
-  border: 1px solid rgba(0, 170, 255, 0.2);
-  border-radius: 8px;
-  padding: 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: all 0.3s ease;
+  gap: var(--space-sm);
+  transition: all var(--transition-normal);
 }
 
 .data-item:hover {
-  border-color: rgba(0, 170, 255, 0.5);
-  box-shadow: 0 0 15px rgba(0, 170, 255, 0.1);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
 }
 
 .data-item.warning {
-  border-color: rgba(255, 159, 67, 0.5);
+  border-color: var(--color-warning);
   background: rgba(255, 159, 67, 0.1);
 }
 
 .data-item.danger {
-  border-color: rgba(255, 71, 87, 0.5);
+  border-color: var(--color-danger);
   background: rgba(255, 71, 87, 0.1);
   animation: pulse-danger 1s ease-in-out infinite;
 }
@@ -205,14 +225,14 @@ function getPressureColor(pressure) {
 .data-icon {
   width: 32px;
   height: 32px;
-  color: #00aaff;
+  color: var(--color-primary);
   opacity: 0.8;
 }
 
-.data-icon.temp { color: #ff9f43; }
-.data-icon.pressure { color: #9b59b6; }
-.data-icon.motor { color: #36d399; }
-.data-icon.product { color: #f39c12; }
+.data-icon.temp { color: var(--color-warning); }
+.data-icon.pressure { color: var(--color-primary-400); }
+.data-icon.motor { color: var(--color-accent); }
+.data-icon.product { color: var(--color-warning); }
 
 .data-content {
   display: flex;
@@ -221,27 +241,28 @@ function getPressureColor(pressure) {
 }
 
 .data-label {
-  color: #8892b0;
+  color: var(--color-text-tertiary);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .data-value {
-  color: #fff;
+  color: var(--color-text-primary);
   font-size: 20px;
   font-weight: 600;
   font-family: 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .data-value.product-value {
-  color: #36d399;
+  color: var(--color-accent);
   font-size: 24px;
 }
 
 .data-unit {
   font-size: 12px;
-  color: #8892b0;
+  color: var(--color-text-tertiary);
   margin-left: 2px;
 }
 
@@ -263,15 +284,15 @@ function getPressureColor(pressure) {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: #36d399;
+  color: var(--color-accent);
 }
 
 .data-trend.up {
-  color: #36d399;
+  color: var(--color-accent);
 }
 
 .data-trend.down {
-  color: #ff4757;
+  color: var(--color-danger);
 }
 
 @media (max-width: 1200px) {

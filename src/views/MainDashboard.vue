@@ -158,10 +158,10 @@ const tempBarWidth = computed(() => {
 
 const tempBarColor = computed(() => {
   const temp = store.temperature
-  if (temp < 35) return '#36d399'
-  if (temp < 45) return '#ffc107'
+  if (temp < 35) return 'var(--color-accent)'
+  if (temp < 45) return 'var(--color-warning)'
   if (temp < 50) return '#ff9800'
-  return '#ff4444'
+  return 'var(--color-danger)'
 })
 
 function formatRuntime(seconds) {
@@ -569,7 +569,7 @@ onUnmounted(() => {
   }
   50% {
     box-shadow: 0 0 35px rgba(255, 68, 68, 0.6);
-    border-color: #ff6666;
+    border-color: var(--color-danger);
   }
 }
 

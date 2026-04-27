@@ -129,8 +129,8 @@ function getAlarmClass(type) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(10, 14, 23, 0.95);
-  border-radius: 10px;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -139,12 +139,12 @@ function getAlarmClass(type) {
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background: rgba(26, 34, 53, 0.8);
-  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
+  background: var(--color-bg-glass);
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .plant-title {
-  color: #00aaff;
+  color: var(--color-primary);
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -167,17 +167,17 @@ function getAlarmClass(type) {
 
 .legend-item.running {
   background: rgba(54, 211, 153, 0.2);
-  color: #36d399;
+  color: var(--color-accent);
 }
 
 .legend-item.stopped {
   background: rgba(74, 85, 104, 0.2);
-  color: #4a5568;
+  color: var(--color-text-disabled);
 }
 
 .legend-item.alarm {
   background: rgba(255, 71, 87, 0.2);
-  color: #ff4757;
+  color: var(--color-danger);
 }
 
 .plant-container {
@@ -217,33 +217,33 @@ function getAlarmClass(type) {
 
 .data-label {
   position: absolute;
-  background: rgba(26, 34, 53, 0.95);
-  border: 1px solid rgba(0, 170, 255, 0.5);
-  border-radius: 6px;
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
   padding: 6px 12px;
   font-size: 14px;
   font-weight: 600;
   font-family: 'Courier New', monospace;
-  color: #36d399;
-  box-shadow: 0 0 15px rgba(0, 170, 255, 0.2);
-  transition: all 0.3s ease;
+  color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+  transition: all var(--transition-normal);
 }
 
 .data-label.warning {
-  border-color: rgba(255, 159, 67, 0.7);
-  color: #ff9f43;
+  border-color: var(--color-warning);
+  color: var(--color-warning);
   animation: label-pulse-warning 1.5s ease-in-out infinite;
 }
 
 .data-label.danger {
-  border-color: rgba(255, 71, 87, 0.7);
-  color: #ff4757;
+  border-color: var(--color-danger);
+  color: var(--color-danger);
   animation: label-pulse-danger 0.8s ease-in-out infinite;
 }
 
 .data-label.active {
-  border-color: rgba(54, 211, 153, 0.7);
-  box-shadow: 0 0 20px rgba(54, 211, 153, 0.3);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow-accent);
 }
 
 @keyframes label-pulse-warning {
@@ -289,7 +289,7 @@ function getAlarmClass(type) {
   left: 50%;
   width: 40px;
   height: 4px;
-  background: linear-gradient(90deg, transparent, #00aaff, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
   transform-origin: center;
   border-radius: 2px;
 }
@@ -320,7 +320,7 @@ function getAlarmClass(type) {
   left: 57%;
   width: 40px;
   height: 40px;
-  border: 3px solid #00aaff;
+  border: 3px solid var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -330,7 +330,7 @@ function getAlarmClass(type) {
 .motor-rotor {
   width: 20px;
   height: 20px;
-  background: conic-gradient(#00aaff, #00ffee, #00aaff);
+  background: conic-gradient(var(--color-primary), var(--color-accent), var(--color-primary));
   border-radius: 50%;
   opacity: 0.6;
 }

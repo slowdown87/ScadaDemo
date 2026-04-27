@@ -327,15 +327,15 @@ onUnmounted(() => {
 }
 
 .stat-item.transit .stat-value {
-  color: #00aaff;
+  color: var(--color-primary);
 }
 
 .stat-item.stored .stat-value {
-  color: #36d399;
+  color: var(--color-accent);
 }
 
 .stat-item.processing .stat-value {
-  color: #f7b731;
+  color: var(--color-warning);
 }
 
 .lots-list {
@@ -433,8 +433,8 @@ onUnmounted(() => {
 }
 
 .action-btn.start {
-  border-color: #36d399;
-  color: #36d399;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .action-btn.start:hover {
@@ -442,8 +442,8 @@ onUnmounted(() => {
 }
 
 .action-btn.advance {
-  border-color: #00aaff;
-  color: #00aaff;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .action-btn.advance:hover {
@@ -451,8 +451,8 @@ onUnmounted(() => {
 }
 
 .action-btn.complete {
-  border-color: #26de81;
-  color: #26de81;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .action-btn.complete:hover {
@@ -585,8 +585,8 @@ onUnmounted(() => {
 }
 
 .timeline-step.current .step-dot {
-  background: #f7b731;
-  border-color: #f7b731;
+  background: var(--color-warning);
+  border-color: var(--color-warning);
   box-shadow: 0 0 8px rgba(247, 183, 49, 0.5);
 }
 
