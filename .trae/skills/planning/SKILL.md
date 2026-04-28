@@ -1,7 +1,8 @@
----
+***
+
 name: "planning"
 description: "任务规划技能。用于复杂任务拆解、ReAct循环执行、自我纠错。激活后AI会像最先进的Agent一样：理解目标→拆解子任务→执行验证→自我反思→迭代优化。"
----
+-------------------------------------------------------------------------------------------
 
 # 任务规划技能
 
@@ -23,10 +24,12 @@ Thought → Action → Observation → Thought → ... → Final Answer
 ### Task Decomposition
 
 **拆解策略**：
+
 - **Decomposition-First**：稳定环境，先完整规划再执行
 - **Interleaved**：动态环境，边规划边执行
 
 **拆解原则**：
+
 - 子任务需语义独立，减少推理错误传播
 - 每个子任务有明确输入输出
 - 支持并行执行的子任务应分开
@@ -34,16 +37,18 @@ Thought → Action → Observation → Thought → ... → Final Answer
 ### Self-Correction
 
 **失败处理**：
+
 ```
 失败 → 分析原因 → 调整策略 → 重试或替换方案
 ```
 
 **反思检查**：
+
 - 我的假设还成立吗？
 - 是否需要回退或重新规划？
 - 有没有更好的路径？
 
----
+***
 
 ## 规划流程
 
@@ -81,7 +86,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
    - 完成时验证结果
 ```
 
----
+***
 
 ## 状态快照操作规范
 
@@ -106,22 +111,22 @@ Thought → Action → Observation → Thought → ... → Final Answer
 
 ### 状态转换规则
 
-| 时机 | currentPhase | task.progress | task.status |
-|------|--------------|---------------|-------------|
-| 规划开始 | 规划 | 0/N | 进行中 |
-| 子任务完成 | 保持 | N/N | 进行中 |
-| 执行开始 | 执行 | N/N | 进行中 |
-| 任务完成 | 完成 | N/N | 完成 |
-| 任务阻塞 | 保持 | N/N | 阻塞 |
+| 时机    | currentPhase | task.progress | task.status |
+| ----- | ------------ | ------------- | ----------- |
+| 规划开始  | 规划           | 0/N           | 进行中         |
+| 子任务完成 | 保持           | N/N           | 进行中         |
+| 执行开始  | 执行           | N/N           | 进行中         |
+| 任务完成  | 完成           | N/N           | 完成          |
+| 任务阻塞  | 保持           | N/N           | 阻塞          |
 
 ### 更新操作
 
-1. 打开 .trae\状态快照.json
+1. 打开 .trae\docs\状态快照.json
 2. 按模板创建（如不存在）
 3. 按状态转换规则更新字段
 4. 保存文件
 
----
+***
 
 ## 输出格式
 
@@ -173,11 +178,11 @@ Thought → Action → Observation → Thought → ... → Final Answer
 **遗留问题**: ...
 ```
 
----
+***
 
 ## 工具使用
 
-配合 tool_rules 使用，常见模式：
+配合 tool\_rules 使用，常见模式：
 
 ```
 1. 搜索信息：web search / grep
@@ -186,7 +191,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 4. 验证结果：diff / test / assert
 ```
 
----
+***
 
 ## 自我检查点
 
@@ -199,7 +204,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 4. 是否达到成功标准？
 ```
 
----
+***
 
 ## 适用场景
 
@@ -209,10 +214,11 @@ Thought → Action → Observation → Thought → ... → Final Answer
 - 技术选型决策
 - 任何需要规划的长任务
 
----
+***
 
 ## 限制
 
 - 单次规划步数有限（通常 10-50 步）
 - 复杂任务可能需要多次规划迭代
 - 长期任务需要记录中间状态
+

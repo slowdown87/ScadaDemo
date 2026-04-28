@@ -1,0 +1,469 @@
+# SCADA 通讯接口模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 说明: 定义通讯接口模板，用于自动生成通讯接口规格书
+
+meta:
+  version: "1.0"
+  created: "2026-04-28"
+  source_doc: "通讯接口规格书.md"
+  project_name: "茶饮料生产线SCADA监控系统"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+  capacity_rated: "50000B/H (额定)"
+  capacity_max: "54000B/H (最大)"
+
+# ============================================================================
+# PLC配置
+# ============================================================================
+plc_config:
+  - id: "PLC-1"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.11"
+    sections: ["WT", "TH", "EX"]
+    section_names: ["水处理", "茶叶前处理", "萃取"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW254", points: 128, desc: "温度、压力、流量"}
+      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+
+  - id: "PLC-2"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.12"
+    sections: ["FL", "BL", "HM"]
+    section_names: ["过滤净化", "调配", "均质"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW254", points: 128, desc: "pH、Brix、温度"}
+      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+
+  - id: "PLC-3"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.13"
+    sections: ["UH", "CP", "PF", "PK"]
+    section_names: ["UHT杀菌", "CIP清洗", "灌装", "冷却包装"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW254", points: 128, desc: "温度、压力、速度"}
+      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+
+# ============================================================================
+# 通讯协议参数
+# ============================================================================
+protocol_params:
+  ethernet_ip:
+    name: "Ethernet/IP (PLC)"
+    scan_cycle: "100ms"
+    redundancy: "双网口绑定"
+    points_per_plc: 2000
+    timeout: "3次重试后报警"
+
+  modbus_tcp:
+    name: "Modbus TCP"
+    port: 502
+    devices: 6
+    points: 48
+    timeout: "3秒无响应"
+
+  modbus_rtu:
+    name: "Modbus RTU"
+    baudrate: 9600
+    databits: 8
+    parity: "N"
+    stopbits: 1
+    devices: 28
+    points: 112
+
+  hart:
+    name: "HART"
+    devices: 4
+    points: 4
+    scan_cycle: "1秒"
+
+  opc_ua:
+    name: "OPC UA"
+    endpoint: "opc.tcp://SCADA-SERVER:4840/SCADA/MESInterface"
+    direction: "SCADA作为Server，MES作为Client"
+    subscription: "周期订阅(1秒)+变化订阅"
+    points: 200
+    security: "SignAndEncrypt"
+    policy: "Basic256Sha256"
+
+# ============================================================================
+# 智能仪表配置
+# ============================================================================
+smart_devices:
+  modbus_rtu_devices:
+    flowmeters:
+      name: "流量计"
+      protocol: "Modbus RTU"
+      baudrate: 9600
+      register: 40001
+      function_code: 03
+      data_format: "浮点数(IEEE754)"
+      devices:
+        - {addr: 1, tag: "WT-102-FT", desc: "RO产水流量", unit: "m³/h"}
+        - {addr: 2, tag: "WT-103-FT", desc: "活性炭流量", unit: "m³/h"}
+        - {addr: 3, tag: "EX-101-FT", desc: "萃取1进水量", unit: "m³/h"}
+        - {addr: 4, tag: "EX-102-FT", desc: "萃取2进水量", unit: "m³/h"}
+        - {addr: 5, tag: "EX-103-FT", desc: "萃取3进水量", unit: "m³/h"}
+        - {addr: 6, tag: "EX-104-FT", desc: "茶渣分离流量", unit: "m³/h"}
+        - {addr: 7, tag: "FL-102-FT", desc: "超滤产水流量", unit: "m³/h"}
+        - {addr: 8, tag: "FL-103-FT", desc: "超滤浓水流量", unit: "m³/h"}
+        - {addr: 9, tag: "BL-101-FT", desc: "调配1进茶流量", unit: "m³/h"}
+        - {addr: 10, tag: "BL-102-FT", desc: "调配2进茶流量", unit: "m³/h"}
+        - {addr: 11, tag: "HM-101-FT", desc: "均质流量", unit: "m³/h"}
+        - {addr: 12, tag: "UH-101-FT", desc: "UHT产品流量", unit: "m³/h"}
+        - {addr: 13, tag: "CP-104-FT", desc: "CIP回水流量", unit: "m³/h"}
+        - {addr: 14, tag: "PF-101-FT", desc: "压缩空气流量", unit: "Nm³/h"}
+        - {addr: 15, tag: "PK-109-FT", desc: "纸箱供应计数", unit: "个"}
+        - {addr: 16, tag: "PK-110-FT", desc: "装箱速度", unit: "箱/min"}
+        - {addr: 17, tag: "PK-112-FT", desc: "码垛速度", unit: "箱/min"}
+        - {addr: 18, tag: "PK-114-FT", desc: "缠绕膜速度", unit: "卷/min"}
+
+    conductivity_meters:
+      name: "电导率仪"
+      protocol: "Modbus RTU"
+      baudrate: 9600
+      register: 40001
+      function_code: 03
+      devices:
+        - {addr: 11, tag: "WT-102-CtT", desc: "RO产水电导率", unit: "μS/cm"}
+        - {addr: 12, tag: "WT-105-CtT", desc: "离子交换电导率", unit: "μS/cm"}
+        - {addr: 13, tag: "FL-103-CtT", desc: "超滤浓水电导率", unit: "μS/cm"}
+        - {addr: 14, tag: "CP-101-CtT", desc: "CIP碱液浓度", unit: "%"}
+        - {addr: 15, tag: "CP-102-CtT", desc: "CIP酸液浓度", unit: "%"}
+        - {addr: 16, tag: "CP-104-CtT", desc: "CIP回水电导率", unit: "μS/cm"}
+
+  hart_devices:
+    ph_meters:
+      name: "pH计"
+      protocol: "HART 7.x"
+      polling_addr: 0
+      primary_var: "pH值 (0-14)"
+      secondary_var: "温度"
+      scan_cycle: "1秒"
+      devices:
+        - {addr: 20, tag: "BL-101-AT", desc: "调配罐1 pH"}
+        - {addr: 21, tag: "BL-102-AT", desc: "调配罐2 pH"}
+        - {addr: 22, tag: "BL-104-AT", desc: "酸液罐pH"}
+        - {addr: 23, tag: "BL-105-AT", desc: "香料罐pH"}
+
+  modbus_tcp_devices:
+    power_meters:
+      name: "电能表"
+      protocol: "Modbus TCP"
+      ip_range: "192.168.1.31-36"
+      port: 502
+      device_id: "1-6"
+      register_start: 40001
+      registers:
+        - {addr: 40001, param: "总有功功率", type: "Float"}
+        - {addr: 40003, param: "总无功功率", type: "Float"}
+        - {addr: 40005, param: "功率因数", type: "Float"}
+        - {addr: 40007, param: "电压L1-N", type: "Float"}
+        - {addr: 40009, param: "电压L2-N", type: "Float"}
+        - {addr: 40011, param: "电压L3-N", type: "Float"}
+        - {addr: 40013, param: "电流L1", type: "Float"}
+        - {addr: 40015, param: "电流L2", type: "Float"}
+        - {addr: 40017, param: "电流L3", type: "Float"}
+        - {addr: 40019, param: "累计有功电能", type: "Double"}
+      devices:
+        - {addr: 1, ip: "192.168.1.31", tag: "EM-WT01", desc: "水处理电能表", section: "WT"}
+        - {addr: 2, ip: "192.168.1.32", tag: "EM-EX01", desc: "萃取电能表", section: "EX"}
+        - {addr: 3, ip: "192.168.1.33", tag: "EM-UH01", desc: "UHT电能表", section: "UH"}
+        - {addr: 4, ip: "192.168.1.34", tag: "EM-PF01", desc: "灌装电能表", section: "PF"}
+        - {addr: 5, ip: "192.168.1.35", tag: "EM-PK01", desc: "包装电能表", section: "PK"}
+        - {addr: 6, ip: "192.168.1.36", tag: "EM-Total", desc: "总电能表", section: "Total"}
+
+# ============================================================================
+# 第三方系统接口
+# ============================================================================
+third_party_interfaces:
+  mes_opcua:
+    name: "MES系统接口"
+    protocol: "OPC UA"
+    direction: "SCADA作为Server，MES作为Client"
+    endpoint: "opc.tcp://SCADA-SERVER:4840/SCADA/MESInterface"
+    security_mode: "SignAndEncrypt"
+    security_policy: "Basic256Sha256"
+    auth_method: "用户名密码"
+    certificate: "X.509v3"
+    subscription_mode: "周期订阅(1秒)+变化订阅"
+    data_count: 200
+
+    read_points:
+      - tag: "WT-107-FT"
+        desc: "纯水产流量"
+        type: "Float"
+        mode: "周期1s"
+      - tag: "EX-101-TT"
+        desc: "萃取温度"
+        type: "Float"
+        mode: "周期1s"
+      - tag: "BL-101-AT"
+        desc: "调配pH"
+        type: "Float"
+        mode: "变化>0.1"
+      - tag: "BL-101-BT"
+        desc: "调配Brix"
+        type: "Float"
+        mode: "变化>0.1"
+      - tag: "UH-101-TT2"
+        desc: "杀菌温度"
+        type: "Float"
+        mode: "变化>0.5℃"
+      - tag: "PF-104-FT"
+        desc: "灌装流量"
+        type: "Float"
+        mode: "周期1s"
+      - tag: "CNT-004"
+        desc: "产品灌装量"
+        type: "Int64"
+        mode: "变化"
+      - tag: "CNT-007"
+        desc: "吹瓶数量"
+        type: "Int64"
+        mode: "变化"
+
+    write_points:
+      - tag: "RECIPE-SELECT"
+        desc: "配方选择"
+        type: "Int"
+        values: "1=绿茶,2=红茶,3=乌龙茶"
+      - tag: "PRODUCTION-START"
+        desc: "生产开始"
+        type: "Bool"
+        trigger: "上升沿触发"
+      - tag: "PRODUCTION-STOP"
+        desc: "生产停止"
+        type: "Bool"
+        trigger: "上升沿触发"
+      - tag: "BATCH-START"
+        desc: "批次开始"
+        type: "Bool"
+        trigger: "上升沿触发"
+      - tag: "BATCH-END"
+        desc: "批次结束"
+        type: "Bool"
+        trigger: "上升沿触发"
+
+  energy_modbus_tcp:
+    name: "能源管理系统接口"
+    protocol: "Modbus TCP"
+    direction: "能源管理系统作为Client"
+    scada_role: "Server"
+    port: 502
+    data_count: 30
+    registers:
+      - {addr: 40001, param: "总有功功率", type: "Float", unit: "kW", desc: ""}
+      - {addr: 40003, param: "总有功电能", type: "Double", unit: "kWh", desc: ""}
+      - {addr: 40005, param: "水处理功耗", type: "Float", unit: "kW", desc: "WT区域"}
+      - {addr: 40007, param: "萃取功耗", type: "Float", unit: "kW", desc: "EX区域"}
+      - {addr: 40009, param: "过滤功耗", type: "Float", unit: "kW", desc: "FL区域"}
+      - {addr: 40011, param: "调配功耗", type: "Float", unit: "kW", desc: "BL区域"}
+      - {addr: 40013, param: "UHT功耗", type: "Float", unit: "kW", desc: "UH区域"}
+      - {addr: 40015, param: "灌装功耗", type: "Float", unit: "kW", desc: "PF区域"}
+      - {addr: 40017, param: "蒸汽流量", type: "Float", unit: "kg/h", desc: ""}
+      - {addr: 40019, param: "冷却水流量", type: "Float", unit: "m³/h", desc: ""}
+      - {addr: 40021, param: "压缩空气流量", type: "Float", unit: "Nm³/h", desc: ""}
+
+  bottle_cap_serial:
+    name: "瓶盖供应系统接口"
+    protocol: "Modbus RTU (从模式)"
+    port: "COM1"
+    baudrate: 9600
+    databits: 8
+    parity: "N"
+    stopbits: 1
+    direction: "瓶盖计数器→SCADA"
+    registers:
+      - {addr: 40001, param: "瓶盖计数", desc: "当前班次计数"}
+      - {addr: 40002, param: "报警状态", desc: "0=正常,1=缺盖"}
+
+  labeler_tcp:
+    name: "贴标机接口"
+    protocol: "TCP/IP (自定义协议)"
+    scada_role: "Client"
+    device_role: "Server"
+    ip: "192.168.1.51"
+    port: 5000
+    frame_format:
+      header: "0xAA 0x55"
+      length: "1字节 n"
+      command: "01=速度,02=状态"
+      data: "n字节"
+      checksum: "XOR"
+      trailer: "0x0D 0x0A"
+    commands:
+      - {code: "0x01", data: "速度值(4字节)", desc: "瓶/小时"}
+      - {code: "0x02", data: "运行状态(1字节)", desc: "0=停,1=运行,2=故障"}
+
+  coder_tcp:
+    name: "喷码机接口"
+    protocol: "TCP/IP"
+    scada_role: "Client"
+    device_role: "Server"
+    ip: "192.168.1.52"
+    port: 2000
+    functions:
+      - name: "生产计数"
+        desc: "将灌装数量发送给喷码机用于喷码"
+      - name: "故障监视"
+        desc: "监视喷码机运行状态"
+      - name: "远程控制"
+        desc: "远程暂停/恢复喷码"
+
+# ============================================================================
+# IP地址规划
+# ============================================================================
+ip_planning:
+  servers:
+    - device: "SCADA-SERVER"
+      ip: "192.168.1.10"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "HMI-01"
+      ip: "192.168.1.20"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "HMI-02"
+      ip: "192.168.1.21"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+
+  plcs:
+    - device: "PLC-1"
+      ip: "192.168.1.11"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-2"
+      ip: "192.168.1.12"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-3"
+      ip: "192.168.1.13"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+
+  instruments:
+    - device: "电能表EM-WT01"
+      ip: "192.168.1.31"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "电能表EM-EX01"
+      ip: "192.168.1.32"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "电能表EM-UH01"
+      ip: "192.168.1.33"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "电能表EM-PF01"
+      ip: "192.168.1.34"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "电能表EM-PK01"
+      ip: "192.168.1.35"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "电能表EM-Total"
+      ip: "192.168.1.36"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+
+  third_party:
+    - device: "贴标机"
+      ip: "192.168.1.51"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "喷码机"
+      ip: "192.168.1.52"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+
+# ============================================================================
+# 串口配置
+# ============================================================================
+serial_ports:
+  - port: "COM1"
+    usage: "瓶盖计数器"
+    baudrate: 9600
+    databits: 8
+    parity: "N"
+    stopbits: 1
+  - port: "COM2"
+    usage: "pH计(HART)"
+    baudrate: 9600
+    databits: 8
+    parity: "N"
+    stopbits: 1
+  - port: "COM3"
+    usage: "预留"
+    baudrate: "-"
+    databits: "-"
+    parity: "-"
+    stopbits: "-"
+
+# ============================================================================
+# 端口汇总
+# ============================================================================
+port_summary:
+  - port: 4840
+    protocol: "OPC UA"
+    usage: "MES系统对接"
+  - port: 502
+    protocol: "Modbus TCP"
+    usage: "电能表、能源系统"
+  - port: 5000
+    protocol: "TCP"
+    usage: "贴标机"
+  - port: 2000
+    protocol: "TCP"
+    usage: "喷码机"
+
+# ============================================================================
+# 通讯诊断配置
+# ============================================================================
+comm_diagnostics:
+  plc_comm:
+    method: "心跳检测"
+    alarm: "3次无响应"
+    action: "标记故障，切换备用PLC"
+
+  modbus_rtu:
+    method: "响应超时"
+    alarm: "3秒无响应"
+    action: "标记设备故障，继续轮询"
+
+  modbus_tcp:
+    method: "连接检测"
+    alarm: "连接断开"
+    action: "尝试重连，5次后报警"
+
+  opc_ua:
+    method: "会话状态"
+    alarm: "会话中断"
+    action: "通知MES，重建连接"
+
+# ============================================================================
+# 故障记录格式
+# ============================================================================
+fault_log_format:
+  - field: "故障时间"
+    format: "YYYY-MM-DD HH:mm:ss"
+  - field: "设备名称"
+    format: "故障设备位号"
+  - field: "故障类型"
+    format: "通讯超时/CRC错误/设备忙"
+  - field: "故障次数"
+    format: "连续故障次数"
+  - field: "自动恢复"
+    format: "是否自动恢复"
+  - field: "恢复时间"
+    format: "如自动恢复，记录恢复时间"

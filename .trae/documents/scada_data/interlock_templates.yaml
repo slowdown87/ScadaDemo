@@ -1,0 +1,1125 @@
+# SCADA 联锁逻辑模板定义
+# 文档版本: v1.1
+# 创建日期: 2026-04-28
+# 更新日期: 2026-04-28
+# 说明: 定义标准联锁逻辑模板，用于自动生成联锁逻辑说明书
+# 来源: 联锁逻辑说明书.md (完整内容)
+
+meta:
+  version: "1.1"
+  created: "2026-04-28"
+  source_doc: "联锁逻辑说明书.md"
+  project_name: "茶饮料生产线SCADA监控系统"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+  capacity_rated: "50000B/H (额定)"
+  capacity_max: "54000B/H (最大)"
+
+# ============================================================================
+# 联锁级别定义
+# ============================================================================
+interlock_levels:
+  L0:
+    name: "紧急停止"
+    color: "红色闪烁"
+    sound: "连续"
+    response_time: "≤100ms"
+    action: "立即停止所有相关设备"
+    reset: "手动复位"
+
+  L1:
+    name: "安全联锁"
+    color: "红色"
+    sound: "断续"
+    response_time: "≤500ms"
+    action: "停止故障设备及上游设备"
+    reset: "手动复位"
+
+  L2:
+    name: "关键报警"
+    color: "红色/黄色"
+    sound: "断续"
+    response_time: "≤1s"
+    action: "停止生产线，报警提示"
+    reset: "手动确认"
+
+  L3:
+    name: "工艺报警"
+    color: "黄色"
+    sound: "无"
+    response_time: "≤1s"
+    action: "报警提示，允许手动处理"
+    reset: "自动恢复"
+
+  L4:
+    name: "提示信息"
+    color: "蓝色"
+    sound: "无"
+    response_time: "-"
+    action: "显示记录，无需动作"
+    reset: "无需复位"
+
+# ============================================================================
+# ESD紧急停止联锁
+# ============================================================================
+esd_interlocks:
+  trigger_sources:
+    - source: "急停按钮"
+      location: "各操作员站"
+      level: "L0"
+    - source: "急停按钮"
+      location: "UHT杀菌现场"
+      level: "L0"
+    - source: "急停按钮"
+      location: "灌装现场"
+      level: "L0"
+    - source: "急停按钮"
+      location: "包装现场"
+      level: "L0"
+    - source: "皮带撕裂检测"
+      location: "输送链"
+      level: "L0"
+    - source: "电机过载"
+      location: "任意电机"
+      level: "L1"
+
+  action_matrix:
+    - trigger: "任意急停"
+      stop_devices: "所有泵、电机"
+      close_valves: "所有气动阀关闭"
+      start_actions: "CIP泵启动排空"
+      reset_mode: "手动复位"
+    - trigger: "输送链急停"
+      stop_devices: "P-PF01, P-PK01"
+      close_valves: "-"
+      start_actions: "-"
+      reset_mode: "手动复位"
+
+# ============================================================================
+# 工段联锁模板
+# ============================================================================
+interlock_templates:
+
+  # --------------------------------------------------------------------------
+  # UHT杀菌系统联锁
+  # --------------------------------------------------------------------------
+  UH:
+    name: "UHT杀菌系统"
+    interlock_prefix: "UH"
+    section_index: 3
+
+    critical_points_desc: "UHT杀菌是食品安全的关键控制点(CCP)，必须确保温度、时间、压力三参数匹配。"
+
+    critical_points:
+      - tag: "UH-101-TT2"
+        name: "杀菌温度"
+        unit: "℃"
+        setpoint: 135
+        tolerance: 5
+
+      - tag: "UH-101-PT2"
+        name: "杀菌压力"
+        unit: "MPa"
+        setpoint: 0.35
+        tolerance: 0.15
+
+      - tag: "UH-101-FT"
+        name: "产品流量"
+        unit: "m³/h"
+        setpoint: 3.0
+        tolerance: 0.5
+
+    interlocks:
+      - id: "UH-01"
+        trigger_desc: "杀菌温度TT2 < 130℃"
+        trigger_tag: "UH-101-TT2"
+        condition: "< 130"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭UV-101进料阀"
+          - "2.打开UV-107排放阀"
+          - "3.停P-UH01"
+          - "4.物料回流无菌罐或排放"
+        reset_condition: "温度>130℃后手动复位"
+
+      - id: "UH-02"
+        trigger_desc: "杀菌温度TT2 > 142℃"
+        trigger_tag: "UH-101-TT2"
+        condition: "> 142"
+        level: "L0"
+        alarm_level: "HH"
+        actions:
+          - "1.紧急关闭UV-101"
+          - "2.打开UV-107"
+          - "3.停P-UH01"
+          - "4.停蒸汽调节阀UV-102"
+        reset_condition: "温度<140℃后手动复位"
+
+      - id: "UH-03"
+        trigger_desc: "杀菌压力PT2 < 0.2MPa"
+        trigger_tag: "UH-101-PT2"
+        condition: "< 0.2"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭UV-101"
+          - "2.打开UV-107"
+          - "3.停P-UH01"
+        reset_condition: "压力>0.25MPa后手动复位"
+
+      - id: "UH-04"
+        trigger_desc: "杀菌压力PT2 > 0.5MPa"
+        trigger_tag: "UH-101-PT2"
+        condition: "> 0.5"
+        level: "L0"
+        alarm_level: "HH"
+        actions:
+          - "1.打开UV-106泄压"
+          - "2.停P-UH01"
+        reset_condition: "压力<0.4MPa后手动复位"
+
+      - id: "UH-05"
+        trigger_desc: "产品流量FT > 3.5m³/h"
+        trigger_tag: "UH-101-FT"
+        condition: "> 3.5"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低UV-101开度"
+        reset_condition: "自动恢复"
+
+      - id: "UH-06"
+        trigger_desc: "产品流量FT < 2.5m³/h"
+        trigger_tag: "UH-101-FT"
+        condition: "< 2.5"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.提升UV-101开度或停产"
+        reset_condition: "流量恢复后自动"
+
+      - id: "UH-07"
+        trigger_desc: "保温段TT3 < 130℃持续10s"
+        trigger_tag: "UH-101-TT3"
+        condition: "< 130 持续10s"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查蒸汽调节"
+        reset_condition: "手动确认"
+
+      - id: "UH-08"
+        trigger_desc: "冷却段出口TT5 > 40℃"
+        trigger_tag: "UH-101-TT5"
+        condition: "> 40"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.加大冷却水UV-103"
+        reset_condition: "手动确认"
+
+      - id: "UH-09"
+        trigger_desc: "无菌罐UH-105液位 > 95%"
+        trigger_tag: "UH-105-LT"
+        condition: "> 95"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭UV-104"
+          - "2.报警提示"
+        reset_condition: "液位<90%后自动"
+
+      - id: "UH-10"
+        trigger_desc: "无菌罐UH-105液位 < 10%"
+        trigger_tag: "UH-105-LT"
+        condition: "< 10"
+        level: "L1"
+        alarm_level: "LL"
+        actions:
+          - "1.报警提示"
+          - "2.停产"
+        reset_condition: "液位>20%后手动"
+
+      - id: "UH-11"
+        trigger_desc: "无菌罐压力PT > 0.05MPa"
+        trigger_tag: "UH-105-PT"
+        condition: "> 0.05"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查呼吸阀"
+        reset_condition: "手动确认"
+
+    start_conditions:
+      - condition: "CIP完成标志"
+        requirement: "CIP-OK = 1"
+        check_point: "CIP程序执行完毕"
+      - condition: "无菌罐液位"
+        requirement: "30% < LT < 90%"
+        check_point: "UH-105-LT"
+      - condition: "无菌罐温度"
+        requirement: "TT < 35℃"
+        check_point: "UH-105-TT"
+      - condition: "无菌罐压力"
+        requirement: "PT < 0.03MPa"
+        check_point: "UH-105-PT"
+      - condition: "蒸汽压力"
+        requirement: "PT > 0.6MPa"
+        check_point: "UH-102-PT"
+      - condition: "冷却水温度"
+        requirement: "< 30℃"
+        check_point: "-"
+      - condition: "所有阀门处于安全位置"
+        requirement: "-"
+        check_point: "初始状态确认"
+
+  # --------------------------------------------------------------------------
+  # 萃取系统联锁
+  # --------------------------------------------------------------------------
+  EX:
+    name: "萃取系统"
+    interlock_prefix: "EX"
+    section_index: 4
+
+    control_logic_desc: "三级逆流萃取采用批次控制，每级萃取罐独立温控。"
+
+    interlocks:
+      - id: "EX-01"
+        trigger_desc: "萃取罐温度TT < 75℃"
+        trigger_tag: "EX-101-TT"
+        condition: "< 75"
+        level: "L2"
+        alarm_level: "LL"
+        actions:
+          - "1.开大蒸汽阀EV-10X"
+          - "2.报警提示"
+        reset_condition: "温度>78℃后确认"
+
+      - id: "EX-02"
+        trigger_desc: "萃取罐温度TT > 100℃"
+        trigger_tag: "EX-101-TT"
+        condition: "> 100"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭蒸汽阀EV-10X"
+          - "2.开大进水阀"
+          - "3.报警提示"
+        reset_condition: "温度<95℃后确认"
+
+      - id: "EX-03"
+        trigger_desc: "萃取罐液位LT > 98%"
+        trigger_tag: "EX-101-LT"
+        condition: "> 98"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭进水阀EV-101/104"
+          - "2.关闭进茶阀EV-103/106"
+          - "3.报警提示"
+        reset_condition: "液位<95%后自动"
+
+      - id: "EX-04"
+        trigger_desc: "萃取罐液位LT < 5%"
+        trigger_tag: "EX-101-LT"
+        condition: "< 5"
+        level: "L2"
+        alarm_level: "LL"
+        actions:
+          - "1.关闭出水阀EV-106"
+          - "2.报警提示"
+        reset_condition: "液位>10%后确认"
+
+      - id: "EX-05"
+        trigger_desc: "萃取时间到但温度未达标"
+        trigger_tag: "EX-萃取时间"
+        condition: "时间到但温度未达标"
+        level: "L3"
+        alarm_level: "H"
+        actions:
+          - "1.延长萃取时间"
+          - "2.报警提示"
+        reset_condition: "温度达标后继续"
+
+      - id: "EX-06"
+        trigger_desc: "茶渣分离器堵塞"
+        trigger_tag: "EX-104-PT"
+        condition: "差压高(堵塞)"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.停P-EX01"
+          - "2.打开EV-107排放"
+          - "3.报警提示"
+        reset_condition: "人工确认"
+
+    sequence_control: |
+      启动顺序:
+      1. 检查上一级茶汁储量 > 20%
+      2. 开萃取罐排水阀EV-106，液位<10%后关闭
+      3. 开进水阀EV-101，液位达到90%后关闭
+      4. 开进茶阀EV-103，进茶量达到设定值后关闭
+      5. 启动搅拌电机M-EX01，设定转速
+      6. 启动温度控制，TT达到设定值后开始计时
+      7. 萃取计时结束后，打开EV-106泵送茶汁
+      8. 循环直到本级萃取液送完
+
+      批次切换:
+      - 一级→二级: 二级茶汁已送完，一级新批次开始
+      - 二级→三级: 三级茶汁已送完，二级新批次开始
+      - 三级→排放: 三级茶汁送完后，排放茶渣
+
+  # --------------------------------------------------------------------------
+  # 均质系统联锁
+  # --------------------------------------------------------------------------
+  HM:
+    name: "均质系统"
+    interlock_prefix: "HM"
+    section_index: 5
+
+    critical_points_desc: "均质压力和温度是产品口感和稳定性的关键参数。"
+
+    interlocks:
+      - id: "HM-01"
+        trigger_desc: "均质压力PT2 < 18MPa"
+        trigger_tag: "HM-101-PT2"
+        condition: "< 18"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.打开BV-108回流阀"
+          - "2.关闭BV-107进口阀"
+          - "3.物料回流调配罐"
+          - "4.报警提示"
+        reset_condition: "压力>20MPa后手动"
+
+      - id: "HM-02"
+        trigger_desc: "均质压力PT2 > 27MPa"
+        trigger_tag: "HM-101-PT2"
+        condition: "> 27"
+        level: "L0"
+        alarm_level: "HH"
+        actions:
+          - "1.紧急停M-HM01"
+          - "2.打开BV-108"
+          - "3.报警提示"
+        reset_condition: "压力<25MPa后手动"
+
+      - id: "HM-03"
+        trigger_desc: "均质进口温度TT < 55℃"
+        trigger_tag: "HM-101-TT"
+        condition: "< 55"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.降低均质流量"
+        reset_condition: "温度>60℃后自动"
+
+      - id: "HM-04"
+        trigger_desc: "均质进口温度TT > 75℃"
+        trigger_tag: "HM-101-TT"
+        condition: "> 75"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.加大冷却水"
+        reset_condition: "温度<70℃后确认"
+
+      - id: "HM-05"
+        trigger_desc: "均质阀温度TT2 > 140℃"
+        trigger_tag: "HM-101-TT2"
+        condition: "> 140"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停M-HM01"
+          - "2.报警提示"
+        reset_condition: "温度<120℃后手动"
+
+      - id: "HM-06"
+        trigger_desc: "均质机电机温度MT > 130℃"
+        trigger_tag: "HM-101-MT"
+        condition: "> 130"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停M-HM01"
+          - "2.报警提示"
+        reset_condition: "温度<100℃后手动"
+
+    start_conditions:
+      - condition: "调配液温度"
+        requirement: "60℃ < TT < 70℃"
+        check_point: "BL-10X-TT"
+      - condition: "调配液pH"
+        requirement: "5.0 < AT < 6.5"
+        check_point: "BL-10X-AT"
+      - condition: "调配液Brix"
+        requirement: "8° < BT < 12°"
+        check_point: "BL-10X-BT"
+      - condition: "上游UHT就绪"
+        requirement: "UHT-Ready = 1"
+        check_point: "无菌储罐有空位"
+      - condition: "均质机状态"
+        requirement: "无故障"
+        check_point: "HM-101-DT"
+
+  # --------------------------------------------------------------------------
+  # 调配系统联锁
+  # --------------------------------------------------------------------------
+  BL:
+    name: "调配系统"
+    interlock_prefix: "BL"
+    section_index: 6
+
+    critical_points_desc: "调配工序的pH值和糖度是产品口感一致性的关键。"
+
+    interlocks:
+      - id: "BL-01"
+        trigger_desc: "pH值AT < 5.0"
+        trigger_tag: "BL-101-AT"
+        condition: "< 5.0"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭进酸阀BV-103"
+          - "2.停止搅拌"
+          - "3.报警提示"
+          - "4.物料排空"
+        reset_condition: "pH>5.2后手动"
+
+      - id: "BL-02"
+        trigger_desc: "pH值AT > 6.5"
+        trigger_tag: "BL-101-AT"
+        condition: "> 6.5"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭进酸阀BV-103"
+          - "2.报警提示"
+          - "3.停产"
+        reset_condition: "pH<6.2后手动"
+
+      - id: "BL-03"
+        trigger_desc: "Brix值BT < 8°"
+        trigger_tag: "BL-101-BT"
+        condition: "< 8"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.开大BV-102进糖浆阀"
+          - "2.报警提示"
+        reset_condition: "Brix>8.5°后自动"
+
+      - id: "BL-04"
+        trigger_desc: "Brix值BT > 12°"
+        trigger_tag: "BL-101-BT"
+        condition: "> 12"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.减小BV-102开度"
+          - "2.报警提示"
+        reset_condition: "Brix<11.5°后自动"
+
+      - id: "BL-05"
+        trigger_desc: "液位LT > 98%"
+        trigger_tag: "BL-101-LT"
+        condition: "> 98"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭所有进料阀"
+          - "2.报警提示"
+        reset_condition: "液位<95%后确认"
+
+      - id: "BL-06"
+        trigger_desc: "液位LT < 5%"
+        trigger_tag: "BL-101-LT"
+        condition: "< 5"
+        level: "L2"
+        alarm_level: "LL"
+        actions:
+          - "1.关闭出口阀BV-106"
+          - "2.报警提示"
+        reset_condition: "液位>10%后确认"
+
+      - id: "BL-07"
+        trigger_desc: "糖浆罐温度TT < 55℃"
+        trigger_tag: "BL-103-TT"
+        condition: "< 55"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.开大蒸汽加热"
+          - "2.报警提示"
+        reset_condition: "温度>58℃后自动"
+
+      - id: "BL-08"
+        trigger_desc: "糖浆罐温度TT > 70℃"
+        trigger_tag: "BL-103-TT"
+        condition: "> 70"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.关小蒸汽加热"
+          - "2.报警提示"
+        reset_condition: "温度<68℃后自动"
+
+      - id: "BL-09"
+        trigger_desc: "酸液罐液位LT < 10%"
+        trigger_tag: "BL-104-LT"
+        condition: "< 10"
+        level: "L2"
+        alarm_level: "LL"
+        actions:
+          - "1.报警提示"
+          - "2.停止酸液进料"
+        reset_condition: "液位>20%后确认"
+
+      - id: "BL-10"
+        trigger_desc: "电机温度MT > 120℃"
+        trigger_tag: "BL-101-MT"
+        condition: "> 120"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停M-BL0X"
+          - "2.报警提示"
+        reset_condition: "温度<100℃后手动"
+
+  # --------------------------------------------------------------------------
+  # 灌装系统联锁
+  # --------------------------------------------------------------------------
+  PF:
+    name: "灌装系统"
+    interlock_prefix: "PF"
+    section_index: 7
+
+    critical_points_desc: "灌装温度和旋盖扭矩是食品安全和密封性的关键。"
+
+    interlocks:
+      - id: "PF-01"
+        trigger_desc: "灌装温度TT < 80℃"
+        trigger_tag: "PF-104-TT"
+        condition: "< 80"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止灌装机"
+          - "2.停止P-PF01"
+          - "3.报警提示"
+          - "4.停旋盖机"
+        reset_condition: "温度>82℃后手动"
+
+      - id: "PF-02"
+        trigger_desc: "灌装温度TT > 92℃"
+        trigger_tag: "PF-104-TT"
+        condition: "> 92"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低灌装速度"
+        reset_condition: "温度<90℃后自动"
+
+      - id: "PF-03"
+        trigger_desc: "旋盖扭矩TT < 0.3Nm"
+        trigger_tag: "PF-105-TT"
+        condition: "< 0.3"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止生产线"
+          - "2.报警提示"
+          - "3.不合格品追踪"
+        reset_condition: "扭矩调好后手动"
+
+      - id: "PF-04"
+        trigger_desc: "旋盖扭矩TT > 0.7Nm"
+        trigger_tag: "PF-105-TT"
+        condition: "> 0.7"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止生产线"
+          - "2.报警提示"
+          - "3.不合格品追踪"
+        reset_condition: "扭矩调好后手动"
+
+      - id: "PF-05"
+        trigger_desc: "吹瓶速度ST < 50000瓶/h"
+        trigger_tag: "PF-101-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.降低灌装速度匹配"
+        reset_condition: "速度恢复后自动"
+
+      - id: "PF-06"
+        trigger_desc: "吹瓶速度ST > 58000瓶/h"
+        trigger_tag: "PF-101-ST"
+        condition: "> 58000"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低吹瓶速度"
+        reset_condition: "速度恢复后自动"
+
+      - id: "PF-07"
+        trigger_desc: "灌装液位LT < 50%"
+        trigger_tag: "PF-104-LT"
+        condition: "< 50"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查均质系统"
+        reset_condition: "液位>60%后确认"
+
+      - id: "PF-08"
+        trigger_desc: "灌装压力PT > 0.3MPa"
+        trigger_tag: "PF-104-PT"
+        condition: "> 0.3"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查背压阀PV-102"
+        reset_condition: "压力恢复后确认"
+
+      - id: "PF-09"
+        trigger_desc: "金属检测报警DT=1"
+        trigger_tag: "PF-103-DT"
+        condition: "=1"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.剔除不合格瓶"
+          - "2.计数CNT-010+1"
+          - "3.报警提示"
+        reset_condition: "自动"
+
+      - id: "PF-10"
+        trigger_desc: "空瓶缺失"
+        trigger_tag: "PF-空瓶检测"
+        condition: "缺失"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.灌装机暂停"
+          - "2.报警提示"
+        reset_condition: "人工确认"
+
+    speed_sync:
+      - device: "吹瓶机PF-101"
+        base_speed: "54000B/H"
+        sync_mode: "主令"
+        tolerance: "±5%"
+      - device: "灌装机PF-104"
+        base_speed: "跟随吹瓶机"
+        sync_mode: "从动"
+        tolerance: "±3%"
+      - device: "旋盖机PF-105"
+        base_speed: "跟随灌装机"
+        sync_mode: "从动"
+        tolerance: "±2%"
+      - device: "贴标机PK-103"
+        base_speed: "跟随灌装机"
+        sync_mode: "从动"
+        tolerance: "±3%"
+      - device: "装箱机PK-106"
+        base_speed: "跟随灌装机/24"
+        sync_mode: "从动"
+        tolerance: "±5%"
+      - device: "码垛机PK-108"
+        base_speed: "跟随装箱机"
+        sync_mode: "从动"
+        tolerance: "±5%"
+
+  # --------------------------------------------------------------------------
+  # 水处理系统联锁
+  # --------------------------------------------------------------------------
+  WT:
+    name: "水处理系统"
+    interlock_prefix: "WT"
+    section_index: 8
+
+    interlocks:
+      - id: "WT-01"
+        trigger_desc: "RO产水电导率CtT > 15μS/cm"
+        trigger_tag: "WT-102-CtT"
+        condition: "> 15"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.切换到旁路"
+          - "2.报警提示"
+          - "3.通知工艺员"
+        reset_condition: "人工确认"
+
+      - id: "WT-02"
+        trigger_desc: "RO产水电导率CtT > 20μS/cm"
+        trigger_tag: "WT-102-CtT"
+        condition: "> 20"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭WV-102"
+          - "2.报警提示"
+          - "3.停产风险"
+        reset_condition: "人工确认"
+
+      - id: "WT-03"
+        trigger_desc: "RO前压力PT > 0.8MPa"
+        trigger_tag: "WT-103-PT"
+        condition: "> 0.8"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低高压泵频率"
+        reset_condition: "压力恢复后自动"
+
+      - id: "WT-04"
+        trigger_desc: "离子交换水电导率CtT > 10μS/cm"
+        trigger_tag: "WT-105-CtT"
+        condition: "> 10"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查树脂再生周期"
+        reset_condition: "人工确认"
+
+      - id: "WT-05"
+        trigger_desc: "原水箱液位LT < 10%"
+        trigger_tag: "WT-101-LT"
+        condition: "< 10"
+        level: "L1"
+        alarm_level: "LL"
+        actions:
+          - "1.停P-WT01"
+          - "2.报警提示"
+        reset_condition: "液位>20%后手动"
+
+      - id: "WT-06"
+        trigger_desc: "纯水储罐液位LT < 20%"
+        trigger_tag: "WT-107-LT"
+        condition: "< 20"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.加大产水"
+        reset_condition: "液位>30%后自动"
+
+      - id: "WT-07"
+        trigger_desc: "纯水储罐液位LT > 95%"
+        trigger_tag: "WT-107-LT"
+        condition: "> 95"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.关闭WV-103"
+          - "2.报警提示"
+        reset_condition: "液位<90%后自动"
+
+  # --------------------------------------------------------------------------
+  # CIP清洗系统联锁
+  # --------------------------------------------------------------------------
+  CP:
+    name: "CIP清洗系统"
+    interlock_prefix: "CP"
+    section_index: 9
+
+    allow_conditions:
+      - condition: "设备停机"
+        requirement: "所有相关设备停止"
+        note: "确保安全"
+      - condition: "温度达标"
+        requirement: "清洗介质温度在设定范围"
+        note: "85℃碱/60℃酸"
+      - condition: "液位正常"
+        requirement: "CIP罐液位足够"
+        note: ">30%"
+      - condition: "浓度正常"
+        requirement: "清洗剂浓度符合要求"
+        note: "碱2%/酸1%"
+
+    interlocks:
+      - id: "CP-01"
+        trigger_desc: "碱液浓度CtT < 1.5%"
+        trigger_tag: "CP-101-CtT"
+        condition: "< 1.5"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.补加NaOH"
+        reset_condition: "浓度>1.8%后自动"
+
+      - id: "CP-02"
+        trigger_desc: "碱液浓度CtT > 2.5%"
+        trigger_tag: "CP-101-CtT"
+        condition: "> 2.5"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.补加纯水"
+        reset_condition: "浓度<2.3%后自动"
+
+      - id: "CP-03"
+        trigger_desc: "酸液浓度CtT < 0.8%"
+        trigger_tag: "CP-102-CtT"
+        condition: "< 0.8"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.补加HNO₃"
+        reset_condition: "浓度>1.0%后自动"
+
+      - id: "CP-04"
+        trigger_desc: "酸液浓度CtT > 1.5%"
+        trigger_tag: "CP-102-CtT"
+        condition: "> 1.5"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.补加纯水"
+        reset_condition: "浓度<1.3%后自动"
+
+      - id: "CP-05"
+        trigger_desc: "CIP回水电导率CtT > 100μS/cm"
+        trigger_tag: "CP-104-CtT"
+        condition: "> 100"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.延长最终冲洗时间"
+        reset_condition: "浓度<50μS/cm后自动"
+
+      - id: "CP-06"
+        trigger_desc: "CIP回水流速FT < 3m³/h"
+        trigger_tag: "CP-104-FT"
+        condition: "< 3"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查泵和过滤器"
+        reset_condition: "流速恢复后确认"
+
+      - id: "CP-07"
+        trigger_desc: "清洗时间超限"
+        trigger_tag: "CP-清洗时间"
+        condition: "超限"
+        level: "L3"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.人工确认是否继续"
+        reset_condition: "人工确认"
+
+  # --------------------------------------------------------------------------
+  # 过滤系统联锁
+  # --------------------------------------------------------------------------
+  FL:
+    name: "过滤系统"
+    interlock_prefix: "FL"
+    section_index: 10
+
+    interlocks:
+      - id: "FL-01"
+        trigger_desc: "超滤膜压差DPT > 0.15MPa"
+        trigger_tag: "FL-102-DPT"
+        condition: "> 0.15"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.启动反洗程序"
+        reset_condition: "反洗完成后自动"
+
+      - id: "FL-02"
+        trigger_desc: "超滤产水流量FT < 1.5m³/h"
+        trigger_tag: "FL-102-FT"
+        condition: "< 1.5"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查膜污染"
+        reset_condition: "人工确认"
+
+      - id: "FL-03"
+        trigger_desc: "离心机转速ST < 7000rpm"
+        trigger_tag: "FL-101-ST"
+        condition: "< 7000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查变频器"
+        reset_condition: "速度恢复后确认"
+
+      - id: "FL-04"
+        trigger_desc: "离心机转速ST > 8500rpm"
+        trigger_tag: "FL-101-ST"
+        condition: "> 8500"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.紧急停M-FL01"
+          - "2.报警提示"
+        reset_condition: "速度<8000rpm后手动"
+
+# ============================================================================
+# 操作联锁模板
+# ============================================================================
+operation_interlocks:
+  valve_operations:
+    - valve: "WV-103"
+      name: "纯水罐进水阀"
+      allow_condition: "WT-107-LT < 90%"
+      forbid_condition: "LT > 90%"
+      message: "液位已高，禁止补水"
+
+    - valve: "UV-104"
+      name: "无菌罐进口阀"
+      allow_condition: "UH-105-LT < 90%"
+      forbid_condition: "LT > 90%"
+      message: "无菌罐已满，禁止进料"
+
+    - valve: "BV-107"
+      name: "均质机进口阀"
+      allow_condition: "BV-108已打开"
+      forbid_condition: "阀门未开"
+      message: "请先打开进出口阀"
+
+    - valve: "CIP程序"
+      name: "启动CIP"
+      allow_condition: "相关设备已停机"
+      forbid_condition: "设备运行中"
+      message: "请先停止生产设备"
+
+  motor_start_conditions:
+    - motor: "M-EX01/02/03"
+      name: "萃取搅拌"
+      allow_condition: "对应萃取罐液位 > 20%"
+      forbid_condition: "液位过低"
+      message: "液位过低，禁止启动"
+
+    - motor: "M-BL01/02"
+      name: "调配搅拌"
+      allow_condition: "对应调配罐液位 > 10%"
+      forbid_condition: "液位过低"
+      message: "液位过低，禁止启动"
+
+    - motor: "M-HM01"
+      name: "均质机"
+      allow_condition: "进口阀BV-107开 + 出口阀BV-108开"
+      forbid_condition: "阀门未开"
+      message: "请先打开进出口阀"
+
+    - motor: "P-EX01"
+      name: "茶汁输送泵"
+      allow_condition: "萃取罐液位 > 30%"
+      forbid_condition: "液位过低"
+      message: "液位过低，禁止启动"
+
+# ============================================================================
+# 复位权限与流程
+# ============================================================================
+reset_permissions:
+  - level: "L0"
+    name: "紧急停止"
+    reset_authority: "工程师/管理员"
+    confirm_requirement: "必须现场确认"
+  - level: "L1"
+    name: "安全联锁"
+    reset_authority: "工程师"
+    confirm_requirement: "必须现场确认"
+  - level: "L2"
+    name: "关键报警"
+    reset_authority: "工艺员/班长"
+    confirm_requirement: "操作站确认"
+  - level: "L3"
+    name: "工艺报警"
+    reset_authority: "操作员"
+    confirm_requirement: "操作站确认"
+
+reset_flow: |
+  1. 消除触发原因
+  2. 检查设备状态
+  3. 确认安全条件
+  4. 在操作站复位报警
+  5. 记录复位时间和原因
+  6. 逐步恢复生产
+
+# ============================================================================
+# 联锁点汇总（用于自动生成）
+# ============================================================================
+interlock_summary:
+  - section: "UHT"
+    l0: 1
+    l1: 3
+    l2: 5
+    l3: 1
+    l4: 0
+  - section: "萃取"
+    l0: 0
+    l1: 1
+    l2: 4
+    l3: 1
+    l4: 0
+  - section: "均质"
+    l0: 1
+    l1: 3
+    l2: 2
+    l3: 0
+    l4: 0
+  - section: "调配"
+    l0: 0
+    l1: 3
+    l2: 5
+    l3: 0
+    l4: 0
+  - section: "灌装"
+    l0: 0
+    l1: 4
+    l2: 4
+    l3: 0
+    l4: 0
+  - section: "水处理"
+    l0: 0
+    l1: 1
+    l2: 5
+    l3: 0
+    l4: 0
+  - section: "CIP"
+    l0: 0
+    l1: 0
+    l2: 5
+    l3: 2
+    l4: 0
+  - section: "过滤"
+    l0: 0
+    l1: 1
+    l2: 3
+    l3: 0
+    l4: 0

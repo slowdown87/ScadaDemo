@@ -1,0 +1,633 @@
+# SCADA CIP清洗程序模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 说明: 定义CIP清洗程序模板，用于自动生成CIP清洗程序规格书
+
+meta:
+  version: "1.0"
+  created: "2026-04-28"
+  source_doc: "CIP清洗程序规格书.md"
+
+# ============================================================================
+# CIP系统配置
+# ============================================================================
+cip_system:
+  stations:
+    - id: "CP-101"
+      name: "CIP碱液罐"
+      volume_m3: 2
+      tank_type: "SS304"
+      chemical: "NaOH"
+      concentration_default: 2
+      concentration_range: [1.5, 2.5]
+      temp_default: 85
+      temp_range: [80, 90]
+
+    - id: "CP-102"
+      name: "CIP酸液罐"
+      volume_m3: 1
+      tank_type: "SS304"
+      chemical: "HNO₃"
+      concentration_default: 1
+      concentration_range: [0.8, 1.5]
+      temp_default: 60
+      temp_range: [55, 65]
+
+    - id: "CP-103"
+      name: "CIP热水罐"
+      volume_m3: 3
+      tank_type: "SS304"
+      temp_default: 85
+      temp_range: [80, 90]
+
+  pumps:
+    - id: "P-CP01"
+      name: "CIP清洗泵1"
+      flow_m3_h: 5
+      is_inverter: true
+
+    - id: "P-CP02"
+      name: "CIP清洗泵2"
+      flow_m3_h: 5
+      is_inverter: true
+
+# ============================================================================
+# 清洗剂规格
+# ============================================================================
+cleaning_agents:
+  NaOH:
+    name: "氢氧化钠(碱)"
+    concentration_default: 2
+    concentration_unit: "%"
+    temp_default: 85
+    time_default: 30
+    unit: "min"
+    applicable: "所有不锈钢设备"
+
+  HNO3:
+    name: "硝酸(酸)"
+    concentration_default: 1
+    concentration_unit: "%"
+    temp_default: 60
+    time_default: 20
+    unit: "min"
+    applicable: "所有不锈钢设备"
+
+  热水:
+    name: "热水"
+    temp_default: 85
+    time_default: 15
+    unit: "min"
+    applicable: "最终冲洗"
+
+  纯水:
+    name: "纯水"
+    temp_default: "常温"
+    time_default: 10
+    unit: "min"
+    applicable: "最终冲洗"
+
+  H2O2:
+    name: "过氧化氢(消毒)"
+    concentration_default: 0.5
+    concentration_unit: "%"
+    temp_default: "常温"
+    time_default: 10
+    unit: "min"
+    applicable: "消毒处理"
+
+# ============================================================================
+# 清洗区域定义
+# ============================================================================
+cleaning_zones:
+  A:
+    name: "A区"
+    description: "水处理系统"
+    section_codes: ["WT"]
+    target_devices: ["原水箱、管道、过滤器(不含RO膜)、纯水储罐"]
+    cip_program: "CIP-WT"
+    frequency: "每日生产前"
+
+  B:
+    name: "B区"
+    description: "茶叶前处理+萃取"
+    section_codes: ["TH", "EX"]
+    target_devices: ["茶叶储罐、粉碎机、萃取罐、茶渣分离器、冷却器、萃取液储罐"]
+    cip_program: "CIP-EX"
+    frequency: "每批次后"
+
+  C:
+    name: "C区"
+    description: "过滤系统"
+    section_codes: ["FL"]
+    target_devices: ["碟式离心机、超滤膜组件、超滤循环泵、膜清洗罐"]
+    cip_program: "CIP-FL"
+    frequency: "每批次过滤完成后"
+
+  D:
+    name: "D区"
+    description: "调配系统"
+    section_codes: ["BL"]
+    target_devices: ["调配罐、糖浆罐、酸液罐、香料罐、计量罐、管道"]
+    cip_program: "CIP-BL"
+    frequency: "每批次调配完成后"
+
+  E:
+    name: "E区"
+    description: "UHT系统"
+    section_codes: ["UH"]
+    target_devices: ["UHT杀菌锅、预热器、保温管、冷却器、无菌储罐"]
+    cip_program: "CIP-UH"
+    frequency: "每48小时"
+
+  F:
+    name: "F区"
+    description: "灌装系统"
+    section_codes: ["PF"]
+    target_devices: ["吹灌一体机、旋盖机、管道"]
+    cip_program: "CIP-PF"
+    frequency: "每12小时"
+
+# ============================================================================
+# CIP清洗程序模板
+# ============================================================================
+cip_programs:
+
+  CIP-WT:
+    name: "水处理系统清洗"
+    zone: "A"
+    description: "原水箱、管道、过滤器(不含RO膜)、纯水储罐"
+    trigger_conditions:
+      - "每日生产前"
+      - "停产超过48小时"
+      - "水质检测不合格"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "原水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 3
+        drain: true
+        standard: "冲水清澈"
+
+      - step: 2
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 85
+        time_min: 20
+        flow_m3_h: 3
+        drain: false
+        circulation: true
+        standard: "回水电导率稳定"
+
+      - step: 3
+        name: "中间冲洗"
+        medium: "原水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 3
+        drain: true
+        standard: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 60
+        time_min: 15
+        flow_m3_h: 3
+        drain: false
+        circulation: true
+        standard: "回水电导率稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 3
+        drain: true
+        standard: "电导率<50μS/cm"
+
+    notes:
+      - "RO膜组件不参与清洗，需单独处理"
+      - "UV灯管需拆下后才能清洗"
+
+  CIP-EX:
+    name: "茶叶前处理+萃取系统清洗"
+    zone: "B"
+    description: "茶叶储罐、粉碎机、萃取罐、茶渣分离器、冷却器、萃取液储罐"
+    trigger_conditions:
+      - "每批次茶叶用完"
+      - "停产超过24小时"
+      - "产品切换（绿茶↔红茶↔乌龙茶）"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "纯水"
+        temp: 50
+        time_min: 15
+        flow_m3_h: 2
+        drain: true
+        standard: "冲水无茶渣"
+
+      - step: 2
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 85
+        time_min: 30
+        flow_m3_h: 2
+        drain: false
+        circulation: true
+        standard: "回水电导率稳定"
+
+      - step: 3
+        name: "中间冲洗"
+        medium: "纯水"
+        temp: 60
+        time_min: 15
+        flow_m3_h: 2
+        drain: true
+        standard: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 60
+        time_min: 20
+        flow_m3_h: 2
+        drain: false
+        circulation: true
+        standard: "回水电导率稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 2
+        drain: true
+        standard: "电导率<50μS/cm"
+
+    notes:
+      - "茶叶储罐需人工清理残余茶叶后再启动CIP"
+      - "萃取罐内部冲洗球必须全部动作"
+      - "清洗完成后打开EX-106检查内部清洁度"
+
+  CIP-FL:
+    name: "膜过滤系统清洗"
+    zone: "C"
+    description: "碟式离心机、超滤膜组件、超滤循环泵、膜清洗罐"
+    trigger_conditions:
+      - "每批次过滤完成后"
+      - "膜压差超过0.15MPa"
+      - "停产超过24小时"
+      - "每日待机前"
+
+    steps:
+      - step: 1
+        name: "顶料"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "产品完全顶出"
+
+      - step: 2
+        name: "反冲洗"
+        medium: "纯水"
+        temp: 50
+        time_min: 15
+        flow_m3_h: 3
+        pressure_max: 0.3
+        standard: "出水清澈"
+
+      - step: 3
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 45
+        time_min: 30
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "回水电导稳定"
+
+      - step: 4
+        name: "冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 10
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "pH<8.5"
+
+      - step: 5
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 35
+        time_min: 20
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "回水电导稳定"
+
+      - step: 6
+        name: "冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 15
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "电导率<50μS/cm"
+
+      - step: 7
+        name: "膜完整性测试"
+        medium: "纯水"
+        temp: "常温"
+        pressure_test: 0.2
+        standard: "压降<10%"
+
+    enhanced_cleaning:
+      frequency: "每72小时"
+      steps:
+        - step: "CIP-1"
+          medium: "NaOH 1%"
+          temp: 45
+          time_min: 30
+          note: "去除有机物"
+
+        - step: "CIP-2"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 10
+          note: "冲洗"
+
+        - step: "CIP-3"
+          medium: "HNO₃ 0.5%"
+          temp: 35
+          time_min: 30
+          note: "去除无机物"
+
+        - step: "CIP-4"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 15
+          note: "冲洗至中性"
+
+  CIP-BL:
+    name: "调配系统清洗"
+    zone: "D"
+    description: "调配罐、糖浆罐、酸液罐、香料罐、计量罐、管道"
+    trigger_conditions:
+      - "每批次调配完成后"
+      - "产品切换"
+      - "停产超过24小时"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "纯水"
+        temp: 40
+        time_min: 10
+        flow_m3_h: 2
+        agitation: "低速"
+        standard: "无残留糖液"
+
+      - step: 2
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 85
+        time_min: 30
+        flow_m3_h: 2
+        agitation: "低速"
+        standard: "回水电导稳定"
+
+      - step: 3
+        name: "冲洗"
+        medium: "纯水"
+        temp: 50
+        time_min: 15
+        flow_m3_h: 2
+        agitation: "低速"
+        standard: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 60
+        time_min: 20
+        flow_m3_h: 2
+        agitation: "低速"
+        standard: "回水电导稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 15
+        flow_m3_h: 2
+        standard: "电导率<50μS/cm"
+
+      - step: 6
+        name: "消毒"
+        medium: "0.5% H₂O₂"
+        temp: "常温"
+        time_min: 10
+        standard: "无残留"
+
+    notes:
+      - "糖浆罐BL-103使用前需用85℃热水溶解残留糖"
+      - "酸液罐BL-104需单独酸洗，避免与碱液混合"
+
+  CIP-UH:
+    name: "UHT杀菌系统清洗"
+    zone: "E"
+    description: "UHT杀菌锅、预热器、保温管、冷却器、无菌储罐"
+    trigger_conditions:
+      - "每48小时"
+      - "停产超过12小时"
+      - "产品切换"
+      - "微生物检测不合格"
+
+    steps:
+      - step: 1
+        name: "纯水顶料"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 5
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "产品完全顶出"
+
+      - step: 2
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 85
+        time_min: 45
+        flow_m3_h: 2
+        pressure_range: [0.3, 0.5]
+        standard: "回流温度>80℃"
+
+      - step: 3
+        name: "纯水冲洗"
+        medium: "纯水"
+        temp: 70
+        time_min: 15
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 60
+        time_min: 30
+        flow_m3_h: 2
+        pressure_range: [0.3, 0.5]
+        standard: "回流温度>55℃"
+
+      - step: 5
+        name: "纯水冲洗"
+        medium: "纯水"
+        temp: "常温"
+        time_min: 15
+        flow_m3_h: 2
+        pressure_max: 0.3
+        standard: "电导率<50μS/cm"
+
+      - step: 6
+        name: "无菌验证"
+        medium: "-"
+        standard: "无菌培养48h"
+
+    notes:
+      - "清洗过程中保温管必须保持满管状态"
+      - "无菌储罐清洗后需充无菌空气保持正压"
+      - "清洗完成后需进行无菌验证"
+
+  CIP-PF:
+    name: "灌装系统清洗"
+    zone: "F"
+    description: "吹灌一体机、旋盖机、管道"
+    trigger_conditions:
+      - "每12小时"
+      - "停产超过8小时"
+      - "产品切换"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "RO水"
+        temp: 50
+        time_min: 10
+        standard: "冲洗管道残留"
+
+      - step: 2
+        name: "碱洗"
+        medium: "2% NaOH"
+        temp: 85
+        time_min: 40
+        standard: "CIP球阀切换冲刷"
+
+      - step: 3
+        name: "冲洗"
+        medium: "RO水"
+        temp: 60
+        time_min: 15
+        standard: "冲洗至中性"
+
+      - step: 4
+        name: "酸洗"
+        medium: "1% HNO₃"
+        temp: 60
+        time_min: 30
+        standard: "CIP球阀切换冲刷"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "RO水"
+        temp: "常温"
+        time_min: 15
+        standard: "电导率<50μS/cm"
+
+      - step: 6
+        name: "消毒"
+        medium: "0.5% H₂O₂"
+        temp: "常温"
+        time_min: 10
+        standard: "无残留"
+
+    notes:
+      - "吹灌一体机内部阀需全部打开清洗"
+      - "料缸内部需全面冲刷"
+      - "清洗完成后检查灌装阀无残留水渍"
+
+# ============================================================================
+# 产品切换清洗矩阵
+# ============================================================================
+product_switch_matrix:
+  - current_product: "绿茶"
+    target_product: "红茶"
+    programs: ["CIP-BL", "CIP-EX"]
+    estimated_time_h: 4
+
+  - current_product: "绿茶"
+    target_product: "乌龙茶"
+    programs: ["CIP-BL", "CIP-EX"]
+    estimated_time_h: 4
+
+  - current_product: "红茶"
+    target_product: "绿茶"
+    programs: ["CIP-BL", "CIP-EX"]
+    estimated_time_h: 4
+
+  - current_product: "任一产品"
+    target_product: "停产"
+    programs: ["CIP-ALL"]
+    estimated_time_h: 6
+
+  - current_product: "-"
+    target_product: "每日启动"
+    programs: ["CIP-WT", "CIP-PF"]
+    estimated_time_h: 2
+
+# ============================================================================
+# 清洗验收标准
+# ============================================================================
+acceptance_standards:
+  visual:
+    method: "目视检查"
+    standard: "无残留、无变色"
+
+  pH:
+    method: "在线pH计"
+    standard: "6.5-7.5"
+
+  conductivity:
+    method: "在线电导率仪"
+    standard: "<50μS/cm"
+
+  microbiology:
+    method: "棉签法"
+    standard: "平板计数<10CFU/cm²"
+
+  ATP:
+    method: "拭子检测仪"
+    standard: "<100RLU"
+
+# ============================================================================
+# 清洗用水规格
+# ============================================================================
+water_specifications:
+  预冲洗:
+    type: "RO水"
+    conductivity_max: "100μS/cm"
+
+  最终冲洗:
+    type: "纯水"
+    conductivity_max: "10μS/cm"
+
+  无菌冲洗:
+    type: "无菌水"
+    microbiology_max: "10CFU/ml"

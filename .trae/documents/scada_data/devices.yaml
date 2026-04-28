@@ -1,0 +1,1883 @@
+# 茶饮料生产线设备主数据
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 数据来源: 茶饮料生产线设备清单.md (v2.0)
+# 说明: 结构化设备数据，用于自动生成监控点表、联锁逻辑、CIP规格等
+
+meta:
+  version: "1.0"
+  created: "2026-04-28"
+  source_doc: "茶饮料生产线设备清单.md"
+  source_version: "v2.0"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+
+# ============================================================================
+# 工段定义
+# ============================================================================
+sections:
+  WT:
+    name: "水处理系统"
+    name_en: "Water Treatment"
+    prefix: "WT"
+    number_range: [101, 199]
+    plc: "PLC-1"
+    plc_ip: "192.168.1.11"
+  TH:
+    name: "茶叶前处理系统"
+    name_en: "Tea Handling"
+    prefix: "TH"
+    number_range: [201, 299]
+    plc: "PLC-1"
+    plc_ip: "192.168.1.11"
+  EX:
+    name: "萃取系统"
+    name_en: "Extraction"
+    prefix: "EX"
+    number_range: [301, 399]
+    plc: "PLC-1"
+    plc_ip: "192.168.1.11"
+  FL:
+    name: "过滤净化系统"
+    name_en: "Filtration"
+    prefix: "FL"
+    number_range: [401, 499]
+    plc: "PLC-2"
+    plc_ip: "192.168.1.12"
+  BL:
+    name: "调配系统"
+    name_en: "Blending"
+    prefix: "BL"
+    number_range: [501, 599]
+    plc: "PLC-2"
+    plc_ip: "192.168.1.12"
+  HM:
+    name: "均质系统"
+    name_en: "Homogenization"
+    prefix: "HM"
+    number_range: [601, 699]
+    plc: "PLC-2"
+    plc_ip: "192.168.1.12"
+  UH:
+    name: "UHT杀菌系统"
+    name_en: "UHT Processing"
+    prefix: "UH"
+    number_range: [701, 799]
+    plc: "PLC-3"
+    plc_ip: "192.168.1.13"
+  CP:
+    name: "CIP清洗系统"
+    name_en: "Cleaning In Place"
+    prefix: "CP"
+    number_range: [801, 899]
+    plc: "PLC-3"
+    plc_ip: "192.168.1.13"
+  PF:
+    name: "灌装系统"
+    name_en: "Packaging Fill"
+    prefix: "PF"
+    number_range: [901, 999]
+    plc: "PLC-3"
+    plc_ip: "192.168.1.13"
+  PK:
+    name: "冷却包装系统"
+    name_en: "Packing"
+    prefix: "PK"
+    number_range: [1001, 1099]
+    plc: "PLC-3"
+    plc_ip: "192.168.1.13"
+
+# ============================================================================
+# 设备分类模板
+# ============================================================================
+device_types:
+  tank:
+    name: "储罐/容器"
+    has_level_sensor: true
+    has_temp_sensor: true
+    standard_sensors: ["LT", "TT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  pump:
+    name: "输送泵"
+    has_status: true
+    has_running_status: true
+    standard_sensors: ["DT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  motor:
+    name: "电机/搅拌"
+    has_status: true
+    has_temp_sensor: true
+    has_speed_sensor: false
+    standard_sensors: ["DT", "MT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  valve:
+    name: "阀门"
+    has_status: true
+    has_open_feedback: true
+    has_close_feedback: true
+    standard_sensors: ["DT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  heat_exchanger:
+    name: "换热器/冷却器"
+    has_temp_sensor: true
+    has_pressure_sensor: true
+    standard_sensors: ["TT", "PT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  filter:
+    name: "过滤器/超滤"
+    has_pressure_sensor: true
+    has_diff_pressure: true
+    has_flow_sensor: true
+    standard_sensors: ["PT", "DPT", "FT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  uht:
+    name: "UHT杀菌锅"
+    has_multi_temp: true
+    has_pressure_sensor: true
+    has_flow_sensor: true
+    standard_sensors: ["TT1", "TT2", "TT3", "TT4", "TT5", "PT1", "PT2", "FT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  filler:
+    name: "灌装机"
+    has_speed_sensor: true
+    has_temp_sensor: true
+    has_pressure_sensor: true
+    has_flow_sensor: true
+    standard_sensors: ["ST", "TT", "PT", "FT", "LT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  packaging:
+    name: "包装设备"
+    has_speed_sensor: true
+    has_status: true
+    standard_sensors: ["ST", "DT"]
+    valves: []
+    pumps: []
+    motors: []
+
+# ============================================================================
+# 设备清单
+# ============================================================================
+devices:
+
+  # --------------------------------------------------------------------------
+  # 水处理系统 (WT) - 7套设备
+  # --------------------------------------------------------------------------
+  - id: "WT-101"
+    name: "原水箱"
+    type: tank
+    section: WT
+    model: "SS304, 10m³"
+    spec: "Φ2000×3500mm, 带液位计"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {LL: 10, L: 20, H: 90, HH: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+
+  - id: "WT-102"
+    name: "多介质过滤器"
+    type: filter
+    section: WT
+    model: "Φ1200×2400"
+    spec: "滤速10m/h, 石英砂+无烟煤"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "过滤流量"
+        type: "流量计"
+        range: [0, 15]
+        unit: "m³/h"
+        alarm: {L: 5}
+      - code: "PT"
+        name: "RO前压力"
+        type: "压力计"
+        range: [0, 1]
+        unit: "MPa"
+        alarm: {H: 0.8}
+        note: "高压泵前"
+
+  - id: "WT-103"
+    name: "活性炭过滤器"
+    type: filter
+    section: WT
+    model: "Φ1000×2000"
+    spec: "活性炭填充量1.5m³"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "活性炭过滤流量"
+        type: "流量计"
+        range: [0, 15]
+        unit: "m³/h"
+        alarm: {L: 5}
+      - code: "PT"
+        name: "高压泵压力"
+        type: "压力计"
+        range: [0, 2]
+        unit: "MPa"
+        alarm: {H: 1.6}
+
+  - id: "WT-104"
+    name: "RO反渗透系统"
+    type: filter
+    section: WT
+    model: "BWRO-5000"
+    spec: "产水5m³/h, 脱盐率≥97%"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "PT"
+        name: "RO段压力"
+        type: "压力计"
+        range: [0, 1.5]
+        unit: "MPa"
+        alarm: {H: 1.2}
+      - code: "FT"
+        name: "RO产水流量"
+        type: "流量计"
+        range: [0, 10]
+        unit: "m³/h"
+        alarm: {L: 3, H: 7}
+
+  - id: "WT-105"
+    name: "离子交换柱"
+    type: tank
+    section: WT
+    model: "Φ800×2000"
+    spec: "阳离子+阴离子树脂"
+    quantity: 2
+    supplier: "国产"
+    sensors:
+      - code: "PT"
+        name: "离子交换后压力"
+        type: "压力计"
+        range: [0, 0.5]
+        unit: "MPa"
+        alarm: {H: 0.4}
+      - code: "CtT"
+        name: "离子交换水电导率"
+        type: "电导率仪"
+        range: [0, 50]
+        unit: "μS/cm"
+        alarm: {H: 10}
+        is_key_point: true
+
+  - id: "WT-106"
+    name: "UV紫外线杀菌器"
+    type: heat_exchanger
+    section: WT
+    model: "UV-40GPM"
+    spec: "40W, 杀菌率99.9%"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "UV前温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+
+  - id: "WT-107"
+    name: "纯水储罐"
+    type: tank
+    section: WT
+    model: "SS304, 10m³"
+    spec: "Φ2000×3500mm, 带呼吸器"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {LL: 20, L: 30, H: 85, HH: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+
+  # --------------------------------------------------------------------------
+  # 茶叶前处理系统 (TH) - 3套设备
+  # --------------------------------------------------------------------------
+  - id: "TH-101"
+    name: "茶叶储罐1"
+    type: tank
+    section: TH
+    model: "SS304, 2m³"
+    spec: "螺旋输送, 真空吸料"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+
+  - id: "TH-102"
+    name: "茶叶储罐2"
+    type: tank
+    section: TH
+    model: "SS304, 2m³"
+    spec: "螺旋输送, 真空吸料"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+
+  - id: "TH-103"
+    name: "茶叶粉碎机"
+    type: motor
+    section: TH
+    model: "CF-200"
+    spec: "产量200kg/h, 细度60目"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 7.5
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "茶叶粉碎流量"
+        type: "流量计"
+        range: [0, 300]
+        unit: "kg/h"
+        alarm: {L: 150, H: 250}
+      - code: "ST"
+        name: "粉碎机转速"
+        type: "转速计"
+        range: [0, 3000]
+        unit: "rpm"
+        alarm: {H: 2800}
+      - code: "MT"
+        name: "粉碎机电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+
+  # --------------------------------------------------------------------------
+  # 萃取系统 (EX) - 6套设备
+  # --------------------------------------------------------------------------
+  - id: "EX-101"
+    name: "萃取罐1"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度95℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐1温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "FT"
+        name: "萃取罐1进水量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+      - code: "MT"
+        name: "萃取罐1搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-101"
+        name: "萃取罐1进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-103"
+        name: "萃取罐1进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX01"
+        name: "萃取罐1搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-102"
+    name: "萃取罐2"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度90℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐2温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "MT"
+        name: "萃取罐2搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-102"
+        name: "萃取罐2进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-104"
+        name: "萃取罐2进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX02"
+        name: "萃取罐2搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-103"
+    name: "萃取罐3"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度85℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐3温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "MT"
+        name: "萃取罐3搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-105"
+        name: "萃取罐3进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-106"
+        name: "萃取罐3进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX03"
+        name: "萃取罐3搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-104"
+    name: "茶渣分离器"
+    type: filter
+    section: EX
+    model: "CS-500"
+    spec: "筛网60目, 离心式"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "茶渣分离流量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+        alarm: {L: 2}
+      - code: "TT"
+        name: "茶汁出口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 85}
+    valves:
+      - id: "EV-107"
+        name: "茶渣分离排放阀"
+        type: "气动阀"
+        control: "手动"
+
+  - id: "EX-105"
+    name: "茶汁冷却器"
+    type: heat_exchanger
+    section: EX
+    model: "PL-3000"
+    spec: "板式换热器, 冷却水冷却"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "PT"
+        name: "冷却器出口压力"
+        type: "压力计"
+        range: [0, 0.5]
+        unit: "MPa"
+        alarm: {H: 0.4}
+      - code: "TT"
+        name: "冷却器出口温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+
+  - id: "EX-106"
+    name: "萃取液储罐"
+    type: tank
+    section: EX
+    model: "SS304, 3m³"
+    spec: "带搅拌, 冷藏储存"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20, H: 90}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+        note: "冷藏储存"
+
+  # --------------------------------------------------------------------------
+  # 过滤净化系统 (FL) - 膜过滤工艺
+  # --------------------------------------------------------------------------
+  - id: "FL-101"
+    name: "碟式离心机"
+    type: motor
+    section: FL
+    model: "DF-616"
+    spec: "6000L/h, 分离因数9000"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 15
+    is_inverter: true
+    sensors:
+      - code: "PT"
+        name: "碟式离心机进口压力"
+        type: "压力计"
+        range: [0, 0.3]
+        unit: "MPa"
+        alarm: {H: 0.25}
+      - code: "ST"
+        name: "碟式离心机转速"
+        type: "转速计"
+        range: [0, 10000]
+        unit: "rpm"
+        alarm: {L: 5000, H: 7000}
+      - code: "MT"
+        name: "碟式离心机电机温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {H: 100}
+    motors:
+      - id: "M-FL01"
+        name: "碟式离心机电机"
+        power_kw: 15
+        is_inverter: true
+
+  - id: "FL-102"
+    name: "超滤膜组件"
+    type: filter
+    section: FL
+    model: "UF-0.1μm"
+    spec: "陶瓷膜, 0.1μm孔径, 6000L/h"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "PT"
+        name: "超滤进口压力"
+        type: "压力计"
+        range: [0, 0.4]
+        unit: "MPa"
+        alarm: {H: 0.35}
+      - code: "PT2"
+        name: "超滤出口压力"
+        type: "压力计"
+        range: [0, 0.3]
+        unit: "MPa"
+        alarm: {H: 0.25}
+      - code: "DPT"
+        name: "超滤膜压差"
+        type: "差压计"
+        range: [0, 0.2]
+        unit: "MPa"
+        alarm: {H: 0.15}
+        note: "膜污染判断"
+      - code: "FT"
+        name: "超滤产水流量"
+        type: "流量计"
+        range: [0, 6]
+        unit: "m³/h"
+        alarm: {L: 4}
+      - code: "FT2"
+        name: "超滤浓水流量"
+        type: "流量计"
+        range: [0, 2]
+        unit: "m³/h"
+        alarm: {L: 0.5}
+        note: "反洗监控"
+      - code: "TT"
+        name: "超滤进口温度"
+        type: "温度计"
+        range: [0, 80]
+        unit: "℃"
+        alarm: {L: 55, H: 75}
+        note: "膜工作温度"
+
+  - id: "FL-103"
+    name: "超滤循环泵"
+    type: pump
+    section: FL
+    model: "卫生级离心泵"
+    spec: "8m³/h, SS316"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 5.5
+    is_inverter: true
+    sensors:
+      - code: "PT"
+        name: "超滤循环泵出口压力"
+        type: "压力计"
+        range: [0, 0.6]
+        unit: "MPa"
+        alarm: {H: 0.5}
+      - code: "FT"
+        name: "超滤循环流量"
+        type: "流量计"
+        range: [0, 8]
+        unit: "m³/h"
+        alarm: {L: 6}
+
+  - id: "FL-104"
+    name: "膜组件清洗罐"
+    type: tank
+    section: FL
+    model: "SS304, 1m³"
+    spec: "CIP清洗用"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+  # --------------------------------------------------------------------------
+  # 调配系统 (BL) - 7套设备 (2套调配罐)
+  # --------------------------------------------------------------------------
+  - id: "BL-101"
+    name: "调配罐1"
+    type: tank
+    section: BL
+    model: "MT-5000"
+    spec: "5m³, 高速搅拌(80rpm)"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "AT"
+        name: "pH值"
+        type: "pH计"
+        range: [0, 14]
+        alarm: {L: 5.0, H: 6.5}
+        is_key_point: true
+      - code: "BT"
+        name: "Brix值"
+        type: "糖度计"
+        range: [0, 20]
+        unit: "°Brix"
+        alarm: {L: 8, H: 12}
+        is_key_point: true
+      - code: "MT"
+        name: "搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "BV-101"
+        name: "调配罐1进茶阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-102"
+        name: "调配罐1进糖浆阀"
+        type: "计量阀"
+        control: "Brix控制"
+      - id: "BV-103"
+        name: "调配罐1进酸阀"
+        type: "计量阀"
+        control: "pH控制"
+      - id: "BV-104"
+        name: "调配罐1进香料阀"
+        type: "计量阀"
+        control: "配方控制"
+      - id: "BV-105"
+        name: "调配罐1搅拌阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-106"
+        name: "调配液出口阀"
+        type: "气动阀"
+        control: "批次结束"
+      - id: "BV-107"
+        name: "均质机进口阀"
+        type: "气动阀"
+        control: "均质启动"
+      - id: "BV-108"
+        name: "均质机出口阀"
+        type: "气动阀"
+        control: "均质启动"
+    motors:
+      - id: "M-BL01"
+        name: "调配罐1搅拌"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "BL-102"
+    name: "调配罐2"
+    type: tank
+    section: BL
+    model: "MT-5000"
+    spec: "5m³, 高速搅拌(80rpm)"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "AT"
+        name: "pH值"
+        type: "pH计"
+        range: [0, 14]
+        alarm: {L: 5.0, H: 6.5}
+        is_key_point: true
+      - code: "BT"
+        name: "Brix值"
+        type: "糖度计"
+        range: [0, 20]
+        unit: "°Brix"
+        alarm: {L: 8, H: 12}
+        is_key_point: true
+      - code: "MT"
+        name: "搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "BV-201"
+        name: "调配罐2进茶阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-202"
+        name: "调配罐2进糖浆阀"
+        type: "计量阀"
+        control: "Brix控制"
+      - id: "BV-203"
+        name: "调配罐2进酸阀"
+        type: "计量阀"
+        control: "pH控制"
+      - id: "BV-204"
+        name: "调配罐2进香料阀"
+        type: "计量阀"
+        control: "配方控制"
+      - id: "BV-205"
+        name: "调配罐2搅拌阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-206"
+        name: "调配液出口阀2"
+        type: "气动阀"
+        control: "批次结束"
+    motors:
+      - id: "M-BL02"
+        name: "调配罐2搅拌"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "BL-103"
+    name: "糖浆溶解罐"
+    type: tank
+    section: BL
+    model: "ST-2000"
+    spec: "2m³, 夹套加热溶解"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20, H: 90}
+      - code: "TT"
+        name: "糖浆罐温度"
+        type: "温度计"
+        range: [0, 80]
+        unit: "℃"
+        alarm: {L: 55, H: 70}
+        note: "保温"
+      - code: "BT"
+        name: "糖浆Brix值"
+        type: "糖度计"
+        range: [0, 50]
+        unit: "°Brix"
+        alarm: {L: 60, H: 65}
+        note: "糖浆浓度"
+
+  - id: "BL-104"
+    name: "糖浆储罐"
+    type: tank
+    section: BL
+    model: "SS304, 2m³"
+    spec: "带搅拌, 保温60℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "酸液罐液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30}
+      - code: "AT"
+        name: "酸液pH值"
+        type: "pH计"
+        range: [0, 14]
+        note: "2%浓度"
+
+  - id: "BL-105"
+    name: "酸液罐"
+    type: tank
+    section: BL
+    model: "SS316, 0.5m³"
+    spec: "柠檬酸/乳酸, 搅拌"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "香料罐液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30}
+
+  - id: "BL-106"
+    name: "香料/辅料罐1"
+    type: tank
+    section: BL
+    model: "SS304, 0.2m³"
+    spec: "小型搅拌罐"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+  - id: "BL-107"
+    name: "香料/辅料罐2"
+    type: tank
+    section: BL
+    model: "SS304, 0.2m³"
+    spec: "小型搅拌罐"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+  # --------------------------------------------------------------------------
+  # 均质系统 (HM) - 3套设备
+  # --------------------------------------------------------------------------
+  - id: "HM-101"
+    name: "高压均质机"
+    type: uht
+    section: HM
+    model: "GYB-3000"
+    spec: "20-25MPa, 3000L/h"
+    quantity: 1
+    supplier: "进口"
+    power_kw: 75
+    is_inverter: false
+    sensors:
+      - code: "PT"
+        name: "均质进口压力"
+        type: "压力计"
+        range: [0, 1]
+        unit: "MPa"
+        alarm: {H: 0.8}
+      - code: "PT2"
+        name: "均质工作压力"
+        type: "压力计"
+        range: [0, 40]
+        unit: "MPa"
+        alarm: {L: 18, H: 27}
+        is_key_point: true
+      - code: "TT"
+        name: "均质进口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 55, H: 75}
+      - code: "FT"
+        name: "均质流量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+        alarm: {L: 2.5}
+      - code: "MT"
+        name: "均质机电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 130}
+      - code: "ST"
+        name: "均质机转速"
+        type: "转速计"
+        range: [0, 5000]
+        unit: "rpm"
+      - code: "TT2"
+        name: "均质阀温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 140}
+    valves:
+      - id: "BV-107"
+        name: "均质机进口阀"
+        type: "气动阀"
+        control: "均质启动"
+      - id: "BV-108"
+        name: "均质机出口阀"
+        type: "气动阀"
+        control: "均质启动"
+    motors:
+      - id: "M-HM01"
+        name: "均质机电机"
+        power_kw: 75
+        is_inverter: false
+
+  - id: "HM-102"
+    name: "均质阀组"
+    type: valve
+    section: HM
+    model: "原厂配件"
+    spec: "动静阀, 碳化钨材质"
+    quantity: 2
+    supplier: "进口"
+
+  - id: "HM-103"
+    name: "均质压力传感器"
+    type: sensor
+    section: HM
+    model: "0-40MPa"
+    spec: "精度0.5级"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "PT"
+        name: "均质压力"
+        type: "压力计"
+        range: [0, 40]
+        unit: "MPa"
+
+  # --------------------------------------------------------------------------
+  # UHT杀菌系统 (UH) - 6套设备
+  # --------------------------------------------------------------------------
+  - id: "UH-101"
+    name: "UHT杀菌锅"
+    type: uht
+    section: UH
+    model: "KNU-3000"
+    spec: "135℃/15s, 3000L/h"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT1"
+        name: "预热段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 75, H: 90}
+      - code: "TT2"
+        name: "杀菌段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 140}
+        is_key_point: true
+        note: "关键控制点 CCP"
+      - code: "TT3"
+        name: "保温段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 140}
+      - code: "TT4"
+        name: "冷却段进口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 90}
+      - code: "TT5"
+        name: "冷却段出口温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "PT1"
+        name: "杀菌前压力"
+        type: "压力计"
+        range: [0, 1]
+        unit: "MPa"
+        alarm: {H: 0.8}
+      - code: "PT2"
+        name: "杀菌压力"
+        type: "压力计"
+        range: [0, 0.6]
+        unit: "MPa"
+        alarm: {L: 0.2, H: 0.5}
+        interlock: "与温度连锁"
+      - code: "FT"
+        name: "产品流量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+        alarm: {L: 2.5, H: 3.5}
+        note: "关联杀菌时间"
+    valves:
+      - id: "UV-101"
+        name: "产品进料阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-102"
+        name: "蒸汽进口阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-103"
+        name: "冷却水进口阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-106"
+        name: "清洗回流阀"
+        type: "气动阀"
+        control: "自动"
+      - id: "UV-107"
+        name: "排放阀"
+        type: "气动阀"
+        control: "手动"
+
+  - id: "UH-102"
+    name: "预热器"
+    type: heat_exchanger
+    section: UH
+    model: "板式换热器"
+    spec: "80℃预热段"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "热水系统温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 145}
+      - code: "PT"
+        name: "蒸汽压力"
+        type: "压力计"
+        range: [0, 1.5]
+        unit: "MPa"
+        alarm: {L: 0.6, H: 1.0}
+
+  - id: "UH-103"
+    name: "保温管"
+    type: tank
+    section: UH
+    model: "SS316L"
+    spec: "直径25mm, 长度30m"
+    quantity: 1
+    supplier: "国产"
+
+  - id: "UH-104"
+    name: "冷却器"
+    type: heat_exchanger
+    section: UH
+    model: "板式换热器"
+    spec: "冷却至25℃"
+    quantity: 1
+    supplier: "进口"
+    sensors: []
+
+  - id: "UH-105"
+    name: "无菌储罐"
+    type: tank
+    section: UH
+    model: "AS-3000"
+    spec: "3m³, 无菌设计"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30, H: 90}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+      - code: "PT"
+        name: "无菌储罐压力"
+        type: "压力计"
+        range: [0, 0.1]
+        unit: "MPa"
+        alarm: {H: 0.05}
+        note: "微正压"
+    valves:
+      - id: "UV-104"
+        name: "无菌罐进口阀"
+        type: "气动阀"
+        control: "液位控制"
+      - id: "UV-105"
+        name: "无菌罐出口阀"
+        type: "气动阀"
+        control: "流量控制"
+
+  - id: "UH-106"
+    name: "温度传感器"
+    type: sensor
+    section: UH
+    model: "PT100, A级"
+    spec: "精度±0.5℃"
+    quantity: 4
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "温度传感器"
+        type: "PT100"
+        range: [0, 150]
+        unit: "℃"
+
+  # --------------------------------------------------------------------------
+  # CIP清洗系统 (CP) - 6套设备
+  # --------------------------------------------------------------------------
+  - id: "CP-101"
+    name: "CIP碱液罐"
+    type: tank
+    section: CP
+    model: "SS304, 2m³"
+    spec: "2% NaOH溶液"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+      - code: "CtT"
+        name: "碱液浓度"
+        type: "电导率仪"
+        range: [0, 5]
+        unit: "%"
+        alarm: {L: 1.5, H: 2.5}
+        note: "2%浓度"
+      - code: "TT"
+        name: "碱液温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 80, H: 90}
+        note: "85℃清洗"
+
+  - id: "CP-102"
+    name: "CIP酸液罐"
+    type: tank
+    section: CP
+    model: "SS304, 1m³"
+    spec: "1% HNO₃溶液"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+      - code: "CtT"
+        name: "酸液浓度"
+        type: "电导率仪"
+        range: [0, 3]
+        unit: "%"
+        alarm: {L: 0.8, H: 1.5}
+        note: "1%浓度"
+      - code: "TT"
+        name: "酸液温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 55, H: 65}
+        note: "60℃清洗"
+
+  - id: "CP-103"
+    name: "CIP热水罐"
+    type: tank
+    section: CP
+    model: "SS304, 3m³"
+    spec: "85℃热水, 保温"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 50}
+      - code: "TT"
+        name: "热水罐温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 80}
+        note: "85℃"
+
+  - id: "CP-104"
+    name: "CIP输送泵1"
+    type: pump
+    section: CP
+    model: "卫生级离心泵"
+    spec: "5m³/h, SS316, 变频"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "CIP回水流速"
+        type: "流量计"
+        range: [0, 10]
+        unit: "m³/h"
+        alarm: {L: 3}
+        note: "清洗效果判定"
+      - code: "CtT"
+        name: "CIP回水电导率"
+        type: "电导率仪"
+        range: [0, 500]
+        unit: "μS/cm"
+        alarm: {H: 100}
+        note: "最终冲洗水"
+
+  - id: "CP-105"
+    name: "CIP输送泵2"
+    type: pump
+    section: CP
+    model: "卫生级离心泵"
+    spec: "5m³/h, SS316, 变频"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: true
+    sensors: []
+
+  - id: "CP-106"
+    name: "电导率仪"
+    type: sensor
+    section: CP
+    model: "在线式"
+    spec: "0-2000μS/cm"
+    quantity: 2
+    supplier: "进口"
+
+  # --------------------------------------------------------------------------
+  # 灌装系统 (PF) - 吹灌一体机 (4套设备)
+  # --------------------------------------------------------------------------
+  - id: "PF-101"
+    name: "吹灌一体机"
+    type: filler
+    section: PF
+    model: "SBL-FG54000"
+    spec: "54000B/H, 一步法吹瓶+72头灌装"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "ST"
+        name: "吹灌一体机速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        alarm: {L: 50000, H: 58000}
+        note: "同步控制"
+      - code: "MT"
+        name: "吹灌一体机主电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 130}
+      - code: "FT"
+        name: "压缩空气流量"
+        type: "流量计"
+        range: [0, 200]
+        unit: "Nm³/h"
+        alarm: {L: 150}
+      - code: "PT"
+        name: "吹瓶压力"
+        type: "压力计"
+        range: [0, 3]
+        unit: "MPa"
+        alarm: {L: 2.0, H: 2.8}
+    valves:
+      - id: "PV-101"
+        name: "灌装机进口阀"
+        type: "气动阀"
+        control: "灌装启动"
+      - id: "PV-102"
+        name: "灌装机背压阀"
+        type: "气动调节阀"
+        control: "压力控制"
+      - id: "PV-103"
+        name: "冷却水阀"
+        type: "气动阀"
+        control: "温度控制"
+      - id: "PV-104"
+        name: "气源阀"
+        type: "气动阀"
+        control: "手动"
+        note: "安全连锁"
+    motors:
+      - id: "M-PF01"
+        name: "吹瓶机"
+        power_kw: 45
+        is_inverter: true
+      - id: "M-PF02"
+        name: "灌装机"
+        power_kw: 30
+        is_inverter: true
+      - id: "M-PF03"
+        name: "旋盖机"
+        power_kw: 15
+        is_inverter: true
+
+  - id: "PF-102"
+    name: "瓶盖消毒器"
+    type: heat_exchanger
+    section: PF
+    model: "CD-200"
+    spec: "UV+酒精消毒"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+  - id: "PF-103"
+    name: "金属检测机"
+    type: packaging
+    section: PF
+    model: "MD-6300"
+    spec: "灵敏度φ0.8mm Fe"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "DT"
+        name: "金属检测机状态"
+        type: "状态"
+        alarm_action: "报警时停线"
+
+  - id: "PF-104"
+    name: "漏堵检测器"
+    type: packaging
+    section: PF
+    model: "LD-100"
+    spec: "红外检测"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "DT"
+        name: "漏堵检测器状态"
+        type: "状态"
+        alarm_action: "报警时停线"
+
+  # --------------------------------------------------------------------------
+  # 冷却包装系统 (PK) - 10套设备
+  # --------------------------------------------------------------------------
+  - id: "PK-101"
+    name: "冷却隧道"
+    type: heat_exchanger
+    section: PK
+    model: "CL-40"
+    spec: "长度40m, 风冷+水冷"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "TT1"
+        name: "冷却隧道入口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 70}
+      - code: "TT2"
+        name: "冷却隧道中段温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 45}
+      - code: "TT3"
+        name: "冷却隧道出口温度"
+        type: "温度计"
+        range: [0, 40]
+        unit: "℃"
+        alarm: {H: 38}
+        note: "降至室温"
+
+  - id: "PK-102"
+    name: "灯检台1"
+    type: packaging
+    section: PK
+    model: "LJ-4"
+    spec: "4工位, 人工目检"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "ST"
+        name: "灯检输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        note: "与灌装同步"
+
+  - id: "PK-103"
+    name: "灯检台2"
+    type: packaging
+    section: PK
+    model: "LJ-4"
+    spec: "4工位, 人工目检"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "ST"
+        name: "灯检输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        note: "与灌装同步"
+
+  - id: "PK-104"
+    name: "灯检台3"
+    type: packaging
+    section: PK
+    model: "LJ-4"
+    spec: "4工位, 人工目检"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "ST"
+        name: "灯检输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        note: "与灌装同步"
+
+  - id: "PK-105"
+    name: "灯检台4"
+    type: packaging
+    section: PK
+    model: "LJ-4"
+    spec: "4工位, 人工目检"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "ST"
+        name: "灯检输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        note: "与灌装同步"
+
+  - id: "PK-106"
+    name: "贴标机"
+    type: packaging
+    section: PK
+    model: "LB-54000"
+    spec: "54000B/H, 定位精度±1mm"
+    quantity: 1
+    supplier: "进口"
+    power_kw: 5.5
+    is_inverter: true
+    sensors:
+      - code: "ST"
+        name: "贴标机速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        note: "与灌装同步"
+      - code: "MT"
+        name: "贴标机电机温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {H: 100}
+    motors:
+      - id: "M-PK01"
+        name: "贴标机"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "PK-107"
+    name: "喷码机1"
+    type: packaging
+    section: PK
+    model: "CIJ-200"
+    spec: "速度54000B/H, 小字符"
+    quantity: 1
+    supplier: "进口"
+    sensors: []
+
+  - id: "PK-108"
+    name: "喷码机2"
+    type: packaging
+    section: PK
+    model: "CIJ-200"
+    spec: "速度54000B/H, 小字符"
+    quantity: 1
+    supplier: "进口"
+    sensors: []
+
+  - id: "PK-109"
+    name: "纸箱成型机"
+    type: packaging
+    section: PK
+    model: "CM-30"
+    spec: "30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 4.0
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "纸箱供应计数"
+        type: "计数"
+        unit: "个"
+
+  - id: "PK-110"
+    name: "装箱机"
+    type: packaging
+    section: PK
+    model: "MC-30"
+    spec: "24瓶/箱, 30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 5.5
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "装箱速度"
+        type: "计数"
+        range: [0, 60]
+        unit: "箱/min"
+        alarm: {L: 25, H: 40}
+        note: "30箱/分钟额定"
+    motors:
+      - id: "M-PK02"
+        name: "装箱机"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "PK-111"
+    name: "重量检测机"
+    type: packaging
+    section: PK
+    model: "GC-30"
+    spec: "精度±5g, 速度30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "DT"
+        name: "重量检测机状态"
+        type: "状态"
+        alarm_action: "超差报警"
+        note: "±5g"
+
+  - id: "PK-112"
+    name: "码垛机"
+    type: packaging
+    section: PK
+    model: "PL-80"
+    spec: "80箱/分钟, 机器人式"
+    quantity: 1
+    supplier: "进口"
+    power_kw: 15
+    is_inverter: true
+    sensors:
+      - code: "ST"
+        name: "码垛机速度"
+        type: "编码器"
+        range: [0, 100]
+        unit: "箱/min"
+        alarm: {L: 70, H: 90}
+        note: "80箱/分钟额定"
+      - code: "MT"
+        name: "码垛机电机温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {H: 100}
+    motors:
+      - id: "M-PK03"
+        name: "码垛机"
+        power_kw: 15
+        is_inverter: true
+
+  - id: "PK-113"
+    name: "托盘库"
+    type: tank
+    section: PK
+    model: "PS-500"
+    spec: "储存500个托盘"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+  - id: "PK-114"
+    name: "缠绕机"
+    type: packaging
+    section: PK
+    model: "RW-2000"
+    spec: "拉伸膜缠绕"
+    quantity: 1
+    supplier: "国产"
+    sensors: []
+
+# ============================================================================
+# 泵台账 (单独列出，便于统计)
+# ============================================================================
+pumps:
+  - id: "P-WT01"
+    name: "原水输送泵"
+    section: WT
+    power_kw: 5.5
+    is_inverter: true
+    control: "液位连锁"
+  - id: "P-WT02"
+    name: "纯水输送泵"
+    section: WT
+    power_kw: 5.5
+    is_inverter: true
+    control: "压力控制"
+  - id: "P-TH01"
+    name: "茶叶输送泵"
+    section: TH
+    power_kw: 3.0
+    is_inverter: false
+    control: "批次控制"
+  - id: "P-EX01"
+    name: "茶汁输送泵"
+    section: EX
+    power_kw: 3.0
+    is_inverter: false
+    control: "批次控制"
+  - id: "P-FL01"
+    name: "超滤循环泵"
+    section: FL
+    power_kw: 5.5
+    is_inverter: true
+    control: "膜过滤"
+  - id: "P-BL01"
+    name: "调配液输送泵1"
+    section: BL
+    power_kw: 3.0
+    is_inverter: false
+    control: "均质连锁"
+  - id: "P-BL02"
+    name: "调配液输送泵2"
+    section: BL
+    power_kw: 3.0
+    is_inverter: false
+    control: "均质连锁"
+  - id: "P-UH01"
+    name: "UHT产品泵"
+    section: UH
+    power_kw: 3.0
+    is_inverter: false
+    control: "温度连锁"
+  - id: "P-CP01"
+    name: "CIP清洗泵1"
+    section: CP
+    power_kw: 3.0
+    is_inverter: true
+    control: "CIP程序"
+  - id: "P-CP02"
+    name: "CIP清洗泵2"
+    section: CP
+    power_kw: 3.0
+    is_inverter: true
+    control: "CIP程序"
+  - id: "P-PK01"
+    name: "包装输送泵"
+    section: PK
+    power_kw: 3.0
+    is_inverter: true
+    control: "同步灌装"
+
+# ============================================================================
+# 电机台账 (单独列出，便于统计)
+# ============================================================================
+motors:
+  - id: "M-TH01"
+    name: "茶叶粉碎机"
+    section: TH
+    power_kw: 7.5
+    is_inverter: true
+  - id: "M-EX01"
+    name: "萃取罐1搅拌"
+    section: EX
+    power_kw: 3.0
+    is_inverter: true
+  - id: "M-EX02"
+    name: "萃取罐2搅拌"
+    section: EX
+    power_kw: 3.0
+    is_inverter: true
+  - id: "M-EX03"
+    name: "萃取罐3搅拌"
+    section: EX
+    power_kw: 3.0
+    is_inverter: true
+  - id: "M-BL01"
+    name: "调配罐1搅拌"
+    section: BL
+    power_kw: 5.5
+    is_inverter: true
+  - id: "M-BL02"
+    name: "调配罐2搅拌"
+    section: BL
+    power_kw: 5.5
+    is_inverter: true
+  - id: "M-FL01"
+    name: "碟式离心机电机"
+    section: FL
+    power_kw: 15
+    is_inverter: true
+  - id: "M-HM01"
+    name: "均质机电机"
+    section: HM
+    power_kw: 75
+    is_inverter: false
+  - id: "M-PF01"
+    name: "吹瓶机"
+    section: PF
+    power_kw: 45
+    is_inverter: true
+  - id: "M-PF02"
+    name: "灌装机"
+    section: PF
+    power_kw: 30
+    is_inverter: true
+  - id: "M-PF03"
+    name: "旋盖机"
+    section: PF
+    power_kw: 15
+    is_inverter: true
+  - id: "M-PK01"
+    name: "贴标机"
+    section: PK
+    power_kw: 5.5
+    is_inverter: true
+  - id: "M-PK02"
+    name: "装箱机"
+    section: PK
+    power_kw: 5.5
+    is_inverter: true
+  - id: "M-PK03"
+    name: "码垛机"
+    section: PK
+    power_kw: 15
+    is_inverter: true

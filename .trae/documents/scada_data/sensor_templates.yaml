@@ -1,0 +1,478 @@
+# SCADA 传感器/仪表模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 说明: 定义标准传感器类型和测量后缀规则，用于自动生成监控点表
+
+meta:
+  version: "1.0"
+  created: "2026-04-28"
+  source_doc: "位号编码规则.md"
+
+# ============================================================================
+# 测量类型后缀定义
+# ============================================================================
+measurement_types:
+  LT:
+    name: "液位"
+    name_en: "Level Transmitter"
+    unit: "%"
+    range_default: [0, 100]
+    alarm_types: ["LL", "L", "H", "HH"]
+
+  TT:
+    name: "温度"
+    name_en: "Temperature Transmitter"
+    unit: "℃"
+    range_default: [0, 150]
+    alarm_types: ["L", "H"]
+
+  PT:
+    name: "压力"
+    name_en: "Pressure Transmitter"
+    unit: "MPa"
+    range_default: [0, 1]
+    alarm_types: ["L", "H"]
+
+  PT2:
+    name: "压力2"
+    name_en: "Pressure Transmitter 2"
+    unit: "MPa"
+    range_default: [0, 1]
+    alarm_types: ["L", "H"]
+
+  FT:
+    name: "流量"
+    name_en: "Flow Transmitter"
+    unit: "m³/h"
+    range_default: [0, 10]
+    alarm_types: ["L", "H"]
+
+  FT2:
+    name: "流量2"
+    name_en: "Flow Transmitter 2"
+    unit: "m³/h"
+    range_default: [0, 10]
+    alarm_types: ["L", "H"]
+
+  ST:
+    name: "转速"
+    name_en: "Speed Transmitter"
+    unit: "rpm"
+    range_default: [0, 3000]
+    alarm_types: ["L", "H"]
+
+  AT:
+    name: "分析仪表(pH)"
+    name_en: "Analyzer Transmitter (pH)"
+    unit: "-"
+    range_default: [0, 14]
+    alarm_types: ["L", "H"]
+
+  BT:
+    name: "糖度"
+    name_en: "Brix Transmitter"
+    unit: "°Brix"
+    range_default: [0, 20]
+    alarm_types: ["L", "H"]
+
+  CtT:
+    name: "电导率"
+    name_en: "Conductivity Transmitter"
+    unit: "μS/cm"
+    range_default: [0, 100]
+    alarm_types: ["L", "H"]
+
+  DT:
+    name: "设备状态"
+    name_en: "Device Status"
+    unit: "-"
+    range_default: null
+    alarm_types: []
+
+  MT:
+    name: "电机温度"
+    name_en: "Motor Temperature"
+    unit: "℃"
+    range_default: [0, 150]
+    alarm_types: ["H"]
+
+  DPT:
+    name: "差压"
+    name_en: "Differential Pressure"
+    unit: "MPa"
+    range_default: [0, 0.5]
+    alarm_types: ["H"]
+
+# ============================================================================
+# 传感器类型映射
+# ============================================================================
+sensor_type_mapping:
+  液位计: "LT"
+  温度计: "TT"
+  压力计: "PT"
+  流量计: "FT"
+  转速计: "ST"
+  pH计: "AT"
+  糖度计: "BT"
+  电导率仪: "CtT"
+  状态: "DT"
+  温度传感器: "TT"
+  差压计: "DPT"
+  编码器: "ST"
+  扭矩仪: "TT"
+
+# ============================================================================
+# 设备类型标准传感器配置
+# ============================================================================
+device_type_standard_sensors:
+  tank:
+    description: "储罐/容器"
+    default_sensors:
+      - type: "LT"
+        required: true
+      - type: "TT"
+        required: false
+        condition: "带加热或冷却"
+    optional_sensors:
+      - type: "PT"
+        condition: "带压"
+
+  pump:
+    description: "输送泵"
+    default_sensors:
+      - type: "DT"
+        required: true
+        description: "运行/停止/故障"
+    optional_sensors:
+      - type: "PT"
+        condition: "出口压力监控"
+      - type: "FT"
+        condition: "流量监控"
+
+  motor:
+    description: "电机/搅拌"
+    default_sensors:
+      - type: "DT"
+        required: true
+        description: "运行/停止/故障"
+      - type: "MT"
+        required: true
+        description: "电机温度"
+    optional_sensors:
+      - type: "ST"
+        condition: "变频调速"
+
+  valve:
+    description: "阀门"
+    default_sensors:
+      - type: "DT"
+        required: true
+        description: "开/关状态"
+    optional_sensors: []
+
+  heat_exchanger:
+    description: "换热器/冷却器"
+    default_sensors:
+      - type: "TT"
+        required: true
+      - type: "PT"
+        required: false
+        condition: "压力监控"
+    optional_sensors:
+      - type: "FT"
+        condition: "流量监控"
+
+  filter:
+    description: "过滤器/超滤"
+    default_sensors:
+      - type: "PT"
+        required: true
+        description: "进口压力"
+      - type: "DPT"
+        required: true
+        description: "压差"
+      - type: "FT"
+        required: true
+        description: "产水流量"
+    optional_sensors:
+      - type: "TT"
+        condition: "温度监控"
+      - type: "FT2"
+        condition: "浓水流量"
+
+  uht:
+    description: "UHT杀菌锅"
+    default_sensors:
+      - type: "TT1"
+        required: true
+        description: "预热段温度"
+      - type: "TT2"
+        required: true
+        description: "杀菌段温度"
+      - type: "TT3"
+        required: true
+        description: "保温段温度"
+      - type: "TT4"
+        required: true
+        description: "冷却段进口"
+      - type: "TT5"
+        required: true
+        description: "冷却段出口"
+      - type: "PT1"
+        required: true
+        description: "杀菌前压力"
+      - type: "PT2"
+        required: true
+        description: "杀菌压力"
+      - type: "FT"
+        required: true
+        description: "产品流量"
+
+  filler:
+    description: "灌装机"
+    default_sensors:
+      - type: "ST"
+        required: true
+        description: "速度"
+      - type: "TT"
+        required: true
+        description: "料温"
+      - type: "FT"
+        required: true
+        description: "灌装流量"
+      - type: "LT"
+        required: true
+        description: "料位"
+      - type: "PT"
+        required: false
+        description: "灌装压力"
+    optional_sensors:
+      - type: "MT"
+        condition: "电机温度"
+
+  packaging:
+    description: "包装设备"
+    default_sensors:
+      - type: "ST"
+        required: true
+        description: "速度"
+      - type: "DT"
+        required: false
+        condition: "故障检测"
+    optional_sensors:
+      - type: "FT"
+        condition: "计数"
+      - type: "MT"
+        condition: "电机温度"
+
+  cip_tank:
+    description: "CIP储罐"
+    default_sensors:
+      - type: "LT"
+        required: true
+      - type: "CtT"
+        required: true
+        description: "浓度监控"
+      - type: "TT"
+        required: true
+        description: "温度"
+    optional_sensors: []
+
+  cip_pump:
+    description: "CIP泵"
+    default_sensors:
+      - type: "DT"
+        required: true
+      - type: "FT"
+        required: true
+        description: "回水流速"
+      - type: "CtT"
+        required: true
+        description: "回水电导率"
+
+# ============================================================================
+# 关键控制点定义
+# ============================================================================
+key_control_points:
+  WT:
+    - device_id: "WT-102"
+      sensor_code: "CtT"
+      name: "RO产水电导率"
+      critical_value: 15
+      unit: "μS/cm"
+      hazard: "水质不合格，影响食品安全"
+
+  EX:
+    - device_id: "EX-101"
+      sensor_code: "TT"
+      name: "萃取罐1温度"
+      critical_value: "75-100"
+      unit: "℃"
+      hazard: "温度影响萃取效果"
+    - device_id: "EX-102"
+      sensor_code: "TT"
+      name: "萃取罐2温度"
+      critical_value: "75-100"
+      unit: "℃"
+      hazard: "温度影响萃取效果"
+    - device_id: "EX-103"
+      sensor_code: "TT"
+      name: "萃取罐3温度"
+      critical_value: "75-100"
+      unit: "℃"
+      hazard: "温度影响萃取效果"
+
+  BL:
+    - device_id: "BL-101"
+      sensor_code: "AT"
+      name: "调配罐1 pH"
+      critical_value: "5.0-6.5"
+      unit: "-"
+      hazard: "pH偏离影响口感"
+    - device_id: "BL-101"
+      sensor_code: "BT"
+      name: "调配罐1 Brix"
+      critical_value: "8-12"
+      unit: "°Brix"
+      hazard: "糖度偏离影响口感"
+    - device_id: "BL-102"
+      sensor_code: "AT"
+      name: "调配罐2 pH"
+      critical_value: "5.0-6.5"
+      unit: "-"
+      hazard: "pH偏离影响口感"
+    - device_id: "BL-102"
+      sensor_code: "BT"
+      name: "调配罐2 Brix"
+      critical_value: "8-12"
+      unit: "°Brix"
+      hazard: "糖度偏离影响口感"
+
+  HM:
+    - device_id: "HM-101"
+      sensor_code: "PT2"
+      name: "均质工作压力"
+      critical_value: "18-27"
+      unit: "MPa"
+      hazard: "压力影响均质效果"
+
+  UH:
+    - device_id: "UH-101"
+      sensor_code: "TT2"
+      name: "杀菌段温度"
+      critical_value: "130-140"
+      unit: "℃"
+      hazard: "温度不足导致杀菌不彻底，食品安全风险"
+    - device_id: "UH-101"
+      sensor_code: "PT2"
+      name: "杀菌压力"
+      critical_value: "0.2-0.5"
+      unit: "MPa"
+      hazard: "压力与温度连锁"
+
+  PF:
+    - device_id: "PF-101"
+      sensor_code: "TT"
+      name: "灌装温度"
+      critical_value: "80-92"
+      unit: "℃"
+      hazard: "温度影响卫生指标"
+    - device_id: "PF-101"
+      sensor_code: "ST"
+      name: "吹灌一体机速度"
+      critical_value: "50000-58000"
+      unit: "瓶/h"
+      hazard: "速度影响产能"
+
+# ============================================================================
+# 报警等级定义
+# ============================================================================
+alarm_levels:
+  LL:
+    name: "低低报警"
+    color: "红色闪烁"
+    sound: "连续"
+    response: "立即停机，人工处理"
+    level_code: "L1"
+
+  L:
+    name: "低报警"
+    color: "黄色"
+    sound: "断续"
+    response: "30分钟内处理"
+    level_code: "L2"
+
+  H:
+    name: "高报警"
+    color: "黄色"
+    sound: "断续"
+    response: "30分钟内处理"
+    level_code: "L2"
+
+  HH:
+    name: "高高报警"
+    color: "红色闪烁"
+    sound: "连续"
+    response: "立即停机，人工处理"
+    level_code: "L1"
+
+# ============================================================================
+# 阀门类型定义
+# ============================================================================
+valve_types:
+  电动球阀:
+    prefix: "V"
+    control_mode: ["自动", "手动"]
+    has_feedback: true
+
+  气动阀:
+    prefix: "V"
+    control_mode: ["自动", "手动"]
+    has_feedback: true
+
+  气动调节阀:
+    prefix: "V"
+    control_mode: ["自动/PID"]
+    has_feedback: true
+    has_position_feedback: true
+
+  计量阀:
+    prefix: "V"
+    control_mode: ["自动"]
+    has_feedback: true
+    is_measured: true
+
+# ============================================================================
+# 阀门前缀映射
+# ============================================================================
+valve_prefix_mapping:
+  WT: "WV"
+  TH: "TV"
+  EX: "EV"
+  FL: "FV"
+  BL: "BV"
+  UH: "UV"
+  CP: "CV"
+  PF: "PV"
+  PK: "KV"
+  general: "XV"
+
+# ============================================================================
+# 分析仪表子类型后缀
+# ============================================================================
+analyzer_subtypes:
+  pH:
+    suffix: "AT"
+    note: "pH值测量"
+
+  Brix:
+    suffix: "BT"
+    note: "糖度测量"
+
+  Conductivity:
+    suffix: "CtT"
+    note: "电导率测量"
+
+  Turbidity:
+    suffix: "NT"
+    note: "浊度测量"
