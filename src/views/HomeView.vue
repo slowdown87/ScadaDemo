@@ -22,11 +22,15 @@
         <PlantView
           :is-running="store.running"
           :tank-level="store.tankLevel"
+          :tank-b-level="75"
           :flow-rate="store.flowRate"
+          :flow-rate-b="8"
           :reactor-temp="store.reactorTemp"
           :reactor-pressure="store.reactorPressure"
           :motor-speed="store.motorSpeed"
           :product-count="store.productCount"
+          :sep-level="50"
+          :storage-level="100"
           :alarms="store.alarms"
         />
       </div>

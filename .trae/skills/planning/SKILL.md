@@ -63,16 +63,63 @@ Thought → Action → Observation → Thought → ... → Final Answer
    - 预估每步风险
    - 准备备选方案
 
-4. 执行与监控
+4. 生成/更新状态快照
+   - 根据"状态快照操作规范"更新快照
+   - 设置currentPhase为"规划"
+   - 设置task.progress为"0/N"
+   - 设置task.status为"进行中"
+
+5. 执行与监控
    - 按计划执行
    - 观察每步结果
    - 记录关键决策点
+   - 每阶段更新状态快照（progress, currentPhase, blockers）
 
-5. 迭代优化
+6. 迭代优化
    - 失败时自我纠错
    - 根据反馈调整
    - 完成时验证结果
 ```
+
+---
+
+## 状态快照操作规范
+
+### 状态快照模板
+
+```json
+{
+  "version": "1.0",
+  "created": "<ISO8601格式时间戳>",
+  "lastUpdated": "<ISO8601格式时间戳>",
+  "currentPhase": "规划",
+  "task": {
+    "name": "<任务名称>",
+    "progress": "0/<子任务总数>",
+    "status": "进行中"
+  },
+  "blockers": [],
+  "pendingConfirmations": ["<待确认项>"],
+  "lastAgent": "planning"
+}
+```
+
+### 状态转换规则
+
+| 时机 | currentPhase | task.progress | task.status |
+|------|--------------|---------------|-------------|
+| 规划开始 | 规划 | 0/N | 进行中 |
+| 子任务完成 | 保持 | N/N | 进行中 |
+| 执行开始 | 执行 | N/N | 进行中 |
+| 任务完成 | 完成 | N/N | 完成 |
+| 任务阻塞 | 保持 | N/N | 阻塞 |
+
+### 更新操作
+
+1. 打开 .trae\状态快照.json
+2. 按模板创建（如不存在）
+3. 按状态转换规则更新字段
+4. 保存文件
 
 ---
 

@@ -22,8 +22,16 @@
           <span class="label-value">{{ tankLevel }}%</span>
         </div>
 
+        <div class="data-label tank-b-level">
+          <span class="label-value">{{ tankBLevel }}%</span>
+        </div>
+
         <div class="data-label flow-rate">
           <span class="label-value">{{ flowRate }} L/s</span>
+        </div>
+
+        <div class="data-label flow-rate-b">
+          <span class="label-value">{{ flowRateB }} L/s</span>
         </div>
 
         <div class="data-label reactor-temp" :class="getAlarmClass('temp')">
@@ -38,8 +46,16 @@
           <span class="label-value">{{ motorSpeed }} RPM</span>
         </div>
 
+        <div class="data-label sep-level">
+          <span class="label-value">{{ sepLevel }}%</span>
+        </div>
+
         <div class="data-label product-count">
           <span class="label-value">{{ productCount }}</span>
+        </div>
+
+        <div class="data-label storage-level">
+          <span class="label-value">{{ storageLevel }}%</span>
         </div>
       </div>
 
@@ -52,14 +68,18 @@
         <div class="equip motor" :class="{ running: isRunning }">
           <div class="motor-rotor"></div>
         </div>
+
+        <div class="equip pump" :class="{ running: isRunning }">
+          <div class="pump-blade"></div>
+        </div>
       </div>
 
       <div class="pipe-flows">
-        <svg class="pipe-svg" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid meet">
+        <svg class="pipe-svg" viewBox="0 0 1400 750" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" style="stop-color:#00aaff;stop-opacity:0.3" />
-              <stop offset="50%" style="stop-color:#00ffee;stop-opacity:0.8" />
+              <stop offset="50%" style="stop-color:#00ddff;stop-opacity:0.8" />
               <stop offset="100%" style="stop-color:#00aaff;stop-opacity:0.3" />
             </linearGradient>
           </defs>
@@ -67,27 +87,37 @@
           <path
             class="pipe-path horizontal"
             :class="{ flowing: isRunning }"
-            d="M 140 260 L 260 270"
+            d="M 150 220 L 280 225"
+          />
+          <path
+            class="pipe-path horizontal"
+            :class="{ flowing: isRunning }"
+            d="M 150 450 L 280 455"
           />
           <path
             class="pipe-path diagonal"
             :class="{ flowing: isRunning }"
-            d="M 300 270 L 400 250"
+            d="M 330 225 L 420 340"
+          />
+          <path
+            class="pipe-path diagonal"
+            :class="{ flowing: isRunning }"
+            d="M 330 455 L 420 340"
           />
           <path
             class="pipe-path horizontal"
             :class="{ flowing: isRunning }"
-            d="M 500 250 L 580 230"
+            d="M 540 340 L 620 250"
           />
           <path
             class="pipe-path horizontal"
             :class="{ flowing: isRunning }"
-            d="M 720 230 L 780 240"
+            d="M 760 280 L 850 270"
           />
           <path
             class="pipe-path horizontal final"
             :class="{ flowing: isRunning }"
-            d="M 880 240 L 960 260"
+            d="M 950 270 L 1040 250"
           />
         </svg>
       </div>
@@ -101,12 +131,16 @@ import flowsheetSrc from '@/assets/flowsheet.svg'
 
 const props = defineProps({
   isRunning: { type: Boolean, default: false },
-  tankLevel: { type: Number, default: 50 },
-  flowRate: { type: Number, default: 0 },
+  tankLevel: { type: Number, default: 75 },
+  flowRate: { type: Number, default: 10 },
+  flowRateB: { type: Number, default: 8 },
+  tankBLevel: { type: Number, default: 60 },
   reactorTemp: { type: Number, default: 25 },
   reactorPressure: { type: Number, default: 1.0 },
   motorSpeed: { type: Number, default: 0 },
   productCount: { type: Number, default: 0 },
+  sepLevel: { type: Number, default: 50 },
+  storageLevel: { type: Number, default: 100 },
   alarms: { type: Array, default: () => [] }
 })
 
@@ -192,6 +226,7 @@ function getAlarmClass(type) {
     linear-gradient(rgba(26, 34, 53, 0.3) 1px, transparent 1px),
     linear-gradient(90deg, rgba(26, 34, 53, 0.3) 1px, transparent 1px);
   background-size: 100% 100%, 50px 50px, 50px 50px;
+  overflow: hidden;
 }
 
 .flowsheet-image {
@@ -256,12 +291,16 @@ function getAlarmClass(type) {
   50% { box-shadow: 0 0 30px rgba(255, 71, 87, 0.7); }
 }
 
-.tank-level { top: 38%; left: 8%; }
-.flow-rate { top: 50%; left: 24%; }
-.reactor-temp { top: 28%; left: 52%; }
-.reactor-pressure { top: 55%; left: 52%; }
-.motor-speed { top: 10%; left: 55%; }
-.product-count { top: 38%; left: 84%; }
+.tank-level { top: 22%; left: 8%; }
+.tank-b-level { top: 54%; left: 8%; }
+.flow-rate { top: 28%; left: 22%; }
+.flow-rate-b { top: 56%; left: 22%; }
+.reactor-temp { top: 26%; left: 48%; }
+.reactor-pressure { top: 48%; left: 48%; }
+.motor-speed { top: 18%; left: 47%; }
+.sep-level { top: 38%; left: 63%; }
+.product-count { top: 30%; left: 78%; }
+.storage-level { top: 60%; left: 78%; }
 
 .equipment-animations {
   position: absolute;
@@ -277,8 +316,8 @@ function getAlarmClass(type) {
 }
 
 .equip.mixer {
-  top: 32%;
-  left: 37%;
+  top: 42%;
+  left: 33%;
   width: 60px;
   height: 60px;
 }
@@ -317,7 +356,7 @@ function getAlarmClass(type) {
 
 .equip.motor {
   top: 18%;
-  left: 57%;
+  left: 46%;
   width: 40px;
   height: 40px;
   border: 3px solid var(--color-primary);
@@ -342,6 +381,40 @@ function getAlarmClass(type) {
 @keyframes spin-rotor {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.equip.pump {
+  top: 55%;
+  left: 62%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pump-blade {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-primary);
+  border-radius: 50%;
+  position: relative;
+}
+
+.pump-blade::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 4px;
+  background: var(--color-primary);
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center;
+}
+
+.equip.pump.running .pump-blade::before {
+  animation: spin-rotor 0.5s linear infinite;
 }
 
 .pipe-flows {
