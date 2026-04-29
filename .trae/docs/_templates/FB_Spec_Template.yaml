@@ -701,6 +701,249 @@ process_function_blocks:
         type: "REAL"
         default: 0.1
 
+  # --------------------------------------------------------------------------
+  # 糖度(Brix)控制功能块
+  # --------------------------------------------------------------------------
+  FB_Brix_Control:
+    name: "糖度控制功能块"
+    description: "调配罐糖度控制，通过调节糖浆阀实现目标Brix值控制"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iBrix_PV"
+          type: "REAL"
+          desc: "糖度过程值 °Brix"
+        - name: "iBrix_SP"
+          type: "REAL"
+          desc: "糖度设定值 °Brix"
+        - name: "iAuto_Manual"
+          type: "BOOL"
+          desc: "自动/手动切换 TRUE=自动"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+          range: [0.0, 100.0]
+        - name: "iBrix_H"
+          type: "REAL"
+          desc: "高报警值 °Brix"
+          default: 15.0
+        - name: "iBrix_L"
+          type: "REAL"
+          desc: "低报警值 °Brix"
+          default: 10.0
+        - name: "iBrix_HH"
+          type: "REAL"
+          desc: "高高报警值 °Brix"
+          default: 16.0
+        - name: "iBrix_LL"
+          type: "REAL"
+          desc: "低低报警值 °Brix"
+          default: 9.0
+        - name: "iSyrup_Flow_PV"
+          type: "REAL"
+          desc: "糖浆流量过程值 L/h"
+        - name: "iSyrup_Brix"
+          type: "REAL"
+          desc: "糖浆浓度 °Brix"
+          default: 65.0
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qValve_Position"
+          type: "INT"
+          desc: "调节阀开度 0-100%"
+        - name: "qBrix_Error"
+          type: "REAL"
+          desc: "当前偏差 SP-PV"
+        - name: "qBrix_Status"
+          type: "INT"
+          desc: "状态 0=正常,1=高,2=低,3=高高联锁,4=低低联锁"
+        - name: "qSyrup_Flow_SP"
+          type: "REAL"
+          desc: "糖浆流量设定值 L/h"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "高高报警"
+        - name: "qAlarm_LL"
+          type: "BOOL"
+          desc: "低低报警"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 2.0
+        desc: "比例增益"
+      - name: "Tn"
+        type: "TIME"
+        default: "T#45S"
+        desc: "积分时间"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.2
+        desc: "死区宽度 °Brix"
+      - name: "Output_Min"
+        type: "REAL"
+        default: 0.0
+        desc: "输出下限 %"
+      - name: "Output_Max"
+        type: "REAL"
+        default: 100.0
+        desc: "输出上限 %"
+      - name: "Syrup_Conc"
+        type: "REAL"
+        default: 65.0
+        desc: "糖浆浓度 °Brix"
+
+    logic:
+      - step: "1.偏差计算"
+        desc: "计算设定值与过程值的偏差"
+      - step: "2.PID计算"
+        desc: "根据偏差计算输出值"
+      - step: "3.流量换算"
+        desc: "根据糖浆浓度计算所需流量"
+      - step: "4.报警判断"
+        desc: "判断是否触发各类报警"
+
+    diagnostics:
+      - code: "BRX001"
+        desc: "糖度高于高高限"
+      - code: "BRX002"
+        desc: "糖度低于低低限"
+      - code: "BRX003"
+        desc: "糖度偏差超限"
+      - code: "BRX004"
+        desc: "糖浆流量异常"
+
+  # --------------------------------------------------------------------------
+  # pH控制功能块
+  # --------------------------------------------------------------------------
+  FB_PH_Control:
+    name: "pH控制功能块"
+    description: "调配罐pH控制，通过调节酸液阀实现目标pH值控制"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iPH_PV"
+          type: "REAL"
+          desc: "pH过程值"
+        - name: "iPH_SP"
+          type: "REAL"
+          desc: "pH设定值"
+        - name: "iAuto_Manual"
+          type: "BOOL"
+          desc: "自动/手动切换 TRUE=自动"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+          range: [0.0, 100.0]
+        - name: "iPH_H"
+          type: "REAL"
+          desc: "高报警值"
+          default: 6.5
+        - name: "iPH_L"
+          type: "REAL"
+          desc: "低报警值"
+          default: 4.5
+        - name: "iPH_HH"
+          type: "REAL"
+          desc: "高高报警值"
+          default: 7.0
+        - name: "iPH_LL"
+          type: "REAL"
+          desc: "低低报警值"
+          default: 4.0
+        - name: "iAcid_Concentration"
+          type: "REAL"
+          desc: "酸液浓度 %"
+          default: 50.0
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qValve_Position"
+          type: "INT"
+          desc: "调节阀开度 0-100%"
+        - name: "qPH_Error"
+          type: "REAL"
+          desc: "当前偏差 SP-PV"
+        - name: "qPH_Status"
+          type: "INT"
+          desc: "状态 0=正常,1=高,2=低,3=高高联锁,4=低低联锁"
+        - name: "qAcid_Flow_SP"
+          type: "REAL"
+          desc: "酸液流量设定值 L/h"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "高高报警"
+        - name: "qAlarm_LL"
+          type: "BOOL"
+          desc: "低低报警"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 3.0
+        desc: "比例增益"
+      - name: "Tn"
+        type: "TIME"
+        default: "T#30S"
+        desc: "积分时间"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.1
+        desc: "死区宽度"
+      - name: "Output_Min"
+        type: "REAL"
+        default: 0.0
+        desc: "输出下限 %"
+      - name: "Output_Max"
+        type: "REAL"
+        default: 100.0
+        desc: "输出上限 %"
+
+    logic:
+      - step: "1.pH-浓度转换"
+        desc: "pH值与H+浓度非线性转换"
+      - step: "2.偏差计算"
+        desc: "计算设定值与过程值的偏差"
+      - step: "3.PID计算"
+        desc: "根据偏差计算输出值(考虑非线性)"
+      - step: "4.滴定曲线补偿"
+        desc: "根据pH-酸添加量曲线进行补偿"
+      - step: "5.报警判断"
+        desc: "判断是否触发各类报警"
+
+    diagnostics:
+      - code: "PH001"
+        desc: "pH高于高高限"
+      - code: "PH002"
+        desc: "pH低于低低限"
+      - code: "PH003"
+        desc: "pH偏差超限"
+      - code: "PH004"
+        desc: "酸液流量异常"
+
 # ============================================================================
 # 批次控制功能块
 # ============================================================================

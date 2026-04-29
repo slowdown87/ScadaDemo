@@ -26,23 +26,21 @@ from pathlib import Path
 # 配置
 # ============================================================================
 SCRIPT_DIR = Path(__file__).parent
-DATA_DIR = SCRIPT_DIR  # YAML文件在脚本同一目录
-
-# 输出目录 (上级目录的 documents 文件夹)
+TEMPLATES_DIR = SCRIPT_DIR.parent / "_templates"
 OUTPUT_DIR = SCRIPT_DIR.parent
 
-# 数据文件 (与脚本同一目录)
-DEVICES_FILE = DATA_DIR / "devices.yaml"
-SENSORS_FILE = DATA_DIR / "sensor_templates.yaml"
-INTERLOCK_FILE = DATA_DIR / "interlock_templates.yaml"
-CIP_FILE = DATA_DIR / "cip_templates.yaml"
-COMM_FILE = DATA_DIR / "comm_templates.yaml"
+# 数据文件 (_templates目录)
+DEVICES_FILE = TEMPLATES_DIR / "devices.yaml"
+SENSORS_FILE = TEMPLATES_DIR / "sensor_templates.yaml"
+INTERLOCK_FILE = TEMPLATES_DIR / "interlock_templates.yaml"
+CIP_FILE = TEMPLATES_DIR / "cip_templates.yaml"
+COMM_FILE = TEMPLATES_DIR / "comm_templates.yaml"
 
-# 输出文件 (上级目录的 documents 文件夹)
-OUTPUT_POINTS = OUTPUT_DIR / "茶饮料生产线监控点表_auto.md"
-OUTPUT_INTERLOCKS = OUTPUT_DIR / "联锁逻辑说明书_auto.md"
-OUTPUT_CIP = OUTPUT_DIR / "CIP清洗程序规格书_auto.md"
-OUTPUT_COMM = OUTPUT_DIR / "通讯接口规格书_auto.md"
+# 输出文件 (各自分类目录)
+OUTPUT_POINTS = OUTPUT_DIR / "03_Device" / "茶饮料生产线监控点表_auto.md"
+OUTPUT_INTERLOCKS = OUTPUT_DIR / "04_Process" / "联锁逻辑说明书_auto.md"
+OUTPUT_CIP = OUTPUT_DIR / "04_Process" / "CIP清洗程序规格书_auto.md"
+OUTPUT_COMM = OUTPUT_DIR / "04_Process" / "通讯接口规格书_auto.md"
 
 
 # ============================================================================

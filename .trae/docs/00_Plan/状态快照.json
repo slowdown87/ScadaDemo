@@ -1,0 +1,268 @@
+{
+  "version": "2.0",
+  "created": "2026-04-28T10:00:00",
+  "lastUpdated": "2026-04-29T11:00:00",
+  "project": {
+    "name": "茶饮料生产线SCADA文档体系",
+    "description": "基于项目文档体系建设方案(v2.0)，实现文档自动化生成与管理",
+    "totalPhases": 17,
+    "completedPhases": 3,
+    "currentPhaseId": 4,
+    "currentPhaseName": "PLC架构修正 + 14个工段控制规格"
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "配方管理",
+      "status": "已完成",
+      "progress": "3/3",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "创建配方YAML模板 recipe_templates.yaml",
+          "status": "已完成",
+          "output": "_templates/recipe_templates.yaml"
+        },
+        {
+          "id": 2,
+          "name": "开发配方生成器 recipe_generator.py",
+          "status": "已完成",
+          "output": "_generators/recipe_generator.py"
+        },
+        {
+          "id": 3,
+          "name": "生成配方文档",
+          "status": "已完成",
+          "output": "05_Product/*.md"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "SCADA规格与HMI",
+      "status": "已完成",
+      "progress": "3/3",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "SCADA系统功能规格说明书",
+          "status": "已完成",
+          "output": "01_Spec/SCADA系统功能规格说明书.md (v2.1)"
+        },
+        {
+          "id": 2,
+          "name": "HMI画面规格清单",
+          "status": "已完成",
+          "output": "01_Spec/HMI_Screens.md (v2.0)"
+        },
+        {
+          "id": 3,
+          "name": "FB功能块规格模板",
+          "status": "已完成",
+          "output": "_templates/FB_Spec_Template.yaml"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "工艺文档",
+      "status": "已完成",
+      "progress": "4/4",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "监控点表",
+          "status": "已完成",
+          "output": "03_Device/监控点表_auto.md"
+        },
+        {
+          "id": 2,
+          "name": "CIP清洗程序规格书",
+          "status": "已完成",
+          "output": "04_Process/CIP清洗程序规格书_auto.md"
+        },
+        {
+          "id": 3,
+          "name": "联锁逻辑说明书",
+          "status": "已完成",
+          "output": "04_Process/联锁逻辑说明书_auto.md"
+        },
+        {
+          "id": 4,
+          "name": "通讯接口规格书",
+          "status": "已完成",
+          "output": "04_Process/通讯接口规格书_auto.md"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "PLC架构与工段控制规格",
+      "status": "待开始",
+      "priority": "P0",
+      "progress": "0/15",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "PLC架构修正 (14个PLC)",
+          "status": "待开始",
+          "priority": "P0",
+          "output": "02_Arch/PLC_Architecture.md (待修正)",
+          "risk": "当前架构不合理，需重新设计"
+        },
+        {
+          "id": 2,
+          "name": "UH_UHT控制规格",
+          "status": "待开始",
+          "priority": "P0",
+          "output": "04_Process/UH_UHT控制规格.md",
+          "risk": "CCP关键控制，需详细定义"
+        },
+        {
+          "id": 3,
+          "name": "PF_灌装控制规格",
+          "status": "待开始",
+          "priority": "P0",
+          "output": "04_Process/PF_灌装控制规格.md",
+          "risk": "超高速同步，需详细定义"
+        },
+        {
+          "id": 4,
+          "name": "WT_水处理控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/WT_水处理控制规格.md"
+        },
+        {
+          "id": 5,
+          "name": "TH_茶叶前处理控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/TH_茶叶前处理控制规格.md"
+        },
+        {
+          "id": 6,
+          "name": "EX_萃取控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/EX_萃取控制规格.md"
+        },
+        {
+          "id": 7,
+          "name": "BL_调配控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/BL_调配控制规格.md"
+        },
+        {
+          "id": 8,
+          "name": "HM_均质控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/HM_均质控制规格.md"
+        },
+        {
+          "id": 9,
+          "name": "BF_制瓶控制规格",
+          "status": "待开始",
+          "priority": "P1",
+          "output": "04_Process/BF_制瓶控制规格.md"
+        },
+        {
+          "id": 10,
+          "name": "CG_旋盖控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/CG_旋盖控制规格.md"
+        },
+        {
+          "id": 11,
+          "name": "LI_灯检控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/LI_灯检控制规格.md"
+        },
+        {
+          "id": 12,
+          "name": "CI_喷码控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/CI_喷码控制规格.md"
+        },
+        {
+          "id": 13,
+          "name": "LB_贴标控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/LB_贴标控制规格.md"
+        },
+        {
+          "id": 14,
+          "name": "CA_装箱控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/CA_装箱控制规格.md"
+        },
+        {
+          "id": 15,
+          "name": "PK_膜包码垛控制规格",
+          "status": "待开始",
+          "priority": "P2",
+          "output": "04_Process/PK_膜包码垛控制规格.md"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "调试运维文档",
+      "status": "待开始",
+      "progress": "0/2",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "调试大纲",
+          "status": "待开始",
+          "output": "调试大纲.md"
+        },
+        {
+          "id": 2,
+          "name": "操作手册",
+          "status": "待开始",
+          "output": "操作手册.md"
+        }
+      ]
+    }
+  ],
+  "blockers": [],
+  "pendingConfirmations": [],
+  "lastAgent": "planning",
+  "notes": "已完成阶段1-3。当前进入阶段4：PLC架构修正(14个PLC)和14个工段控制规格。P0优先：PLC架构修正、UH_UHT控制规格、PF_灌装控制规格。",
+  "documentStats": {
+    "totalDocuments": 32,
+    "completedDocuments": 15,
+    "pendingDocuments": 17,
+    "totalTasks": 22,
+    "completedTasks": 10,
+    "pendingTasks": 12
+  },
+  "plcArchitecture": {
+    "totalPLCs": 14,
+    "plcList": [
+      {"id": 1, "name": "WT_水处理", "ioEstimate": 200},
+      {"id": 2, "name": "TH_茶叶前处理", "ioEstimate": 100},
+      {"id": 3, "name": "EX_萃取", "ioEstimate": 180},
+      {"id": 4, "name": "BL_调配", "ioEstimate": 200},
+      {"id": 5, "name": "HM_均质", "ioEstimate": 80},
+      {"id": 6, "name": "UH_UHT", "ioEstimate": 220, "critical": true},
+      {"id": 7, "name": "BF_制瓶", "ioEstimate": 150},
+      {"id": 8, "name": "PF_灌装", "ioEstimate": 180, "critical": true},
+      {"id": 9, "name": "CG_旋盖", "ioEstimate": 80},
+      {"id": 10, "name": "LI_灯检", "ioEstimate": 60},
+      {"id": 11, "name": "CI_喷码", "ioEstimate": 40},
+      {"id": 12, "name": "LB_贴标", "ioEstimate": 60},
+      {"id": 13, "name": "CA_装箱", "ioEstimate": 80},
+      {"id": 14, "name": "PK_膜包码垛", "ioEstimate": 120}
+    ],
+    "totalIOEstimate": 1750
+  }
+}

@@ -24,14 +24,14 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-DATA_DIR = SCRIPT_DIR
+TEMPLATES_DIR = SCRIPT_DIR.parent / "_templates"
 OUTPUT_DIR = SCRIPT_DIR.parent
 
-RECIPE_FILE = DATA_DIR / "recipe_templates.yaml"
+RECIPE_FILE = TEMPLATES_DIR / "recipe_templates.yaml"
 
-OUTPUT_PRODUCT = OUTPUT_DIR / "产品配方_auto.md"
-OUTPUT_PROCESS = OUTPUT_DIR / "工艺配方_auto.md"
-OUTPUT_CIP = OUTPUT_DIR / "CIP配方_auto.md"
+OUTPUT_PRODUCT = OUTPUT_DIR / "05_Product" / "产品配方_auto.md"
+OUTPUT_PROCESS = OUTPUT_DIR / "04_Process" / "工艺配方_auto.md"
+OUTPUT_CIP = OUTPUT_DIR / "05_Product" / "CIP配方_auto.md"
 
 
 def load_yaml(file_path):
@@ -765,39 +765,34 @@ def main():
 
     args = parser.parse_args()
 
-    os.makedirs(args.output, exist_ok=True)
-
     print(f"SCADA 配方生成器")
-    print(f"输出目录: {args.output}")
+    print(f"模板目录: {TEMPLATES_DIR}")
     print("-" * 50)
 
     if args.generate in ['all', 'product']:
         print("正在生成: 产品配方...")
-        content = generate_product_recipe()
-        output_file = Path(args.output) / OUTPUT_PRODUCT.name
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-        print(f"  完成: {output_file}")
+        os.makedirs(OUTPUT_PRODUCT.parent, exist_ok=True)
+        with open(OUTPUT_PRODUCT, 'w', encoding='utf-8') as f:
+            f.write(generate_product_recipe())
+        print(f"  完成: {OUTPUT_PRODUCT}")
 
     if args.generate in ['all', 'process']:
         print("正在生成: 工艺配方...")
-        content = generate_process_recipe()
-        output_file = Path(args.output) / OUTPUT_PROCESS.name
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-        print(f"  完成: {output_file}")
+        os.makedirs(OUTPUT_PROCESS.parent, exist_ok=True)
+        with open(OUTPUT_PROCESS, 'w', encoding='utf-8') as f:
+            f.write(generate_process_recipe())
+        print(f"  完成: {OUTPUT_PROCESS}")
 
     if args.generate in ['all', 'cip']:
         print("正在生成: CIP配方...")
-        content = generate_cip_recipe()
-        output_file = Path(args.output) / OUTPUT_CIP.name
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(content)
-        print(f"  完成: {output_file}")
+        os.makedirs(OUTPUT_CIP.parent, exist_ok=True)
+        with open(OUTPUT_CIP, 'w', encoding='utf-8') as f:
+            f.write(generate_cip_recipe())
+        print(f"  完成: {OUTPUT_CIP}")
 
     if args.generate == 'all':
         print("\n所有配方文档生成完成!")
-        print(f"输出目录: {args.output}")
+        print(f"输出目录: {OUTPUT_DIR}")
 
 
 if __name__ == '__main__':

@@ -254,15 +254,15 @@
 
 | 回路ID | 回路名称 | 控制方式 | 被控对象 | 设定值范围 | 控制器类型 | HMI操作画面 |
 |--------|----------|----------|----------|------------|------------|-------------|
-| LC-001 | 纯水储罐液位 | PID | LV-107 | 30%-90% | FB_Level_Ctrl | WS-002 |
-| LC-002 | 萃取罐1液位 | PID | LV-101 | 0%-95% | FB_Level_Ctrl | WS-003 |
-| LC-003 | 茶汁冷却温度 | PID | TCV-106 | 20-25℃ | FB_Temp_Ctrl | WS-003 |
-| LC-004 | 调配罐1 Brix | PID | Brix控制阀 | 目标值±1.0°Brix | FB_Brix_Ctrl | WS-005 |
-| LC-005 | 调配罐1 pH | PID | 酸液调节阀 | 目标值±0.5 | FB_PH_Ctrl | WS-005 |
-| LC-006 | 均质压力 | PID | HPV-101 | 20-25MPa | FB_Pressure_Ctrl | WS-006 |
-| LC-007 | UHT预热温度 | PID | TCV-101 | 80±3℃ | FB_Temp_Ctrl | WS-007 |
-| LC-008 | UHT杀菌温度 | PID | TCV-102 | 135±2℃ | FB_UHT_Temp_Profile | WS-007 |
-| LC-009 | UHT冷却温度 | PID | TCV-104 | ≤35℃ | FB_Temp_Ctrl | WS-007 |
+| LC-001 | 纯水储罐液位 | PID | LV-107 | 30%-90% | FB_Level_Control | WS-002 |
+| LC-002 | 萃取罐1液位 | PID | LV-101 | 0%-95% | FB_Level_Control | WS-003 |
+| LC-003 | 茶汁冷却温度 | PID | TCV-106 | 20-25℃ | FB_Temperature_Control | WS-003 |
+| LC-004 | 调配罐1 Brix | PID | Brix控制阀 | 目标值±1.0°Brix | FB_Brix_Control | WS-005 |
+| LC-005 | 调配罐1 pH | PID | 酸液调节阀 | 目标值±0.5 | FB_PH_Control | WS-005 |
+| LC-006 | 均质压力 | PID | HPV-101 | 20-25MPa | FB_Pressure_Control | WS-006 |
+| LC-007 | UHT预热温度 | PID | TCV-101 | 80±3℃ | FB_Temperature_Control | WS-007 |
+| LC-008 | UHT杀菌温度 | PID | TCV-102 | 135±2℃ | FB_UHT_Temperature_Profile | WS-007 |
+| LC-009 | UHT冷却温度 | PID | TCV-104 | ≤35℃ | FB_Temperature_Control | WS-007 |
 
 #### 4.3.2 顺序控制
 
@@ -490,3 +490,4 @@
 **版本历史**:
 - v1.0 (2026-04-28): 初始版本
 - v2.0 (2026-04-29): 补充HMI关联追踪、功能需求矩阵、交叉引用索引
+- v2.1 (2026-04-29): 修复功能块命名不统一问题，新增FB_Brix_Control、FB_PH_Control追踪
