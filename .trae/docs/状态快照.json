@@ -1,0 +1,157 @@
+{
+  "version": "1.1",
+  "created": "2026-04-28T10:00:00",
+  "lastUpdated": "2026-04-29T10:30:00",
+  "project": {
+    "name": "茶饮料生产线SCADA文档体系",
+    "description": "基于项目文档体系建设方案，实现文档自动化生成与管理",
+    "totalPhases": 4,
+    "currentPhaseId": 3
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "配方管理",
+      "status": "已完成",
+      "progress": "3/3",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "创建配方YAML模板 recipe_templates.yaml",
+          "status": "已完成",
+          "input": "产品方案边界说明、工艺流程设计、CIP清洗程序规格书",
+          "output": "recipe_templates.yaml",
+          "risk": "无",
+          "verification": "YAML语法检查通过"
+        },
+        {
+          "id": 2,
+          "name": "开发配方生成器 recipe_generator.py",
+          "status": "已完成",
+          "input": "recipe_templates.yaml",
+          "output": "recipe_generator.py",
+          "risk": "模板格式变更需同步更新生成器",
+          "verification": "运行生成测试，验证输出文档格式正确"
+        },
+        {
+          "id": 3,
+          "name": "生成产品配方文件 产品配方_auto.md",
+          "status": "已完成",
+          "input": "recipe_templates.yaml, recipe_generator.py",
+          "output": "产品配方_auto.md, 工艺配方_auto.md, CIP配方_auto.md",
+          "risk": "无",
+          "verification": "文档内容完整性检查"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "PLC/SCADA开发规范",
+      "status": "已完成",
+      "progress": "3/3",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "PLC程序架构设计",
+          "status": "已完成",
+          "input": "联锁逻辑、监控点表",
+          "output": "PLC_Architecture.md",
+          "risk": "需要同步联锁逻辑更新",
+          "verification": "文档评审通过"
+        },
+        {
+          "id": 2,
+          "name": "功能块规格书模板",
+          "status": "已完成",
+          "input": "联锁逻辑",
+          "output": "FB_Spec_Template.yaml",
+          "risk": "无",
+          "verification": "模板覆盖所有功能块"
+        },
+        {
+          "id": 3,
+          "name": "SCADA画面规格清单",
+          "status": "已完成",
+          "input": "功能规格说明书",
+          "output": "HMI_Screens.md",
+          "risk": "画面需求可能随业务调整",
+          "verification": "与用户确认画面清单"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "调试运维文档",
+      "status": "待开始",
+      "progress": "0/2",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "调试大纲",
+          "status": "待开始",
+          "input": "联锁逻辑、工艺流程",
+          "output": "Commissioning_Guide.md",
+          "risk": "调试步骤可能因设备变更调整",
+          "verification": "调试前评审"
+        },
+        {
+          "id": 2,
+          "name": "操作手册模板",
+          "status": "待开始",
+          "input": "功能规格",
+          "output": "Operation_Manual.md",
+          "risk": "操作流程需与现场确认",
+          "verification": "操作员培训验证"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "工程辅助文件",
+      "status": "待开始",
+      "progress": "0/4",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "电控柜元器件清单",
+          "status": "待开始",
+          "input": "设备清单、监控点表",
+          "output": "Cabinet_BOM.xlsx",
+          "risk": "元器件选型可能变更",
+          "verification": "与电气工程师确认"
+        },
+        {
+          "id": 2,
+          "name": "仪表清单",
+          "status": "待开始",
+          "input": "devices.yaml",
+          "output": "Instrument_List.xlsx",
+          "risk": "仪表型号可能因供货调整",
+          "verification": "与采购确认"
+        },
+        {
+          "id": 3,
+          "name": "端子定义表",
+          "status": "待开始",
+          "input": "监控点表",
+          "output": "Terminal_Assignments.xlsx",
+          "risk": "I/O分配可能因PLC配置调整",
+          "verification": "与PLC程序员确认"
+        },
+        {
+          "id": 4,
+          "name": "电缆清单模板",
+          "status": "待开始",
+          "input": "监控点表",
+          "output": "Cable_List_Template.xlsx",
+          "risk": "电缆走向可能因现场调整",
+          "verification": "与电气工程师确认"
+        }
+      ]
+    }
+  ],
+  "blockers": [],
+  "pendingConfirmations": [],
+  "lastAgent": "planning",
+  "notes": "阶段2（PLC/SCADA开发规范）已完成！生成了3个文档（PLC_Architecture.md、FB_Spec_Template.yaml、HMI_Screens.md）。当前进入阶段3（调试运维文档）。"
+}

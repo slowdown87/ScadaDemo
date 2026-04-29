@@ -1,0 +1,1000 @@
+# SCADA PLC功能块规格书模板
+# 文档版本: v1.0
+# 创建日期: 2026-04-29
+# 说明: 定义所有PLC功能块的输入输出参数、接口定义、逻辑说明
+
+meta:
+  version: "v1.0"
+  created: "2026-04-29"
+  project: "茶饮料生产线SCADA系统"
+  plc_version: "Siemens S7-1500"
+  programming_standard: "IEC 61131-3"
+  author: "SCADA系统"
+
+# ============================================================================
+# 基础控制功能块
+# ============================================================================
+basic_function_blocks:
+
+  # --------------------------------------------------------------------------
+  # 阀门控制功能块
+  # --------------------------------------------------------------------------
+  FB_Valve_Control:
+    name: "阀门控制功能块"
+    description: "用于控制气动阀、调节阀的开关及开度调节"
+    version: "v1.0"
+    category: "基础控制"
+
+    interface:
+      inputs:
+        - name: "iValve_Open"
+          type: "BOOL"
+          desc: "打开命令"
+        - name: "iValve_Close"
+          type: "BOOL"
+          desc: "关闭命令"
+        - name: "iValve_Stop"
+          type: "BOOL"
+          desc: "停止命令"
+        - name: "iValve_Reset"
+          type: "BOOL"
+          desc: "复位命令"
+        - name: "iValve_OpenFB"
+          type: "BOOL"
+          desc: "阀打开反馈"
+        - name: "iValve_CloseFB"
+          type: "BOOL"
+          desc: "阀关闭反馈"
+        - name: "iValve_Alarm"
+          type: "BOOL"
+          desc: "阀故障信号"
+        - name: "iValve_Interlock"
+          type: "BOOL"
+          desc: "阀联锁信号"
+          default: "FALSE"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iManual_Speed"
+          type: "INT"
+          desc: "手动调节速度"
+          range: [0, 100]
+          default: 50
+
+      outputs:
+        - name: "qValve_OpenCmd"
+          type: "BOOL"
+          desc: "阀打开命令"
+        - name: "qValve_CloseCmd"
+          type: "BOOL"
+          desc: "阀关闭命令"
+        - name: "qValve_StopCmd"
+          type: "BOOL"
+          desc: "阀停止命令"
+        - name: "qValve_ResetCmd"
+          type: "BOOL"
+          desc: "阀复位命令"
+        - name: "qValve_Position"
+          type: "INT"
+          desc: "阀开度位置 0-100%"
+        - name: "qValve_Status"
+          type: "INT"
+          desc: "阀状态 0=未知,1=关闭中,2=打开中,3=打开,4=关闭,5=故障,6=联锁"
+        - name: "qValve_Ready"
+          type: "BOOL"
+          desc: "阀准备就绪"
+        - name: "qValve_Warning"
+          type: "BOOL"
+          desc: "阀警告"
+        - name: "qValve_Error"
+          type: "BOOL"
+          desc: "阀错误"
+
+    parameters:
+      - name: "Timeout_Open"
+        type: "TIME"
+        default: "T#10S"
+        desc: "打开超时时间"
+      - name: "Timeout_Close"
+        type: "TIME"
+        default: "T#10S"
+        desc: "关闭超时时间"
+      - name: "Enable_Interlock"
+        type: "BOOL"
+        default: "TRUE"
+        desc: "使能联锁检查"
+
+    logic:
+      - step: "1.状态判断"
+        desc: "根据反馈信号判断当前阀状态"
+      - step: "2.命令处理"
+        desc: "收到打开/关闭命令后输出脉冲信号"
+      - step: "3.超时检测"
+        desc: "超过设定时间未到位触发报警"
+      - step: "4.联锁检查"
+        desc: "联锁信号有效时禁止操作"
+      - step: "5.故障处理"
+        desc: "故障信号有效时进入故障状态"
+
+    diagnostics:
+      - code: "V001"
+        desc: "阀打开超时"
+      - code: "V002"
+        desc: "阀关闭超时"
+      - code: "V003"
+        desc: "阀反馈异常"
+      - code: "V004"
+        desc: "阀联锁激活"
+      - code: "V005"
+        desc: "阀故障"
+
+  # --------------------------------------------------------------------------
+  # 泵控制功能块
+  # --------------------------------------------------------------------------
+  FB_Pump_Control:
+    name: "泵控制功能块"
+    description: "用于控制泵的启停、速度调节及状态监控"
+    version: "v1.0"
+    category: "基础控制"
+
+    interface:
+      inputs:
+        - name: "iPump_Start"
+          type: "BOOL"
+          desc: "泵启动命令"
+        - name: "iPump_Stop"
+          type: "BOOL"
+          desc: "泵停止命令"
+        - name: "iPump_Reset"
+          type: "BOOL"
+          desc: "复位命令"
+        - name: "iPump_RunFB"
+          type: "BOOL"
+          desc: "泵运行反馈"
+        - name: "iPump_Fault"
+          type: "BOOL"
+          desc: "泵故障信号"
+        - name: "iPump_Overload"
+          type: "BOOL"
+          desc: "泵过载信号"
+        - name: "iPump_Interlock"
+          type: "BOOL"
+          desc: "泵联锁信号"
+          default: "FALSE"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iSpeed_Setpoint"
+          type: "INT"
+          desc: "速度设定值 0-100%"
+          range: [0, 100]
+
+      outputs:
+        - name: "qPump_StartCmd"
+          type: "BOOL"
+          desc: "泵启动命令"
+        - name: "qPump_StopCmd"
+          type: "BOOL"
+          desc: "泵停止命令"
+        - name: "qPump_ResetCmd"
+          type: "BOOL"
+          desc: "泵复位命令"
+        - name: "qPump_Speed"
+          type: "INT"
+          desc: "泵实际速度 0-100%"
+        - name: "qPump_Status"
+          type: "INT"
+          desc: "泵状态 0=停止,1=启动中,2=运行,3=故障,4=过载,5=联锁"
+        - name: "qPump_Ready"
+          type: "BOOL"
+          desc: "泵准备就绪"
+        - name: "qPump_Warning"
+          type: "BOOL"
+          desc: "泵警告"
+        - name: "qPump_Error"
+          type: "BOOL"
+          desc: "泵错误"
+
+    parameters:
+      - name: "Start_Delay"
+        type: "TIME"
+        default: "T#2S"
+        desc: "启动延时"
+      - name: "Stop_Delay"
+        type: "TIME"
+        default: "T#3S"
+        desc: "停止延时"
+      - name: "Fault_Delay"
+        type: "TIME"
+        default: "T#1S"
+        desc: "故障确认延时"
+      - name: "Auto_Start"
+        type: "BOOL"
+        default: "FALSE"
+        desc: "液位联锁自动启动"
+
+    logic:
+      - step: "1.启动条件检查"
+        desc: "检查联锁、手自动模式"
+      - step: "2.启动命令输出"
+        desc: "发出启动命令并计时"
+      - step: "3.运行反馈检测"
+        desc: "收到运行反馈后进入运行状态"
+      - step: "4.速度调节"
+        desc: "根据设定值调节泵速度"
+      - step: "5.故障处理"
+        desc: "过载或故障信号触发停机"
+
+    diagnostics:
+      - code: "P001"
+        desc: "泵启动超时"
+      - code: "P002"
+        desc: "泵运行中停机"
+      - code: "P003"
+        desc: "泵过载"
+      - code: "P004"
+        desc: "泵联锁激活"
+      - code: "P005"
+        desc: "泵电机过热"
+
+  # --------------------------------------------------------------------------
+  # PID控制功能块
+  # --------------------------------------------------------------------------
+  FB_PID_Control:
+    name: "PID控制功能块"
+    description: "通用PID控制器，用于温度、压力、流量、液位等过程控制"
+    version: "v1.0"
+    category: "基础控制"
+
+    interface:
+      inputs:
+        - name: "iPV"
+          type: "REAL"
+          desc: "过程值(测量值)"
+        - name: "iSP"
+          type: "REAL"
+          desc: "设定值"
+        - name: "iPV_H"
+          type: "REAL"
+          desc: "过程值上限"
+        - name: "iPV_L"
+          type: "REAL"
+          desc: "过程值下限"
+        - name: "iAuto_Manual"
+          type: "BOOL"
+          desc: "自动/手动切换 TRUE=自动"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+          range: [0.0, 100.0]
+        - name: "iTrack_Input"
+          type: "BOOL"
+          desc: "跟踪输入使能"
+        - name: "iTrack_Value"
+          type: "REAL"
+          desc: "跟踪值"
+        - name: "iSP_Change"
+          type: "BOOL"
+          desc: "设定值变化信号(上升沿)"
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "PID输出值 0-100%"
+        - name: "qOutput_RAW"
+          type: "INT"
+          desc: "原始输出值 0-27648"
+        - name: "qError"
+          type: "REAL"
+          desc: "当前偏差 SP-PV"
+        - name: "qError_Deadband"
+          type: "REAL"
+          desc: "死区处理后偏差"
+        - name: "qMan_Output"
+          type: "REAL"
+          desc: "手动输出值(回读)"
+        - name: "qMode"
+          type: "INT"
+          desc: "当前模式 0=手动,1=自动,2=跟踪"
+        - name: "qSP_Ramp"
+          type: "REAL"
+          desc: "当前设定值(斜坡后)"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "高高报警"
+        - name: "qAlarm_LL"
+          type: "BOOL"
+          desc: "低低报警"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 1.0
+        desc: "比例增益"
+      - name: "Tn"
+        type: "TIME"
+        default: "T#40S"
+        desc: "积分时间"
+      - name: "Tv"
+        type: "TIME"
+        default: "T#10S"
+        desc: "微分时间"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.5
+        desc: "死区宽度"
+      - name: "SP_Ramp"
+        type: "REAL"
+        default: 0.0
+        desc: "设定值斜坡变化率 0=禁止"
+        unit: "°C/min 或 %/min"
+      - name: "Output_Min"
+        type: "REAL"
+        default: 0.0
+        desc: "输出下限"
+      - name: "Output_Max"
+        type: "REAL"
+        default: 100.0
+        desc: "输出上限"
+      - name: "Alarm_H_Dev"
+        type: "REAL"
+        default: 10.0
+        desc: "高报警偏差"
+      - name: "Alarm_L_Dev"
+        type: "REAL"
+        default: 10.0
+        desc: "低报警偏差"
+      - name: "Alarm_HH_Dev"
+        type: "REAL"
+        default: 20.0
+        desc: "高高报警偏差"
+      - name: "Alarm_LL_Dev"
+        type: "REAL"
+        default: 20.0
+        desc: "低低报警偏差"
+
+    logic:
+      - step: "1.PV范围检查"
+        desc: "检查过程值是否在合理范围"
+      - step: "2.偏差计算"
+        desc: "计算SP-PV，考虑死区"
+      - step: "3.设定值斜坡"
+        desc: "根据设定值变化率平滑过渡"
+      - step: "4.PID计算"
+        desc: "执行PID算法计算输出"
+      - step: "5.输出限幅"
+        desc: "将输出限制在设定范围内"
+      - step: "6.报警判断"
+        desc: "根据偏差生成各类报警"
+
+    diagnostics:
+      - code: "PID001"
+        desc: "过程值超上限"
+      - code: "PID002"
+        desc: "过程值超下限"
+      - code: "PID003"
+        desc: "设定值超范围"
+      - code: "PID004"
+        desc: "输出饱和"
+
+# ============================================================================
+# 工艺控制功能块
+# ============================================================================
+process_function_blocks:
+
+  # --------------------------------------------------------------------------
+  # 液位控制功能块
+  # --------------------------------------------------------------------------
+  FB_Level_Control:
+    name: "液位控制功能块"
+    description: "储罐液位控制，带高低液位联锁保护"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iLevel_PV"
+          type: "REAL"
+          desc: "液位过程值 %"
+        - name: "iLevel_SP"
+          type: "REAL"
+          desc: "液位设定值 %"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+        - name: "iLevel_H"
+          type: "REAL"
+          desc: "高液位报警值 %"
+          default: 90.0
+        - name: "iLevel_L"
+          type: "REAL"
+          desc: "低液位报警值 %"
+          default: 20.0
+        - name: "iLevel_HH"
+          type: "REAL"
+          desc: "高高液位联锁值 %"
+          default: 95.0
+        - name: "iLevel_LL"
+          type: "REAL"
+          desc: "低低液位联锁值 %"
+          default: 10.0
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qLevel_Status"
+          type: "INT"
+          desc: "液位状态 0=正常,1=高,2=低,3=高高联锁,4=低低联锁"
+        - name: "qPump_Start"
+          type: "BOOL"
+          desc: "泵启动命令(输液用)"
+        - name: "qPump_Stop"
+          type: "BOOL"
+          desc: "泵停止命令"
+        - name: "qValve_Open"
+          type: "BOOL"
+          desc: "阀打开命令(输液用)"
+        - name: "qValve_Close"
+          type: "BOOL"
+          desc: "阀关闭命令"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高液位报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低液位报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "高高液位联锁"
+        - name: "qAlarm_LL"
+          type: "BOOL"
+          desc: "低低液位联锁"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 2.0
+      - name: "Tn"
+        type: "TIME"
+        default: "T#60S"
+      - name: "Deadband"
+        type: "REAL"
+        default: 1.0
+      - name: "Output_Min"
+        type: "REAL"
+        default: 0.0
+      - name: "Output_Max"
+        type: "REAL"
+        default: 100.0
+
+  # --------------------------------------------------------------------------
+  # 温度控制功能块
+  # --------------------------------------------------------------------------
+  FB_Temperature_Control:
+    name: "温度控制功能块"
+    description: "温度控制，带升降温速率限制及过热保护"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iTemp_PV"
+          type: "REAL"
+          desc: "温度过程值 ℃"
+        - name: "iTemp_SP"
+          type: "REAL"
+          desc: "温度设定值 ℃"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+        - name: "iHeat_Request"
+          type: "BOOL"
+          desc: "加热请求"
+        - name: "iCool_Request"
+          type: "BOOL"
+          desc: "冷却请求"
+        - name: "iTemp_H"
+          type: "REAL"
+          desc: "高报警值 ℃"
+        - name: "iTemp_L"
+          type: "REAL"
+          desc: "低报警值 ℃"
+        - name: "iTemp_HH"
+          type: "REAL"
+          desc: "超温联锁值 ℃"
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qHeat_Output"
+          type: "REAL"
+          desc: "加热输出 0-100%"
+        - name: "qCool_Output"
+          type: "REAL"
+          desc: "冷却输出 0-100%"
+        - name: "qHeat_Request"
+          type: "BOOL"
+          desc: "加热器使能"
+        - name: "qCool_Request"
+          type: "BOOL"
+          desc: "冷却阀使能"
+        - name: "qTemp_Status"
+          type: "INT"
+          desc: "温度状态 0=正常,1=高,2=低,3=超温联锁"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "超温联锁"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 1.5
+      - name: "Tn"
+        type: "TIME"
+        default: "T#40S"
+      - name: "Tv"
+        type: "TIME"
+        default: "T#5S"
+      - name: "Heat_Rate_Limit"
+        type: "REAL"
+        default: 5.0
+        desc: "升温速率限制 ℃/min"
+      - name: "Cool_Rate_Limit"
+        type: "REAL"
+        default: 3.0
+        desc: "降温速率限制 ℃/min"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.5
+
+  # --------------------------------------------------------------------------
+  # 压力控制功能块
+  # --------------------------------------------------------------------------
+  FB_Pressure_Control:
+    name: "压力控制功能块"
+    description: "压力控制，带超压联锁保护"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iPress_PV"
+          type: "REAL"
+          desc: "压力过程值 MPa"
+        - name: "iPress_SP"
+          type: "REAL"
+          desc: "压力设定值 MPa"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+        - name: "iPress_H"
+          type: "REAL"
+          desc: "高报警值 MPa"
+        - name: "iPress_L"
+          type: "REAL"
+          desc: "低报警值 MPa"
+        - name: "iPress_HH"
+          type: "REAL"
+          desc: "超压联锁值 MPa"
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qValve_Position"
+          type: "INT"
+          desc: "调节阀开度 0-100%"
+        - name: "qPress_Status"
+          type: "INT"
+          desc: "压力状态 0=正常,1=高,2=低,3=超压联锁"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+        - name: "qAlarm_HH"
+          type: "BOOL"
+          desc: "超压联锁"
+        - name: "qRelief_Open"
+          type: "BOOL"
+          desc: "泄压阀打开命令"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 2.0
+      - name: "Tn"
+        type: "TIME"
+        default: "T#30S"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.02
+        desc: "MPa"
+      - name: "Relief_Delay"
+        type: "TIME"
+        default: "T#2S"
+        desc: "泄压延时"
+
+  # --------------------------------------------------------------------------
+  # 流量控制功能块
+  # --------------------------------------------------------------------------
+  FB_Flow_Control:
+    name: "流量控制功能块"
+    description: "管道流量控制，带高低流量报警"
+    version: "v1.0"
+    category: "工艺控制"
+    parent: "FB_PID_Control"
+
+    interface:
+      inputs:
+        - name: "iFlow_PV"
+          type: "REAL"
+          desc: "流量过程值 m³/h"
+        - name: "iFlow_SP"
+          type: "REAL"
+          desc: "流量设定值 m³/h"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iManual_Output"
+          type: "REAL"
+          desc: "手动输出值"
+        - name: "iFlow_H"
+          type: "REAL"
+          desc: "高报警值 m³/h"
+        - name: "iFlow_L"
+          type: "REAL"
+          desc: "低报警值 m³/h"
+
+      outputs:
+        - name: "qOutput"
+          type: "REAL"
+          desc: "输出值 0-100%"
+        - name: "qValve_Position"
+          type: "INT"
+          desc: "调节阀开度 0-100%"
+        - name: "qFlow_Status"
+          type: "INT"
+          desc: "流量状态 0=正常,1=高,2=低"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "高报警"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "低报警"
+
+    parameters:
+      - name: "Kp"
+        type: "REAL"
+        default: 1.0
+      - name: "Tn"
+        type: "TIME"
+        default: "T#20S"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.1
+
+# ============================================================================
+# 批次控制功能块
+# ============================================================================
+batch_function_blocks:
+
+  # --------------------------------------------------------------------------
+  # 批次控制功能块
+  # --------------------------------------------------------------------------
+  FB_Batch_Control:
+    name: "批次控制功能块"
+    description: "调配批次顺序控制，管理批次生产的各个步骤"
+    version: "v1.0"
+    category: "批次控制"
+
+    interface:
+      inputs:
+        - name: "iBatch_Start"
+          type: "BOOL"
+          desc: "批次开始命令"
+        - name: "iBatch_Stop"
+          type: "BOOL"
+          desc: "批次停止命令"
+        - name: "iBatch_Pause"
+          type: "BOOL"
+          desc: "批次暂停命令"
+        - name: "iBatch_Resume"
+          type: "BOOL"
+          desc: "批次恢复命令"
+        - name: "iBatch_Abort"
+          type: "BOOL"
+          desc: "批次中止命令"
+        - name: "iStep_Complete"
+          type: "BOOL"
+          desc: "步骤完成信号"
+        - name: "iStep_Ready"
+          type: "BOOL"
+          desc: "步骤准备就绪"
+        - name: "iRecipe_Select"
+          type: "INT"
+          desc: "配方选择 1=绿茶,2=红茶,3=乌龙茶"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+
+      outputs:
+        - name: "qBatch_Status"
+          type: "INT"
+          desc: "批次状态 0=空闲,1=运行,2=暂停,3=完成,4=停止,5=中止,6=故障"
+        - name: "qCurrent_Step"
+          type: "INT"
+          desc: "当前步骤号"
+        - name: "qStep_Command"
+          type: "INT"
+          desc: "步骤命令 1=开始配料,2=添加茶汁,3=添加糖浆..."
+        - name: "qStep_Time_Remaining"
+          type: "TIME"
+          desc: "当前步骤剩余时间"
+        - name: "qBatch_Time_Remaining"
+          type: "TIME"
+          desc: "批次剩余总时间"
+        - name: "qBatch_Progress"
+          type: "INT"
+          desc: "批次完成进度 0-100%"
+        - name: "qBatch_Complete"
+          type: "BOOL"
+          desc: "批次完成信号"
+        - name: "qBatch_Fault"
+          type: "BOOL"
+          desc: "批次故障信号"
+        - name: "qAlarm"
+          type: "BOOL"
+          desc: "批次报警"
+
+    parameters:
+      - name: "Step_Timeout"
+        type: "TIME"
+        default: "T#30M"
+        desc: "步骤超时时间"
+      - name: "Batch_Timeout"
+        type: "TIME"
+        default: "T#2H"
+        desc: "批次总超时时间"
+      - name: "Max_Retries"
+        type: "INT"
+        default: 3
+        desc: "最大重试次数"
+      - name: "Auto_Continue"
+        type: "BOOL"
+        default: "FALSE"
+        desc: "步骤完成后自动继续"
+
+    steps:
+      - step: 1
+        name: "添加纯水"
+        action: "ADD_WATER"
+        target: "液位30%"
+        time_limit: "T#5M"
+      - step: 2
+        name: "添加茶浓缩汁"
+        action: "ADD_TEA"
+        target: "Brix 2.5°"
+        time_limit: "T#10M"
+      - step: 3
+        name: "添加糖浆"
+        action: "ADD_SYRUP"
+        target: "Brix目标值±1.0"
+        time_limit: "T#5M"
+      - step: 4
+        name: "添加酸液"
+        action: "ADD_ACID"
+        target: "pH目标值±0.5"
+        time_limit: "T#3M"
+      - step: 5
+        name: "添加香精"
+        action: "ADD_FLAVOR"
+        target: "时间到"
+        time_limit: "T#1M"
+      - step: 6
+        name: "补水至目标量"
+        action: "ADD_WATER_FINAL"
+        target: "液位100%"
+        time_limit: "T#3M"
+      - step: 7
+        name: "搅拌混合"
+        action: "MIXING"
+        target: "时间到"
+        time_limit: "T#15M"
+
+    logic:
+      - step: "1.配方加载"
+        desc: "根据配方选择加载参数"
+      - step: "2.步骤执行"
+        desc: "按顺序执行各步骤"
+      - step: "3.条件判断"
+        desc: "判断步骤完成条件是否满足"
+      - step: "4.超时检测"
+        desc: "步骤或批次超时检测"
+      - step: "5.异常处理"
+        desc: "故障、重试、停止处理"
+
+    diagnostics:
+      - code: "B001"
+        desc: "步骤超时"
+      - code: "B002"
+        desc: "批次超时"
+      - code: "B003"
+        desc: "步骤条件不满足"
+      - code: "B004"
+        desc: "批次重试次数超限"
+      - code: "B005"
+        desc: "配方数据无效"
+
+# ============================================================================
+# UHT杀菌专用功能块
+# ============================================================================
+uht_function_blocks:
+
+  # --------------------------------------------------------------------------
+  # UHT温度曲线控制
+  # --------------------------------------------------------------------------
+  FB_UHT_Temperature_Profile:
+    name: "UHT温度曲线控制功能块"
+    description: "UHT杀菌机温度分段控制，确保温度曲线符合工艺要求"
+    version: "v1.0"
+    category: "UHT控制"
+
+    interface:
+      inputs:
+        - name: "iTemp_Preheat"
+          type: "REAL"
+          desc: "预热段温度 PV"
+        - name: "iTemp_Sterilize"
+          type: "REAL"
+          desc: "杀菌段温度 PV"
+        - name: "iTemp_Holding"
+          type: "REAL"
+          desc: "保温段温度 PV"
+        - name: "iTemp_Cooling"
+          type: "REAL"
+          desc: "冷却段温度 PV"
+        - name: "iFlow_Rate"
+          type: "REAL"
+          desc: "产品流量"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iStart"
+          type: "BOOL"
+          desc: "启动命令"
+        - name: "iStop"
+          type: "BOOL"
+          desc: "停止命令"
+
+      outputs:
+        - name: "qPreheat_Ctrl"
+          type: "REAL"
+          desc: "预热段控制输出"
+        - name: "qSterilize_Ctrl"
+          type: "REAL"
+          desc: "杀菌段控制输出"
+        - name: "qCooling_Ctrl"
+          type: "REAL"
+          desc: "冷却段控制输出"
+        - name: "qSteam_Valve"
+          type: "REAL"
+          desc: "蒸汽调节阀开度"
+        - name: "qCooling_Valve"
+          type: "REAL"
+          desc: "冷却水阀开度"
+        - name: "qProduct_Valve"
+          type: "BOOL"
+          desc: "产品进料阀"
+        - name: "qDrain_Valve"
+          type: "BOOL"
+          desc: "排放阀"
+        - name: "qStatus"
+          type: "INT"
+          desc: "状态 0=停止,1=预热,2=杀菌,3=运行中,4=冷却,5=故障"
+        - name: "qCCP_OK"
+          type: "BOOL"
+          desc: "关键控制点正常"
+        - name: "qAlarm"
+          type: "BOOL"
+          desc: "报警"
+        - name: "qHold_Status"
+          type: "BOOL"
+          desc: "保温状态保持中"
+
+    parameters:
+      - name: "Preheat_Temp"
+        type: "REAL"
+        default: 80.0
+        desc: "预热温度设定 ℃"
+      - name: "Sterilize_Temp"
+        type: "REAL"
+        default: 135.0
+        desc: "杀菌温度设定 ℃"
+      - name: "Holding_Temp_Min"
+        type: "REAL"
+        default: 130.0
+        desc: "保温温度下限 ℃"
+      - name: "Cooling_Temp_Max"
+        type: "REAL"
+        default: 35.0
+        desc: "冷却温度上限 ℃"
+      - name: "Sterilize_Time"
+        type: "REAL"
+        default: 15.0
+        desc: "杀菌时间秒"
+      - name: "Flow_Rate_Nom"
+        type: "REAL"
+        default: 3000.0
+        desc: "额定流量 L/h"
+      - name: "Temp_Dev_Alarm"
+        type: "REAL"
+        default: 2.0
+        desc: "温度报警偏差 ℃"
+      - name: "Temp_Dev_Interlock"
+        type: "REAL"
+        default: 5.0
+        desc: "温度联锁偏差 ℃"
+
+    logic:
+      - step: "1.温度监测"
+        desc: "实时监测各段温度"
+      - step: "2.流量计算"
+        desc: "根据流量计算保持时间"
+      - step: "3.杀菌判定"
+        desc: "温度>130℃持续15s以上"
+      - step: "4.偏差报警"
+        desc: "温度偏差超限报警"
+      - step: "5.联锁动作"
+        desc: "温度低于130℃持续10s关闭进料"
+
+    ccp_monitoring:
+      - point: "CCP-1"
+        location: "杀菌段"
+        parameter: "温度"
+        limit: "≥130℃"
+        duration: "≥15s"
+        action: "温度低于限值10s关闭进料阀"
+
+# ============================================================================
+# 版本管理
+# ============================================================================
+version_management:
+  current_version: "v1.0"
+  effective_date: "2026-04-29"
+  author: "SCADA系统"
+  approver: "待确认"
+
+  history:
+    - version: "v1.0"
+      date: "2026-04-29"
+      author: "SCADA系统"
+      changes: "初始版本"
+      status: "draft"

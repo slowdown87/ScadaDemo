@@ -63,24 +63,29 @@ Thought → Action → Observation → Thought → ... → Final Answer
    - 确定依赖关系
    - 识别可并行任务
 
-3. 制定执行计划
+3. 检测方案文档
+   - 搜索项目中是否存在《xxx建设方案》《xxx规划》《xxx计划》文档
+   - 如存在，解析文档中的阶段定义，提取 phases 结构
+   - 将 phases 结构纳入状态快照
+
+4. 制定执行计划
    - 排序子任务
    - 预估每步风险
    - 准备备选方案
 
-4. 生成/更新状态快照
+5. 生成/更新状态快照
    - 根据"状态快照操作规范"更新快照
-   - 设置currentPhase为"规划"
-   - 设置task.progress为"0/N"
-   - 设置task.status为"进行中"
+   - 设置 currentPhase 为当前执行阶段
+   - 快照必须包含完整的 phases 数组（所有阶段）
+   - 当前阶段的 tasks 数组包含具体子任务
 
-5. 执行与监控
+6. 执行与监控
    - 按计划执行
    - 观察每步结果
    - 记录关键决策点
    - 每阶段更新状态快照（progress, currentPhase, blockers）
 
-6. 迭代优化
+7. 迭代优化
    - 失败时自我纠错
    - 根据反馈调整
    - 完成时验证结果
@@ -90,7 +95,45 @@ Thought → Action → Observation → Thought → ... → Final Answer
 
 ## 状态快照操作规范
 
-### 状态快照模板
+### 多阶段项目快照模板
+
+```json
+{
+  "version": "1.1",
+  "created": "<ISO8601格式时间戳>",
+  "lastUpdated": "<ISO8601格式时间戳>",
+  "project": {
+    "name": "<项目名称>",
+    "description": "<项目描述>",
+    "totalPhases": <总阶段数>,
+    "currentPhaseId": <当前阶段ID>
+  },
+  "phases": [
+    {
+      "id": 1,
+      "name": "<阶段名称>",
+      "status": "待开始|进行中|已完成|阻塞",
+      "tasks": [
+        {
+          "id": 1,
+          "name": "<子任务名称>",
+          "status": "待开始|进行中|已完成|阻塞",
+          "input": "<输入>",
+          "output": "<输出>",
+          "risk": "<风险>",
+          "verification": "<验证方式>"
+        }
+      ],
+      "progress": "<已完成数>/<总数>"
+    }
+  ],
+  "blockers": [],
+  "pendingConfirmations": [],
+  "lastAgent": "planning"
+}
+```
+
+### 单任务快照模板（无方案文档时）
 
 ```json
 {
@@ -101,30 +144,62 @@ Thought → Action → Observation → Thought → ... → Final Answer
   "task": {
     "name": "<任务名称>",
     "progress": "0/<子任务总数>",
-    "status": "进行中"
+    "status": "进行中",
+    "subtasks": [
+      {
+        "id": 1,
+        "name": "<子任务名称>",
+        "status": "待开始",
+        "input": "<输入>",
+        "output": "<输出>"
+      }
+    ]
   },
   "blockers": [],
-  "pendingConfirmations": ["<待确认项>"],
+  "pendingConfirmations": [],
   "lastAgent": "planning"
 }
 ```
 
+### 方案文档检测规则
+
+**触发条件**：收到任务后，首先搜索以下文件模式：
+
+- `**/*建设方案*.md`
+- `**/*规划*.md`
+- `**/*计划*.md`
+- `**/*方案*.md`
+
+**解析规则**：
+
+- 识别文档中的"第X阶段"、"### X.X"等阶段标记
+- 提取阶段名称和子任务列表
+- 将阶段结构转换为 `phases` 数组
+
+**快照生成规则**：
+
+1. 找到方案文档 → 使用多阶段项目快照模板
+2. 未找到方案文档 → 使用单任务快照模板
+3. 快照路径：`..\docs\状态快照.json`
+4. 快照中的 phases 数组必须包含**所有阶段**，即使某些阶段还未开始
+
 ### 状态转换规则
 
-| 时机    | currentPhase | task.progress | task.status |
-| ----- | ------------ | ------------- | ----------- |
-| 规划开始  | 规划           | 0/N           | 进行中         |
-| 子任务完成 | 保持           | N/N           | 进行中         |
-| 执行开始  | 执行           | N/N           | 进行中         |
-| 任务完成  | 完成           | N/N           | 完成          |
-| 任务阻塞  | 保持           | N/N           | 阻塞          |
+| 时机    | currentPhaseId | phases\[].status | tasks\[].status |
+| ----- | -------------- | ---------------- | --------------- |
+| 规划开始  | 1              | 阶段1: 进行中         | 子任务: 待开始        |
+| 子任务完成 | 保持             | 保持               | 更新为已完成          |
+| 阶段完成  | +1             | 前阶段: 已完成         | 全部: 已完成         |
+| 任务完成  | -              | 所有阶段: 已完成        | 全部: 已完成         |
+| 任务阻塞  | 保持             | 当前阶段: 阻塞         | 当前任务: 阻塞        |
 
 ### 更新操作
 
-1. 打开 .trae\docs\状态快照.json
+1. 打开 `..\docs\状态快照.json`
 2. 按模板创建（如不存在）
-3. 按状态转换规则更新字段
-4. 保存文件
+3. 如有方案文档，解析并填充完整的 `phases` 数组
+4. 按状态转换规则更新字段
+5. 保存文件
 
 ***
 
@@ -135,10 +210,18 @@ Thought → Action → Observation → Thought → ... → Final Answer
 ```
 ## 执行计划
 
-### 任务拆解
+### 项目结构
+- 总阶段数：X
+- 当前阶段：X. <阶段名称>
+
+### 阶段拆解
+#### 阶段1: <名称>
 1. [子任务1] - 输入/输出
 2. [子任务2] - 输入/输出
 3. ...
+
+#### 阶段2: <名称>（待开始）
+...
 
 ### 执行顺序
 1. → 2. → 3.（顺序）
@@ -154,10 +237,11 @@ Thought → Action → Observation → Thought → ... → Final Answer
 ```
 ## 进度
 
-### 已完成
+### 阶段1: <名称> [####----] 4/6
+#### 已完成
 - [x] 子任务1 - 结果
 
-### 进行中
+#### 进行中
 - 子任务2 - 观察: ...
 
 ### 待执行
@@ -185,7 +269,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 配合 tool\_rules 使用，常见模式：
 
 ```
-1. 搜索信息：web search / grep
+1. 搜索信息：web search / grep / Glob（搜索方案文档）
 2. 分析代码：cat / grep / tree
 3. 执行命令：python / bash / pytest
 4. 验证结果：diff / test / assert
@@ -202,6 +286,8 @@ Thought → Action → Observation → Thought → ... → Final Answer
 2. 需要调整后续计划吗？
 3. 可以继续还是需要回退？
 4. 是否达到成功标准？
+5. 状态快照已更新吗？
+6. 快照是否包含完整的 phases 数组？
 ```
 
 ***
@@ -221,4 +307,6 @@ Thought → Action → Observation → Thought → ... → Final Answer
 - 单次规划步数有限（通常 10-50 步）
 - 复杂任务可能需要多次规划迭代
 - 长期任务需要记录中间状态
+
+***
 

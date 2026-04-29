@@ -1,0 +1,1524 @@
+# SCADA 配方管理模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 说明: 定义产品配方、工艺配方、CIP配方模板，用于自动生成配方参数文件
+
+meta:
+  version: "1.0"
+  created: "2026-04-28"
+  source_docs:
+    - "茶饮料生产线工艺流程设计.md"
+    - "CIP清洗程序规格书_auto.md"
+    - "devices.yaml"
+  project_name: "茶饮料生产线SCADA系统"
+  capacity: "54000瓶/小时（500ml PET瓶）"
+
+# ============================================================================
+# 产品配方
+# ============================================================================
+product_recipes:
+  green_tea:
+    name: "绿茶"
+    code: "GT"
+    description: "清淡爽口的绿茶饮料"
+    status: "active"
+
+    # 茶叶原料规格
+    tea_spec:
+      type: "绿茶"
+      grade: "一级以上"
+      origin: "浙江/安徽/江苏"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    # 萃取工艺参数
+    extraction:
+      water_temp_setpoint: 82
+      water_temp_range: [80, 85]
+      tea_ratio_min: 15
+      tea_ratio_max: 20
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 10
+      extraction_time_range: [8, 12]
+      extraction_time_unit: "min"
+      agitation_speed: 50
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    # 调配参数
+    blending:
+      incoming_tea_conc:
+        value: 2.5
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 10
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 5.5
+        tolerance: "±0.5"
+        range: [5.0, 6.0]
+      citric_acid_percent: 0.1
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    # 均质参数
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    # UHT杀菌参数
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    # 灌装参数
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    # 品质指标
+    quality:
+      tea_polyphenol_min: 300
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 1.5
+      turbidity_unit: "NTU"
+      color: "黄绿色"
+      flavor: "清香"
+
+    # 清洗配方关联
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+  red_tea:
+    name: "红茶"
+    code: "RT"
+    description: "浓郁醇厚的红茶饮料"
+    status: "active"
+
+    tea_spec:
+      type: "红茶"
+      grade: "一级以上"
+      origin: "云南/福建/四川"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    extraction:
+      water_temp_setpoint: 92
+      water_temp_range: [90, 95]
+      tea_ratio_min: 20
+      tea_ratio_max: 25
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 7
+      extraction_time_range: [5, 10]
+      extraction_time_unit: "min"
+      agitation_speed: 60
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    blending:
+      incoming_tea_conc:
+        value: 3.0
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 11
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 6.0
+        tolerance: "±0.5"
+        range: [5.5, 6.5]
+      citric_acid_percent: 0.08
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    quality:
+      tea_polyphenol_min: 150
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 2.0
+      turbidity_unit: "NTU"
+      color: "红褐色"
+      flavor: "醇厚"
+
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+  oolong_tea:
+    name: "乌龙茶"
+    code: "OT"
+    description: "清香甘醇的乌龙茶饮料"
+    status: "active"
+
+    tea_spec:
+      type: "乌龙茶"
+      grade: "一级以上"
+      origin: "福建/台湾"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    extraction:
+      water_temp_setpoint: 87
+      water_temp_range: [85, 90]
+      tea_ratio_min: 15
+      tea_ratio_max: 20
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 9
+      extraction_time_range: [8, 10]
+      extraction_time_unit: "min"
+      agitation_speed: 55
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    blending:
+      incoming_tea_conc:
+        value: 2.8
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 10.5
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 5.8
+        tolerance: "±0.5"
+        range: [5.0, 6.5]
+      citric_acid_percent: 0.09
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    quality:
+      tea_polyphenol_min: 200
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 1.8
+      turbidity_unit: "NTU"
+      color: "金黄色"
+      flavor: "清香甘醇"
+
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+# ============================================================================
+# 工艺配方
+# ============================================================================
+process_recipes:
+
+  # 水处理工艺
+  water_treatment:
+    name: "水处理工艺"
+    section: "WT"
+    recipe_id: "PR-WT-001"
+
+    parameters:
+      raw_water:
+        temp: 25
+        temp_unit: "℃"
+        pressure_min: 0.3
+        pressure_max: 0.5
+        pressure_unit: "MPa"
+
+      multimedia_filter:
+        flow_rate: 10
+        flow_rate_unit: "m³/h"
+        backwash_interval: 8
+        backwash_interval_unit: "h"
+        filter_media: "石英砂+无烟煤"
+
+      active_carbon_filter:
+        flow_rate: 10
+        flow_rate_unit: "m³/h"
+        backwash_interval: 24
+        backwash_interval_unit: "h"
+
+      ro_system:
+        flow_rate_product: 5
+        flow_rate_unit: "m³/h"
+        recovery_rate_min: 75
+        recovery_rate_unit: "%"
+        conductivity_max: 10
+        conductivity_unit: "μS/cm"
+        pressure_normal: 1.2
+        pressure_unit: "MPa"
+
+      ion_exchange:
+        conductivity_max: 10
+        conductivity_unit: "μS/cm"
+        regeneration_interval: 72
+        regeneration_interval_unit: "h"
+
+      uv_sterilizer:
+        power: 40
+        power_unit: "W"
+        efficacy_min: 99.9
+        efficacy_unit: "%"
+
+      storage_tank:
+        temp_max: 30
+        temp_unit: "℃"
+        temp_alarm_high: 35
+
+    cleaning_recipe: "CIP-WT"
+
+  # 萃取工艺
+  extraction_process:
+    name: "三级逆流萃取工艺"
+    section: "EX"
+    recipe_id: "PR-EX-001"
+
+    parameters:
+      stage_1:
+        name: "一级萃取罐"
+        tank_id: "EX-101"
+        water_temp: 85
+        water_temp_range: [80, 95]
+        water_temp_unit: "℃"
+        tea_load: 200
+        tea_load_unit: "kg"
+        water_volume: 3.5
+        water_volume_unit: "m³"
+        extraction_time: 10
+        extraction_time_unit: "min"
+        agitation_speed: 50
+        agitation_speed_unit: "rpm"
+
+      stage_2:
+        name: "二级萃取罐"
+        tank_id: "EX-102"
+        water_temp: 90
+        water_temp_range: [85, 95]
+        water_temp_unit: "℃"
+        tea_load: 150
+        tea_load_unit: "kg"
+        water_volume: 3.0
+        water_volume_unit: "m³"
+        extraction_time: 8
+        extraction_time_unit: "min"
+        agitation_speed: 60
+        agitation_speed_unit: "rpm"
+
+      stage_3:
+        name: "三级萃取罐"
+        tank_id: "EX-103"
+        water_temp: 95
+        water_temp_range: [90, 98]
+        water_temp_unit: "℃"
+        tea_load: 100
+        tea_load_unit: "kg"
+        water_volume: 2.5
+        water_volume_unit: "m³"
+        extraction_time: 5
+        extraction_time_unit: "min"
+        agitation_speed: 55
+        agitation_speed_unit: "rpm"
+
+      separation:
+        temperature: 80
+        temperature_unit: "℃"
+        centrifuge_speed: 6000
+        centrifuge_speed_unit: "rpm"
+        separation_factor: 9000
+
+      cooling:
+        target_temp: 25
+        target_temp_unit: "℃"
+        cooling_time_max: 30
+        cooling_time_unit: "min"
+
+    batch_size:
+      green_tea:
+        value: 600
+        unit: "L/batch"
+      red_tea:
+        value: 650
+        unit: "L/batch"
+      oolong_tea:
+        value: 620
+        unit: "L/batch"
+
+    cleaning_recipe: "CIP-EX"
+
+  # 过滤工艺
+  filtration_process:
+    name: "过滤净化工艺"
+    section: "FL"
+    recipe_id: "PR-FL-001"
+
+    parameters:
+      disc_centrifuge:
+        model: "DF-616"
+        capacity: 6000
+        capacity_unit: "L/h"
+        speed: 6500
+        speed_unit: "rpm"
+        separation_factor: 9000
+        inlet_pressure_max: 0.25
+        inlet_pressure_unit: "MPa"
+
+      ultrafiltration:
+        membrane_type: "陶瓷膜"
+        pore_size: 0.1
+        pore_size_unit: "μm"
+        capacity: 6000
+        capacity_unit: "L/h"
+        inlet_pressure_normal: 0.3
+        inlet_pressure_unit: "MPa"
+        inlet_pressure_max: 0.35
+        trans_membrane_pressure_max: 0.15
+        trans_membrane_pressure_unit: "MPa"
+        temperature_range: [55, 75]
+        temperature_unit: "℃"
+        flux_normal: 50
+        flux_unit: "L/(m²·h)"
+        backwash_interval: 30
+        backwash_interval_unit: "min"
+
+    cleaning_recipe: "CIP-FL"
+
+  # 调配工艺
+  blending_process:
+    name: "产品调配工艺"
+    section: "BL"
+    recipe_id: "PR-BL-001"
+
+    parameters:
+      tea_concentrate:
+        brix: 2.5
+        brix_range: [2.3, 2.7]
+        brix_unit: "°Brix"
+        ph: 5.8
+        ph_range: [5.5, 6.2]
+        temp_max: 30
+        temp_unit: "℃"
+
+      sugar_syrup:
+        brix: 65
+        brix_range: [63, 67]
+        brix_unit: "°Brix"
+        temp: 60
+        temp_unit: "℃"
+        dissolution_time: 30
+        dissolution_time_unit: "min"
+
+      citric_acid_solution:
+        concentration: 50
+        concentration_unit: "%"
+        temp: 40
+        temp_unit: "℃"
+
+      target_blend:
+        brix: 10
+        brix_range: [9, 11]
+        brix_tolerance: "±1.0"
+        brix_unit: "°Brix"
+        ph: 5.5
+        ph_range: [5.0, 6.0]
+        ph_tolerance: "±0.5"
+        temp: 25
+        temp_range: [20, 30]
+        temp_unit: "℃"
+
+      blending_sequence:
+        - step: 1
+          action: "添加纯水"
+          volume: 30
+          volume_unit: "%"
+        - step: 2
+          action: "添加茶浓缩汁"
+          volume: 40
+          volume_unit: "%"
+        - step: 3
+          action: "添加糖浆"
+          target_brix: 10
+          tolerance: "±1.0"
+        - step: 4
+          action: "添加酸液"
+          target_ph: 5.5
+          tolerance: "±0.5"
+        - step: 5
+          action: "添加香精"
+          volume: 0.1
+          volume_unit: "%"
+        - step: 6
+          action: "补水至目标量"
+          volume: 100
+          volume_unit: "%"
+        - step: 7
+          action: "搅拌混合"
+          time: 15
+          time_unit: "min"
+          speed: 80
+          speed_unit: "rpm"
+
+      quality_check:
+        - parameter: "Brix"
+          instrument: "在线糖度计"
+          frequency: "每5分钟"
+        - parameter: "pH"
+          instrument: "在线pH计"
+          frequency: "连续监控"
+
+    batch_size:
+      tank_1:
+        value: 5000
+        unit: "L/batch"
+      tank_2:
+        value: 5000
+        unit: "L/batch"
+
+    cleaning_recipe: "CIP-BL"
+
+  # 均质工艺
+  homogenization_process:
+    name: "高压均质工艺"
+    section: "HM"
+    recipe_id: "PR-HM-001"
+
+    parameters:
+      inlet:
+        temp: 65
+        temp_range: [60, 70]
+        temp_unit: "℃"
+        pressure_min: 0.2
+        pressure_unit: "MPa"
+
+      homogenizer:
+        model: "GYB-3000"
+        pressure_setpoint: 22
+        pressure_range: [20, 25]
+        pressure_unit: "MPa"
+        pressure_alarm_low: 18
+        pressure_alarm_high: 27
+        capacity: 3000
+        capacity_unit: "L/h"
+        motor_power: 75
+        motor_power_unit: "kW"
+
+      outlet:
+        temp_max: 75
+        temp_unit: "℃"
+        pressure_normal: 0.3
+        pressure_unit: "MPa"
+
+      valve_group:
+        inlet_valve: "BV-107"
+        outlet_valve: "BV-108"
+        bypass_valve: "BV-109"
+        startup_sequence:
+          - "打开BV-108"
+          - "打开BV-107"
+          - "启动均质机"
+        shutdown_sequence:
+          - "停均质机"
+          - "关闭BV-107"
+          - "关闭BV-108"
+
+      particle_size:
+        target: 1.5
+        target_unit: "μm"
+        max: 2.0
+        measurement: "粒度分析仪"
+
+    cleaning_recipe: "CIP-BL"
+
+  # UHT杀菌工艺
+  uht_process:
+    name: "UHT超高温瞬时杀菌工艺"
+    section: "UH"
+    recipe_id: "PR-UH-001"
+
+    parameters:
+      preheating:
+        temp_setpoint: 80
+        temp_range: [75, 85]
+        temp_unit: "℃"
+        hold_time: 10
+        hold_time_unit: "s"
+
+      sterilization:
+        temp_setpoint: 135
+        temp_range: [133, 137]
+        temp_unit: "℃"
+        time: 15
+        time_unit: "s"
+        critical_limit: 130
+        critical_limit_unit: "℃"
+
+      holding:
+        temp_min: 130
+        temp_min_unit: "℃"
+        time: 15
+        time_unit: "s"
+
+      cooling:
+        stage_1_temp: 90
+        stage_1_temp_unit: "℃"
+        stage_2_temp: 50
+        stage_2_temp_unit: "℃"
+        outlet_temp: 25
+        outlet_temp_max: 35
+        outlet_temp_unit: "℃"
+
+      system:
+        flow_rate: 3000
+        flow_rate_unit: "L/h"
+        flow_rate_tolerance: "±10%"
+        back_pressure: 0.35
+        back_pressure_range: [0.2, 0.5]
+        back_pressure_unit: "MPa"
+
+      quality:
+        sterility: "商业无菌"
+        f0_value_min: 8
+        shelf_life: 12
+        shelf_life_unit: "月"
+
+      aseptic_tank:
+        tank_id: "UH-105"
+        capacity: 3000
+        capacity_unit: "L"
+        temp_max: 35
+        temp_unit: "℃"
+        pressure_max: 0.05
+        pressure_unit: "MPa"
+        pressure_normal: 0.02
+
+    cleaning_recipe: "CIP-UH"
+
+  # 灌装工艺
+  filling_process:
+    name: "热灌装工艺"
+    section: "PF"
+    recipe_id: "PR-PF-001"
+
+    parameters:
+      bottle:
+        material: "PET"
+        volume_nominal: 500
+        volume_unit: "ml"
+        volume_actual_range: [495, 505]
+        temperature: 87
+        temperature_range: [85, 88]
+        temperature_unit: "℃"
+
+      filler:
+        model: "SBL-FG54000"
+        heads: 72
+        speed_nominal: 54000
+        speed_range: [50000, 58000]
+        speed_unit: "瓶/h"
+        fill_volume: 500
+        fill_volume_unit: "ml"
+        fill_accuracy: "±1.5%"
+        level_accuracy: "±5mm"
+
+      capper:
+        model: "12头旋盖机"
+        heads: 12
+        torque_min: 0.3
+        torque_max: 0.7
+        torque_unit: "Nm"
+        seal_check: "扭矩监控"
+
+      cooling:
+        inlet_temp: 87
+        outlet_temp_max: 38
+        tunnel_length: 40
+        tunnel_length_unit: "m"
+        cooling_method: "风冷+水冷"
+
+      quality:
+        leak_rate_max: 0.1
+        leak_rate_unit: "%"
+        headspace_height: 15
+        headspace_height_unit: "mm"
+
+    cleaning_recipe: "CIP-PF"
+
+# ============================================================================
+# CIP清洗配方
+# ============================================================================
+cip_recipes:
+
+  cip_wt:
+    name: "水处理系统清洗"
+    zone: "A"
+    section_codes: ["WT"]
+    recipe_id: "CIP-WT"
+
+    trigger_conditions:
+      - "每日生产前"
+      - "停产超过48小时"
+      - "水质检测不合格"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "原水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "冲水清澈，无杂质"
+
+      - step: 2
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 85
+        temp_unit: "℃"
+        time: 20
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        circulation: true
+        acceptance: "回水电导率稳定，pH>12"
+
+      - step: 3
+        name: "中间冲洗"
+        medium: "原水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 60
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        circulation: true
+        acceptance: "回水电导率稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "电导率<50μS/cm, pH 6.5-7.5"
+
+    notes:
+      - "RO膜组件不参与清洗，需单独处理"
+      - "UV灯管需拆下后才能清洗"
+      - "水质检测合格后方可生产"
+
+    total_time: 65
+    total_time_unit: "min"
+
+  cip_ex:
+    name: "茶叶前处理+萃取系统清洗"
+    zone: "B"
+    section_codes: ["TH", "EX"]
+    recipe_id: "CIP-EX"
+
+    trigger_conditions:
+      - "每批次茶叶用完"
+      - "停产超过24小时"
+      - "产品切换（绿茶↔红茶↔乌龙茶）"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "纯水"
+        temp: 50
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "冲水无茶渣"
+
+      - step: 2
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 85
+        temp_unit: "℃"
+        time: 30
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        circulation: true
+        acceptance: "回水电导率稳定，pH>12"
+
+      - step: 3
+        name: "中间冲洗"
+        medium: "纯水"
+        temp: 60
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 60
+        temp_unit: "℃"
+        time: 20
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        circulation: true
+        acceptance: "回水电导率稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        drain: true
+        acceptance: "电导率<50μS/cm"
+
+    notes:
+      - "茶叶储罐需人工清理残余茶叶后再启动CIP"
+      - "萃取罐内部冲洗球必须全部动作"
+      - "清洗完成后打开EX-106检查内部清洁度"
+
+    total_time: 90
+    total_time_unit: "min"
+
+  cip_fl:
+    name: "膜过滤系统清洗"
+    zone: "C"
+    section_codes: ["FL"]
+    recipe_id: "CIP-FL"
+
+    trigger_conditions:
+      - "每批次过滤完成后"
+      - "膜压差超过0.15MPa"
+      - "停产超过24小时"
+      - "每日待机前"
+
+    steps:
+      - step: 1
+        name: "顶料"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "产品完全顶出"
+
+      - step: 2
+        name: "反冲洗"
+        medium: "纯水"
+        temp: 50
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 3
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "出水清澈"
+
+      - step: 3
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 45
+        temp_unit: "℃"
+        time: 30
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        circulation: true
+        acceptance: "回水电导稳定"
+
+      - step: 4
+        name: "冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "pH<8.5"
+
+      - step: 5
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 35
+        temp_unit: "℃"
+        time: 20
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        circulation: true
+        acceptance: "回水电导稳定"
+
+      - step: 6
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "电导率<50μS/cm"
+
+      - step: 7
+        name: "膜完整性测试"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        pressure_test: 0.2
+        pressure_test_unit: "MPa"
+        hold_time: 5
+        hold_time_unit: "min"
+        acceptance: "压降<10%"
+
+    notes:
+      - "膜组件需定期进行完整性测试"
+      - "膜压差超过0.15MPa需进行化学加强清洗"
+      - "长期停用需进行膜保护处理"
+
+    total_time: 95
+    total_time_unit: "min"
+
+  cip_bl:
+    name: "调配系统清洗"
+    zone: "D"
+    section_codes: ["BL"]
+    recipe_id: "CIP-BL"
+
+    trigger_conditions:
+      - "每批次调配完成后"
+      - "产品切换"
+      - "停产超过24小时"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "纯水"
+        temp: 40
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        agitation: "低速"
+        drain: true
+        acceptance: "无残留糖液"
+
+      - step: 2
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 85
+        temp_unit: "℃"
+        time: 30
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        agitation: "低速"
+        circulation: true
+        acceptance: "回水电导稳定，pH>12"
+
+      - step: 3
+        name: "冲洗"
+        medium: "纯水"
+        temp: 50
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        agitation: "低速"
+        acceptance: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 60
+        temp_unit: "℃"
+        time: 20
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        agitation: "低速"
+        circulation: true
+        acceptance: "回水电导稳定"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        acceptance: "电导率<50μS/cm"
+
+      - step: 6
+        name: "消毒"
+        medium: "H₂O₂"
+        concentration: 0.5
+        concentration_unit: "%"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        acceptance: "无残留"
+
+    notes:
+      - "糖浆罐BL-103使用前需用85℃热水溶解残留糖"
+      - "酸液罐BL-104需单独酸洗，避免与碱液混合"
+      - "调配罐内部需全面冲刷，包括搅拌轴"
+
+    total_time: 100
+    total_time_unit: "min"
+
+  cip_uh:
+    name: "UHT杀菌系统清洗"
+    zone: "E"
+    section_codes: ["UH"]
+    recipe_id: "CIP-UH"
+
+    trigger_conditions:
+      - "每48小时"
+      - "停产超过12小时"
+      - "产品切换"
+      - "微生物检测不合格"
+
+    steps:
+      - step: 1
+        name: "纯水顶料"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 5
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "产品完全顶出"
+
+      - step: 2
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 85
+        temp_unit: "℃"
+        time: 45
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_range: [0.3, 0.5]
+        pressure_unit: "MPa"
+        circulation: true
+        acceptance: "回流温度>80℃"
+
+      - step: 3
+        name: "纯水冲洗"
+        medium: "纯水"
+        temp: 70
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "pH<8.5"
+
+      - step: 4
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 60
+        temp_unit: "℃"
+        time: 30
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_range: [0.3, 0.5]
+        pressure_unit: "MPa"
+        circulation: true
+        acceptance: "回流温度>55℃"
+
+      - step: 5
+        name: "纯水冲洗"
+        medium: "纯水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        flow_rate: 2
+        flow_rate_unit: "m³/h"
+        pressure_max: 0.3
+        pressure_unit: "MPa"
+        acceptance: "电导率<50μS/cm"
+
+      - step: 6
+        name: "无菌验证"
+        medium: "-"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 2880
+        time_unit: "min"
+        time_note: "48小时培养"
+        acceptance: "无菌培养48h合格"
+
+    notes:
+      - "清洗过程中保温管必须保持满管状态"
+      - "无菌储罐清洗后需充无菌空气保持正压"
+      - "清洗完成后需进行无菌验证"
+      - "新批次生产前需进行3次SIP"
+
+    total_time: 110
+    total_time_unit: "min"
+
+  cip_pf:
+    name: "灌装系统清洗"
+    zone: "F"
+    section_codes: ["PF"]
+    recipe_id: "CIP-PF"
+
+    trigger_conditions:
+      - "每12小时"
+      - "停产超过8小时"
+      - "产品切换"
+
+    steps:
+      - step: 1
+        name: "预冲洗"
+        medium: "RO水"
+        temp: 50
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        acceptance: "冲洗管道残留"
+
+      - step: 2
+        name: "碱洗"
+        medium: "NaOH"
+        concentration: 2
+        concentration_unit: "%"
+        temp: 85
+        temp_unit: "℃"
+        time: 40
+        time_unit: "min"
+        acceptance: "CIP球阀切换冲刷"
+
+      - step: 3
+        name: "冲洗"
+        medium: "RO水"
+        temp: 60
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        acceptance: "冲洗至中性"
+
+      - step: 4
+        name: "酸洗"
+        medium: "HNO₃"
+        concentration: 1
+        concentration_unit: "%"
+        temp: 60
+        temp_unit: "℃"
+        time: 30
+        time_unit: "min"
+        acceptance: "CIP球阀切换冲刷"
+
+      - step: 5
+        name: "最终冲洗"
+        medium: "RO水"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 15
+        time_unit: "min"
+        acceptance: "电导率<50μS/cm"
+
+      - step: 6
+        name: "消毒"
+        medium: "H₂O₂"
+        concentration: 0.5
+        concentration_unit: "%"
+        temp: "常温"
+        temp_unit: "℃"
+        time: 10
+        time_unit: "min"
+        acceptance: "无残留"
+
+    notes:
+      - "吹灌一体机内部阀需全部打开清洗"
+      - "料缸内部需全面冲刷"
+      - "清洗完成后检查灌装阀无残留水渍"
+      - "消毒后需自然干燥30分钟"
+
+    total_time: 120
+    total_time_unit: "min"
+
+  cip_all:
+    name: "全线清洗"
+    zone: "ALL"
+    section_codes: ["WT", "TH", "EX", "FL", "BL", "HM", "UH", "PF"]
+    recipe_id: "CIP-ALL"
+
+    trigger_conditions:
+      - "长期停产（超过72小时）"
+      - "年度维护前"
+      - "重大设备检修后"
+
+    steps:
+      - sequence: 1
+        section: "WT"
+        recipe: "CIP-WT"
+      - sequence: 2
+        section: "EX"
+        recipe: "CIP-EX"
+      - sequence: 3
+        section: "FL"
+        recipe: "CIP-FL"
+      - sequence: 4
+        section: "BL"
+        recipe: "CIP-BL"
+      - sequence: 5
+        section: "UH"
+        recipe: "CIP-UH"
+      - sequence: 6
+        section: "PF"
+        recipe: "CIP-PF"
+
+    total_time: 360
+    total_time_unit: "min"
+    total_time_note: "约6小时"
+
+# ============================================================================
+# 产品切换清洗矩阵
+# ============================================================================
+product_switch_matrix:
+  - from_product: "green_tea"
+    from_product_name: "绿茶"
+    to_product: "red_tea"
+    to_product_name: "红茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "green_tea"
+    from_product_name: "绿茶"
+    to_product: "oolong_tea"
+    to_product_name: "乌龙茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "red_tea"
+    from_product_name: "红茶"
+    to_product: "green_tea"
+    to_product_name: "绿茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "red_tea"
+    from_product_name: "红茶"
+    to_product: "oolong_tea"
+    to_product_name: "乌龙茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "oolong_tea"
+    from_product_name: "乌龙茶"
+    to_product: "green_tea"
+    to_product_name: "绿茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "oolong_tea"
+    from_product_name: "乌龙茶"
+    to_product: "red_tea"
+    to_product_name: "红茶"
+    cip_recipes: ["CIP-BL", "CIP-EX"]
+    estimated_time: 4
+    estimated_time_unit: "h"
+    notes: "茶叶系统需要彻底清洗"
+
+  - from_product: "any"
+    from_product_name: "任一产品"
+    to_product: "shutdown"
+    to_product_name: "停产"
+    cip_recipes: ["CIP-ALL"]
+    estimated_time: 6
+    estimated_time_unit: "h"
+    notes: "全线清洗"
+
+  - from_product: "shutdown"
+    from_product_name: "停产"
+    to_product: "any"
+    to_product_name: "每日启动"
+    cip_recipes: ["CIP-WT", "CIP-PF"]
+    estimated_time: 2
+    estimated_time_unit: "h"
+    notes: "基础清洗"
+
+# ============================================================================
+# 验收标准
+# ============================================================================
+acceptance_standards:
+  sensory:
+    - parameter: "外观"
+      standard: "清澈透明，无悬浮物"
+      method: "目视"
+    - parameter: "色泽"
+      standard: "符合各产品特征色"
+      method: "目视"
+    - parameter: "气味"
+      standard: "无异味，具有茶香"
+      method: "感官评定"
+
+  physical:
+    - parameter: "Brix"
+      unit: "°Brix"
+      standard: "10±1.0"
+      method: "在线糖度计"
+    - parameter: "pH"
+      unit: "-"
+      standard: "5.5±0.5"
+      method: "在线pH计"
+    - parameter: "温度"
+      unit: "℃"
+      standard: "25±5"
+      method: "温度传感器"
+
+  chemical:
+    - parameter: "茶多酚"
+      unit: "mg/kg"
+      standard: "≥300(绿茶)/≥150(红茶)/≥200(乌龙茶)"
+      method: "GB/T 8313"
+    - parameter: "电导率"
+      unit: "μS/cm"
+      standard: "<50"
+      method: "在线电导率仪"
+
+  microbiological:
+    - parameter: "菌落总数"
+      unit: "CFU/mL"
+      standard: "<100"
+      method: "GB 4789.2"
+    - parameter: "大肠菌群"
+      unit: "CFU/mL"
+      standard: "<3"
+      method: "GB 4789.3"
+    - parameter: "商业无菌"
+      unit: "-"
+      standard: "阴性"
+      method: "GB/T 4789.26"
+
+# ============================================================================
+# 版本管理
+# ============================================================================
+version_management:
+  current_version: "v1.0"
+  effective_date: "2026-04-28"
+  author: "SCADA系统"
+  approver: "待确认"
+
+  history:
+    - version: "v1.0"
+      date: "2026-04-28"
+      author: "SCADA系统"
+      changes: "初始版本"
+      status: "draft"
