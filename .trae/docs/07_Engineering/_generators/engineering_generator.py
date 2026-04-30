@@ -29,8 +29,8 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 SCRIPT_DIR = Path(__file__).parent
 TEMPLATES_DIR = SCRIPT_DIR / "templates"
-SRC_TEMPLATES_DIR = SCRIPT_DIR.parent / "_templates"
-OUTPUT_DIR = SCRIPT_DIR.parent / "07_Engineering"
+SRC_TEMPLATES_DIR = SCRIPT_DIR.parent.parent / "_templates"
+OUTPUT_DIR = SCRIPT_DIR.parent
 DEFAULT_CONFIGS_DIR = OUTPUT_DIR / "configs"
 
 
@@ -40,13 +40,14 @@ def load_yaml(file_path):
 
 
 def get_data_dir(filename):
+    docs_dir = SCRIPT_DIR.parent.parent
     data_dirs = {
-        'devices.yaml': Path('../03_Device/configs'),
-        'comm_templates.yaml': Path('../04_Process/configs'),
-        'interlock_templates.yaml': Path('../04_Process/configs'),
-        'cip_templates.yaml': Path('../04_Process/configs'),
+        'devices.yaml': docs_dir / '03_Device' / 'configs',
+        'comm_templates.yaml': docs_dir / '04_Process' / 'configs',
+        'interlock_templates.yaml': docs_dir / '04_Process' / 'configs',
+        'cip_templates.yaml': docs_dir / '04_Process' / 'configs',
     }
-    return data_dirs.get(filename, Path('../_templates'))
+    return data_dirs.get(filename, docs_dir / '_templates')
 
 
 def load_data_sources(config):

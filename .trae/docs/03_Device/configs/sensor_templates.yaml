@@ -301,10 +301,10 @@ device_type_standard_sensors:
 # ============================================================================
 key_control_points:
   WT:
-    - device_id: "WT-102"
+    - device_id: "WT-105"
       sensor_code: "CtT"
       name: "RO产水电导率"
-      critical_value: 15
+      critical_value: 10
       unit: "μS/cm"
       hazard: "水质不合格，影响食品安全"
 

@@ -1,0 +1,328 @@
+# 文档索引清单配置
+# 用于自动生成文档索引清单
+
+meta:
+  version: "v1.0"
+  created: "2026-04-30"
+  project_name: "茶饮料生产线文档体系"
+  generator_script: "index_generator.py"
+
+# 目录分类定义
+# key: 目录名 (如 01_Spec)
+# value: 字典
+#   - name: 文档类型名称
+#   - desc: 说明
+#   - edit_mode: 编辑方式
+#   - priority: 显示优先级（可选）
+categories:
+  "00_Index":
+    name: "索引文档"
+    desc: "文档清单、版本追踪"
+    edit_mode: "手动"
+    priority: 0
+  "01_Spec":
+    name: "规格文档"
+    desc: "系统/软件需求规格"
+    edit_mode: "手动（需求驱动）"
+    priority: 1
+  "02_Arch":
+    name: "架构文档"
+    desc: "技术架构设计"
+    edit_mode: "手动"
+    priority: 2
+  "03_Device":
+    name: "设备文档"
+    desc: "设备清单、位号定义"
+    edit_mode: "模板生成+手动"
+    priority: 3
+  "04_Process":
+    name: "工艺文档"
+    desc: "工艺参数、CIP、联锁、通讯、工段控制"
+    edit_mode: "工段控制手动，其他模板生成"
+    priority: 4
+  "05_Product":
+    name: "产品文档"
+    desc: "产品配方、CIP配方"
+    edit_mode: "模板生成"
+    priority: 5
+  "06_OM":
+    name: "运维文档"
+    desc: "调试、验收、维护、应急"
+    edit_mode: "手动"
+    priority: 6
+  "07_Engineering":
+    name: "工程文档"
+    desc: "BOM、端子、电缆、仪表清单"
+    edit_mode: "模板生成+手动"
+    priority: 7
+
+# 根目录文件定义
+root_files:
+  - name: "项目文档综合改进规划方案.md"
+    desc: "项目规划文档"
+    category: "规划"
+  - name: "状态快照.json"
+    desc: "状态追踪"
+    category: "规划"
+
+# 文件名到描述的映射
+file_descriptions:
+  "SCADA系统功能规格说明书.md": "SCADA功能需求总纲"
+  "HMI_Screens.md": "界面规格"
+  "PLC_Architecture.md": "PLC控制架构 (15 PLC) ★基准架构"
+  "PLC功能块规格说明书_auto.md": "自动生成"
+  "茶饮料生产线工艺流程设计.md": "生产工艺设计"
+  "茶饮料生产线设备清单.md": "设备清单"
+  "位号编码规则.md": "位号命名规范"
+  "茶饮料生产线监控点表_auto.md": "自动生成"
+  "Section_Process_Template.md": "工段工艺模板"
+  "工艺配方_auto.md": "自动生成"
+  "CIP清洗程序规格书_auto.md": "自动生成 (跨工段清洗程序)"
+  "联锁逻辑说明书_auto.md": "自动生成"
+  "通讯接口规格书_auto.md": "自动生成"
+  "产品配方_auto.md": "自动生成"
+  "CIP配方_auto.md": "自动生成"
+
+# 生成器与输入输出关系
+# 用于生成"生成器与输出文件对照表"
+generators:
+  - generator: "monitor_point_generator.py"
+    inputs:
+      - "devices_*.yaml"
+      - "sensor_templates.yaml"
+    outputs:
+      - "茶饮料生产线监控点表_auto.md"
+    desc: "SCADA点位配置"
+    module: "03_Device"
+
+  - generator: "comm_spec_generator.py"
+    inputs:
+      - "comm_templates.yaml"
+    outputs:
+      - "通讯接口规格书_auto.md"
+    desc: "PLC通讯配置"
+    module: "04_Process"
+
+  - generator: "fb_spec_generator.py"
+    inputs:
+      - "FB_Spec_Template.yaml"
+    outputs:
+      - "PLC功能块规格说明书_auto.md"
+    desc: "PLC功能块"
+    module: "02_Arch"
+
+  - generator: "process_recipe_generator.py"
+    inputs:
+      - "process_recipe_templates.yaml"
+    outputs:
+      - "工艺配方_auto.md"
+    desc: "工艺参数"
+    module: "04_Process"
+
+  - generator: "product_recipe_generator.py"
+    inputs:
+      - "product_recipe_templates.yaml"
+    outputs:
+      - "产品配方_auto.md"
+    desc: "产品规格"
+    module: "05_Product"
+
+  - generator: "cip_recipe_generator.py"
+    inputs:
+      - "cip_recipe_templates.yaml"
+    outputs:
+      - "CIP配方_auto.md"
+    desc: "CIP清洗剂配方"
+    module: "05_Product"
+
+  - generator: "engineering_generator.py"
+    inputs:
+      - "cabinet_bom.yaml"
+      - "instrument_list.yaml"
+      - "terminal_assignments.yaml"
+      - "cable_list.yaml"
+    outputs:
+      - "Cabinet_BOM_auto.xlsx"
+      - "Instrument_List_auto.xlsx"
+      - "Terminal_Assignments_auto.xlsx"
+      - "Cable_List_auto.xlsx"
+    desc: "工程BOM"
+    module: "07_Engineering"
+
+  - generator: "template_validator.py"
+    inputs:
+      - "所有YAML"
+    outputs:
+      - "-"
+    desc: "模板验证"
+    module: "共享"
+
+# 文档依赖关系矩阵
+# 用于生成"文档依赖关系矩阵"
+# 每个条目：
+#   doc: 文档名（会精确匹配文件名）
+#   dependencies: 依赖的其他文档列表
+dependencies:
+  - doc: "SCADA系统功能规格说明书.md"
+    dependencies:
+      - { name: "HMI_Screens.md", desc: "功能→界面" }
+      - { name: "FB_Spec_Template.yaml", desc: "功能→功能块" }
+      - { name: "监控点表_auto.md", desc: "功能→点位" }
+      - { name: "PLC_Architecture.md", desc: "功能→架构" }
+
+  - doc: "HMI_Screens.md"
+    dependencies:
+      - { name: "SCADA系统功能规格说明书.md", desc: "需求来源" }
+      - { name: "监控点表_auto.md", desc: "位号引用" }
+
+  - doc: "PLC_Architecture.md"
+    dependencies:
+      - { name: "FB_Spec_Template.yaml", desc: "PLC程序→功能块" }
+      - { name: "监控点表_auto.md", desc: "PLC点位" }
+      - { name: "devices_*.yaml", desc: "工段分配" }
+
+  - doc: "工段控制规格 (WT/PF等)"
+    dependencies:
+      - { name: "devices_*.yaml", desc: "设备定义" }
+      - { name: "interlock_templates.yaml", desc: "联锁逻辑" }
+      - { name: "FB_Spec_Template.yaml", desc: "功能块接口" }
+      - { name: "位号编码规则.md", desc: "位号命名" }
+
+  - doc: "监控点表_auto.md"
+    dependencies:
+      - { name: "devices_*.yaml", desc: "设备清单" }
+      - { name: "sensor_templates.yaml", desc: "传感器定义" }
+      - { name: "位号编码规则.md", desc: "位号生成规则" }
+
+  - doc: "联锁逻辑_auto.md"
+    dependencies:
+      - { name: "interlock_templates.yaml", desc: "联锁模板" }
+      - { name: "位号编码规则.md", desc: "位号命名" }
+
+  - doc: "通讯接口_auto.md"
+    dependencies:
+      - { name: "comm_templates.yaml", desc: "通讯配置" }
+
+  - doc: "产品配方_auto.md"
+    dependencies:
+      - { name: "product_recipe_templates.yaml", desc: "配方模板" }
+
+  - doc: "工艺配方_auto.md"
+    dependencies:
+      - { name: "process_recipe_templates.yaml", desc: "配方模板" }
+
+  - doc: "CIP配方_auto.md"
+    dependencies:
+      - { name: "cip_recipe_templates.yaml", desc: "CIP模板" }
+
+# 数据流向定义
+# 用于生成"文档数据流向图"
+data_flow:
+  description: "配置文件 → 生成器 → 输出文档"
+
+  config_dirs:
+    - path: "03_Device/configs"
+      files:
+        - "devices_*.yaml"
+        - "sensor_templates.yaml"
+    - path: "04_Process/configs"
+      files:
+        - "interlock_templates.yaml"
+        - "comm_templates.yaml"
+        - "cip_templates.yaml"
+        - "Section_Control_Template.md"
+    - path: "05_Product/configs"
+      files:
+        - "product_recipe_templates.yaml"
+        - "cip_recipe_templates.yaml"
+    - path: "02_Arch/configs"
+      files:
+        - "FB_Spec_Template.yaml"
+    - path: "07_Engineering/configs"
+      files:
+        - "cabinet_bom.yaml"
+        - "instrument_list.yaml"
+        - "terminal_assignments.yaml"
+        - "cable_list.yaml"
+
+  generators:
+    - name: "monitor_point_generator.py"
+      input_dir: "03_Device/configs"
+      outputs:
+        - "03_Device/茶饮料生产线监控点表_auto.md"
+    - name: "comm_spec_generator.py"
+      input_dir: "04_Process/configs"
+      outputs:
+        - "04_Process/通讯接口规格书_auto.md"
+    - name: "fb_spec_generator.py"
+      input_dir: "02_Arch/configs"
+      outputs:
+        - "02_Arch/PLC功能块规格说明书_auto.md"
+    - name: "process_recipe_generator.py"
+      input_dir: "04_Process/configs"
+      outputs:
+        - "04_Process/工艺配方_auto.md"
+    - name: "product_recipe_generator.py"
+      input_dir: "05_Product/configs"
+      outputs:
+        - "05_Product/产品配方_auto.md"
+    - name: "cip_recipe_generator.py"
+      input_dir: "05_Product/configs"
+      outputs:
+        - "05_Product/CIP配方_auto.md"
+    - name: "engineering_generator.py"
+      input_dir: "07_Engineering/configs"
+      outputs:
+        - "07_Engineering/Cabinet_BOM_auto.xlsx"
+        - "07_Engineering/Instrument_List_auto.xlsx"
+        - "07_Engineering/Terminal_Assignments_auto.xlsx"
+        - "07_Engineering/Cable_List_auto.xlsx"
+
+# 维护规则
+# 用于生成"维护规则"章节
+maintenance_rules:
+  template_modification:
+    title: "模板文件修改流程"
+    steps:
+      - "修改 各模块configs/*.yaml 模板文件（唯一正确入口）"
+      - "运行 各模块_generators/*.py 生成器"
+      - "检查生成的 *_auto.md 文档"
+      - "提交 configs/ 和 _generators/（不提交auto文件）"
+
+  section_control:
+    title: "工段控制规格文档"
+    content:
+      - "工段控制规格文档（WT_xxx.md等）**手动编辑**，不受生成器影响。"
+      - "当设备变更时，需同步更新："
+      - "- devices.yaml（设备定义）"
+      - "- 对应工段控制规格.md（控制逻辑）"
+
+  version_rules:
+    title: "版本更新规则"
+    rules:
+      - { doc_type: "模板文件", trigger: "修改源数据后", rule: "v1.0 → v1.1" }
+      - { doc_type: "生成文档", trigger: "重新生成后", rule: "自动更新日期" }
+      - { doc_type: "手工文档", trigger: "内容重大变更", rule: "v1.0 → v2.0" }
+      - { doc_type: "工段控制规格", trigger: "控制逻辑变更", rule: "v1.0 → v1.1" }
+
+# 版本历史记录
+# 生成时会自动添加新条目
+version_history:
+  - version: "v1.0"
+    date: "2026-04-29"
+    desc: "初始版本"
+  - version: "v2.0"
+    date: "2026-04-29"
+    desc: "补充新增工段控制规格文档，完善文档关系图和数据流向图"
+  - version: "v2.1"
+    date: "2026-04-29"
+    desc: "拆分devices.yaml为14个设备配置文件，更新设备清单"
+  - version: "v2.2"
+    date: "2026-04-30"
+    desc: "更新PLC_Architecture.md为基准架构文档，comm_templates.yaml IP段更新为192.168.2.x，新增comm_spec_generator.py生成器，通讯接口规格书_auto.md重写为15PLC架构版本"
+  - version: "v2.3"
+    date: "2026-04-30"
+    desc: "修正目录结构（生成器分散在各模块），更新生成器清单，完善数据流向图，修正00_Plan目录不存在的问题，修正依赖关系矩阵中的模板文件名"
+  - version: "v2.4"
+    date: "2026-04-30"
+    desc: "索引清单改由index_generator.py自动生成，改为配置驱动模式"

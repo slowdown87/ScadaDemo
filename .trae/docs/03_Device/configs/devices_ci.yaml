@@ -1,0 +1,59 @@
+# 喷码系统 (CI) 设备清单
+# 工段: CI, PLC: PLC-11, IP: 192.168.2.21
+
+devices_ci:
+  - id: "CI-101"
+    name: "激光喷码机"
+    type: packaging
+    section: CI
+    model: "LM-200"
+    spec: "CO2激光, 54000B/H"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "DT"
+        name: "设备状态"
+        type: "状态"
+        alarm_action: "故障报警"
+      - code: "ST"
+        name: "喷印速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+      - code: "TT"
+        name: "激光器温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 60}
+
+  - id: "CI-102"
+    name: "视觉检测相机"
+    type: packaging
+    section: CI
+    model: "VC-500"
+    spec: "字符识别"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "DT"
+        name: "相机状态"
+        type: "状态"
+        alarm_action: "故障报警"
+      - code: "FT"
+        name: "检测计数"
+        type: "计数"
+        unit: "瓶"
+
+  - id: "CI-103"
+    name: "不合格品剔除阀"
+    type: valve
+    section: CI
+    model: "DV-50"
+    spec: "气动阀"
+    quantity: 1
+    valves:
+      - id: "CI-DV01"
+        name: "剔除阀"
+        type: "气动阀"
+        control: "开关量"

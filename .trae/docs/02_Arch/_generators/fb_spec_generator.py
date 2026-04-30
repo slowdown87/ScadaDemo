@@ -12,8 +12,8 @@ from pathlib import Path
 from datetime import datetime
 
 SCRIPT_DIR = Path(__file__).parent
-CONFIG_DIR = SCRIPT_DIR.parent / "02_Arch" / "configs"
-OUTPUT_DIR = SCRIPT_DIR.parent / "02_Arch"
+CONFIG_DIR = SCRIPT_DIR.parent / "configs"
+OUTPUT_DIR = SCRIPT_DIR.parent
 
 
 def load_yaml(file_path):

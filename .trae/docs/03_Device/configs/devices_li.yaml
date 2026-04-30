@@ -1,0 +1,62 @@
+# 灯检系统 (LI) 设备清单
+# 工段: LI, PLC: PLC-10, IP: 192.168.2.20
+
+devices_li:
+  - id: "LI-101"
+    name: "视觉灯检机"
+    type: packaging
+    section: LI
+    model: "VI-54000"
+    spec: "4工位, 54000B/H"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "ST"
+        name: "输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        alarm: {L: 50000, H: 58000}
+      - code: "DT"
+        name: "工位1状态"
+        type: "状态"
+        alarm_action: "不合格停线"
+      - code: "DT2"
+        name: "工位2状态"
+        type: "状态"
+        alarm_action: "不合格停线"
+      - code: "DT3"
+        name: "工位3状态"
+        type: "状态"
+        alarm_action: "不合格停线"
+      - code: "DT4"
+        name: "工位4状态"
+        type: "状态"
+        alarm_action: "不合格停线"
+      - code: "FT"
+        name: "正品计数"
+        type: "计数"
+        unit: "瓶"
+      - code: "FT2"
+        name: "次品计数"
+        type: "计数"
+        unit: "瓶"
+    motors:
+      - id: "M-LI01"
+        name: "输送电机"
+        power_kw: 2.2
+        is_inverter: true
+
+  - id: "LI-102"
+    name: "剔除阀"
+    type: valve
+    section: LI
+    model: "DV-50"
+    spec: "气动阀"
+    quantity: 1
+    supplier: "国产"
+    valves:
+      - id: "LI-DV01"
+        name: "正品通道"
+        type: "气动阀"
+        control: "开关量"

@@ -65,6 +65,9 @@ Thought → Action → Observation → Thought → ... → Final Answer
 
 3. 检测方案文档
    - 搜索项目中是否存在《xxx建设方案》《xxx规划》《xxx计划》文档
+   - 如不存在 → **自动生成方案文档**
+     - 生成到：..\docs\规划方案.md
+     - 使用标准模板（问题汇总 → 详细计划 → 风险分析 → 执行顺序）
    - 如存在，解析文档中的阶段定义，提取 phases 结构
    - 将 phases 结构纳入状态快照
 
@@ -133,34 +136,6 @@ Thought → Action → Observation → Thought → ... → Final Answer
 }
 ```
 
-### 单任务快照模板（无方案文档时）
-
-```json
-{
-  "version": "1.0",
-  "created": "<ISO8601格式时间戳>",
-  "lastUpdated": "<ISO8601格式时间戳>",
-  "currentPhase": "规划",
-  "task": {
-    "name": "<任务名称>",
-    "progress": "0/<子任务总数>",
-    "status": "进行中",
-    "subtasks": [
-      {
-        "id": 1,
-        "name": "<子任务名称>",
-        "status": "待开始",
-        "input": "<输入>",
-        "output": "<输出>"
-      }
-    ]
-  },
-  "blockers": [],
-  "pendingConfirmations": [],
-  "lastAgent": "planning"
-}
-```
-
 ### 方案文档检测规则
 
 **触发条件**：收到任务后，首先搜索以下文件模式：
@@ -179,7 +154,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 **快照生成规则**：
 
 1. 找到方案文档 → 使用多阶段项目快照模板
-2. 未找到方案文档 → 使用单任务快照模板
+2. 未找到方案文档 → 停止并询问用户是否继续规划
 3. 快照路径：`..\docs\状态快照.json`
 4. 快照中的 phases 数组必须包含**所有阶段**，即使某些阶段还未开始
 

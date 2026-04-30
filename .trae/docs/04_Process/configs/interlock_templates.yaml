@@ -704,9 +704,9 @@ interlock_templates:
 
     interlocks:
       - id: "WT-01"
-        trigger_desc: "RO产水电导率CtT > 15μS/cm"
-        trigger_tag: "WT-102-CtT"
-        condition: "> 15"
+        trigger_desc: "RO产水电导率CtT > 10μS/cm"
+        trigger_tag: "WT-105-CtT"
+        condition: "> 10"
         level: "L2"
         alarm_level: "H"
         actions:
@@ -716,9 +716,9 @@ interlock_templates:
         reset_condition: "人工确认"
 
       - id: "WT-02"
-        trigger_desc: "RO产水电导率CtT > 20μS/cm"
-        trigger_tag: "WT-102-CtT"
-        condition: "> 20"
+        trigger_desc: "RO产水电导率CtT > 10μS/cm"
+        trigger_tag: "WT-105-CtT"
+        condition: "> 10"
         level: "L1"
         alarm_level: "HH"
         actions:

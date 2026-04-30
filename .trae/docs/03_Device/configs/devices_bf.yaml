@@ -1,0 +1,63 @@
+# 制瓶系统 (BF) 设备清单
+# 工段: BF, PLC: PLC-7, IP: 192.168.2.17
+
+devices_bf:
+  - id: "BF-101"
+    name: "吹瓶机"
+    type: packaging
+    section: BF
+    model: "SB-54000"
+    spec: "54000B/H, 一步法吹瓶"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "ST"
+        name: "吹瓶机速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+        alarm: {L: 50000, H: 58000}
+      - code: "TT"
+        name: "模具温度"
+        type: "温度计"
+        range: [0, 300]
+        unit: "℃"
+        alarm: {H: 280}
+      - code: "PT"
+        name: "吹瓶气压"
+        type: "压力计"
+        range: [0, 0.5]
+        unit: "MPa"
+        alarm: {L: 0.35, H: 0.45}
+      - code: "FT"
+        name: "压缩空气流量"
+        type: "流量计"
+        range: [0, 300]
+        unit: "Nm³/h"
+        alarm: {L: 150}
+    motors:
+      - id: "M-BF01"
+        name: "吹瓶机主电机"
+        power_kw: 37
+        is_inverter: true
+
+  - id: "BF-102"
+    name: "瓶胚加热炉"
+    type: heat_exchanger
+    section: BF
+    model: "HR-54000"
+    spec: "54000B/H, 红外加热"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "TT"
+        name: "加热区温度"
+        type: "温度计"
+        range: [0, 200]
+        unit: "℃"
+        alarm: {L: 85, H: 110}
+      - code: "FT"
+        name: "空气流量"
+        type: "流量计"
+        range: [0, 100]
+        unit: "Nm³/h"

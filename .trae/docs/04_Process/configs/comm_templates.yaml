@@ -1,13 +1,14 @@
 # SCADA 通讯接口模板定义
 # 文档版本: v1.0
 # 创建日期: 2026-04-28
-# 更新日期: 2026-04-29
+# 更新日期: 2026-04-30
 # 说明: 定义通讯接口模板，用于自动生成通讯接口规格书
+# IP段: 192.168.2.x（2026-04-30更新）
 
 meta:
-  version: "v1.0"
+  version: "v2.0"
   created: "2026-04-28"
-  updated: "2026-04-29"
+  updated: "2026-04-30"
   author: "SCADA系统"
   status: "active"
   source_docs:
@@ -15,6 +16,7 @@ meta:
   project_name: "茶饮料生产线SCADA监控系统"
   product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
   capacity: "50000B/H (额定) / 54000B/H (最大)"
+  ip_segment: "192.168.2.x"
 
 # ============================================================================
 # PLC配置
@@ -23,7 +25,7 @@ meta:
 plc_config:
   - id: "PLC-1"
     name: "S7-1500 R/H"
-    ip: "192.168.1.11"
+    ip: "192.168.2.11"
     sections: ["WT"]
     section_names: ["水处理"]
     redundant: true
@@ -35,7 +37,7 @@ plc_config:
 
   - id: "PLC-2"
     name: "S7-1500 R/H"
-    ip: "192.168.1.12"
+    ip: "192.168.2.12"
     sections: ["TH"]
     section_names: ["茶叶前处理"]
     redundant: true
@@ -47,7 +49,7 @@ plc_config:
 
   - id: "PLC-3"
     name: "S7-1500 R/H"
-    ip: "192.168.1.13"
+    ip: "192.168.2.13"
     sections: ["EX"]
     section_names: ["萃取"]
     redundant: true
@@ -59,7 +61,7 @@ plc_config:
 
   - id: "PLC-4"
     name: "S7-1500 R/H"
-    ip: "192.168.1.14"
+    ip: "192.168.2.14"
     sections: ["FL", "HM"]
     section_names: ["过滤净化", "均质"]
     redundant: true
@@ -71,7 +73,7 @@ plc_config:
 
   - id: "PLC-5"
     name: "S7-1500 R/H"
-    ip: "192.168.1.15"
+    ip: "192.168.2.15"
     sections: ["BL"]
     section_names: ["调配"]
     redundant: true
@@ -83,7 +85,7 @@ plc_config:
 
   - id: "PLC-6"
     name: "S7-1500 R/H"
-    ip: "192.168.1.16"
+    ip: "192.168.2.16"
     sections: ["UH"]
     section_names: ["UHT杀菌"]
     redundant: true
@@ -107,7 +109,7 @@ plc_config:
 
   - id: "PLC-8"
     name: "S7-1500 R/H"
-    ip: "192.168.1.18"
+    ip: "192.168.2.18"
     sections: ["PF"]
     section_names: ["灌装"]
     redundant: true
@@ -119,7 +121,7 @@ plc_config:
 
   - id: "PLC-9"
     name: "S7-1500 R/H"
-    ip: "192.168.1.19"
+    ip: "192.168.2.19"
     sections: ["CG"]
     section_names: ["旋盖"]
     redundant: true
@@ -131,7 +133,7 @@ plc_config:
 
   - id: "PLC-10"
     name: "S7-1500 R/H"
-    ip: "192.168.1.20"
+    ip: "192.168.2.20"
     sections: ["LI"]
     section_names: ["灯检"]
     redundant: true
@@ -143,7 +145,7 @@ plc_config:
 
   - id: "PLC-11"
     name: "CPU 1215C"
-    ip: "192.168.1.21"
+    ip: "192.168.2.21"
     sections: ["CI"]
     section_names: ["喷码"]
     redundant: false
@@ -155,7 +157,7 @@ plc_config:
 
   - id: "PLC-12"
     name: "S7-1500 R/H"
-    ip: "192.168.1.22"
+    ip: "192.168.2.22"
     sections: ["LB"]
     section_names: ["贴标"]
     redundant: true
@@ -167,7 +169,7 @@ plc_config:
 
   - id: "PLC-13"
     name: "S7-1500 R/H"
-    ip: "192.168.1.23"
+    ip: "192.168.2.23"
     sections: ["CA"]
     section_names: ["装箱"]
     redundant: true
@@ -179,7 +181,7 @@ plc_config:
 
   - id: "PLC-14"
     name: "S7-1500 R/H"
-    ip: "192.168.1.24"
+    ip: "192.168.2.24"
     sections: ["PK"]
     section_names: ["膜包码垛"]
     redundant: true
@@ -191,7 +193,7 @@ plc_config:
 
   - id: "PLC-15"
     name: "S7-1500 R/H"
-    ip: "192.168.1.25"
+    ip: "192.168.2.25"
     sections: ["CP"]
     section_names: ["CIP清洗"]
     redundant: true
@@ -307,7 +309,7 @@ smart_devices:
     power_meters:
       name: "电能表"
       protocol: "Modbus TCP"
-      ip_range: "192.168.1.31-36"
+      ip_range: "192.168.2.31-36"
       port: 502
       device_id: "1-6"
       register_start: 40001
@@ -474,115 +476,123 @@ third_party_interfaces:
 ip_planning:
   servers:
     - device: "SCADA-SERVER"
-      ip: "192.168.1.10"
+      ip: "192.168.2.100"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
+    - device: "SCADA-BACKUP"
+      ip: "192.168.2.101"
+      mask: "255.255.255.0"
+      gateway: "192.168.2.1"
     - device: "HMI-01"
-      ip: "192.168.1.20"
+      ip: "192.168.2.110"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "HMI-02"
-      ip: "192.168.1.21"
+      ip: "192.168.2.111"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
+    - device: "HMI-03"
+      ip: "192.168.2.112"
+      mask: "255.255.255.0"
+      gateway: "192.168.2.1"
 
   plcs:
     - device: "PLC-1"
-      ip: "192.168.1.11"
+      ip: "192.168.2.11"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-2"
-      ip: "192.168.1.12"
+      ip: "192.168.2.12"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-3"
-      ip: "192.168.1.13"
+      ip: "192.168.2.13"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-4"
-      ip: "192.168.1.14"
+      ip: "192.168.2.14"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-5"
-      ip: "192.168.1.15"
+      ip: "192.168.2.15"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-6"
-      ip: "192.168.1.16"
+      ip: "192.168.2.16"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-7"
-      ip: "192.168.1.17"
+      ip: "192.168.2.17"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-8"
-      ip: "192.168.1.18"
+      ip: "192.168.2.18"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-9"
-      ip: "192.168.1.19"
+      ip: "192.168.2.19"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-10"
-      ip: "192.168.1.20"
+      ip: "192.168.2.20"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-11"
-      ip: "192.168.1.21"
+      ip: "192.168.2.21"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-12"
-      ip: "192.168.1.22"
+      ip: "192.168.2.22"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-13"
-      ip: "192.168.1.23"
+      ip: "192.168.2.23"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-14"
-      ip: "192.168.1.24"
+      ip: "192.168.2.24"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "PLC-15"
-      ip: "192.168.1.25"
+      ip: "192.168.2.25"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
 
   instruments:
     - device: "电能表EM-WT01"
-      ip: "192.168.1.31"
+      ip: "192.168.2.31"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "电能表EM-EX01"
-      ip: "192.168.1.32"
+      ip: "192.168.2.32"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "电能表EM-UH01"
-      ip: "192.168.1.33"
+      ip: "192.168.2.33"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "电能表EM-PF01"
-      ip: "192.168.1.34"
+      ip: "192.168.2.34"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "电能表EM-PK01"
-      ip: "192.168.1.35"
+      ip: "192.168.2.35"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "电能表EM-Total"
-      ip: "192.168.1.36"
+      ip: "192.168.2.36"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
 
   third_party:
     - device: "贴标机"
-      ip: "192.168.1.51"
+      ip: "192.168.2.51"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
     - device: "喷码机"
-      ip: "192.168.1.52"
+      ip: "192.168.2.52"
       mask: "255.255.255.0"
-      gateway: "192.168.1.1"
+      gateway: "192.168.2.1"
 
 # ============================================================================
 # 串口配置
