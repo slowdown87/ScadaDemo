@@ -1,0 +1,192 @@
+# UHT杀菌系统 (UH) 设备清单
+# 工段: UH, PLC: PLC-6, IP: 192.168.1.16
+
+devices_uh:
+  - id: "UH-101"
+    name: "UHT杀菌锅"
+    type: uht
+    section: UH
+    model: "KNU-3000"
+    spec: "135℃/15s, 3000L/h"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT1"
+        name: "预热段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 75, H: 90}
+      - code: "TT2"
+        name: "杀菌段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 140}
+        is_key_point: true
+        note: "关键控制点 CCP"
+      - code: "TT3"
+        name: "保温段温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 140}
+      - code: "TT4"
+        name: "冷却段进口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 90}
+      - code: "TT5"
+        name: "冷却段出口温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "PT1"
+        name: "杀菌前压力"
+        type: "压力计"
+        range: [0, 1]
+        unit: "MPa"
+        alarm: {H: 0.8}
+      - code: "PT2"
+        name: "杀菌压力"
+        type: "压力计"
+        range: [0, 0.6]
+        unit: "MPa"
+        alarm: {L: 0.2, H: 0.5}
+        interlock: "与温度连锁"
+      - code: "FT"
+        name: "产品流量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+        alarm: {L: 2.5, H: 3.5}
+        note: "关联杀菌时间"
+    valves:
+      - id: "UV-101"
+        name: "产品进料阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-102"
+        name: "蒸汽进口阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-103"
+        name: "冷却水进口阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "UV-106"
+        name: "清洗回流阀"
+        type: "气动阀"
+        control: "自动"
+      - id: "UV-107"
+        name: "排放阀"
+        type: "气动阀"
+        control: "手动"
+
+  - id: "UH-102"
+    name: "预热器"
+    type: heat_exchanger
+    section: UH
+    model: "板式换热器"
+    spec: "80℃预热段"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "热水系统温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {L: 130, H: 145}
+      - code: "PT"
+        name: "蒸汽压力"
+        type: "压力计"
+        range: [0, 1.5]
+        unit: "MPa"
+        alarm: {L: 0.6, H: 1.0}
+
+  - id: "UH-103"
+    name: "保温管"
+    type: tank
+    section: UH
+    model: "SS316L"
+    spec: "直径25mm, 长度30m"
+    quantity: 1
+    supplier: "国产"
+
+  - id: "UH-104"
+    name: "冷却器"
+    type: heat_exchanger
+    section: UH
+    model: "板式换热器"
+    spec: "冷却至25℃"
+    quantity: 1
+    supplier: "进口"
+    sensors: []
+
+  - id: "UH-105"
+    name: "无菌储罐"
+    type: tank
+    section: UH
+    model: "AS-3000"
+    spec: "3m³, 无菌设计"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30, H: 90}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+      - code: "PT"
+        name: "无菌储罐压力"
+        type: "压力计"
+        range: [0, 0.1]
+        unit: "MPa"
+        alarm: {H: 0.05}
+        note: "微正压"
+    valves:
+      - id: "UV-104"
+        name: "无菌罐进口阀"
+        type: "气动阀"
+        control: "液位控制"
+      - id: "UV-105"
+        name: "无菌罐出口阀"
+        type: "气动阀"
+        control: "流量控制"
+
+  - id: "UH-106"
+    name: "温度传感器"
+    type: sensor
+    section: UH
+    model: "PT100, A级"
+    spec: "精度±0.5℃"
+    quantity: 4
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "温度传感器"
+        type: "PT100"
+        range: [0, 150]
+        unit: "℃"
+
+  - id: "P-UH01"
+    name: "UHT产品泵"
+    type: pump
+    section: UH
+    model: "卫生级离心泵"
+    spec: "3m³/h"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: false
+    control: "温度连锁"

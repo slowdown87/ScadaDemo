@@ -1,8 +1,9 @@
 # 茶饮料生产线PLC程序架构设计
 
-> 文档版本: v1.0
+> 文档版本: v2.0
 > 创建日期: 2026-04-29
-> 数据来源: SCADA系统功能规格说明书、联锁逻辑说明书、监控点表
+> 更新日期: 2026-04-29
+> 数据来源: SCADA系统功能规格说明书、联锁逻辑说明书、监控点表、行业最佳实践
 > 项目名称: 茶饮料生产线SCADA监控系统
 > 产品类型: 纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产
 > 产能: 50000B/H (额定) / 54000B/H (最大)
@@ -14,146 +15,620 @@
 ### 1.1 控制系统架构
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SCADA监控层                                    │
-│                    (服务器 + 操作站 + 工程师站)                            │
-└─────────────────────────────────┬───────────────────────────────────────────┘
-                                  │ Ethernet/IP
-          ┌───────────────────────┼───────────────────────┐
-          │                       │                       │
-┌─────────┴─────────┐ ┌─────────┴─────────┐ ┌─────────┴─────────┐
-│    PLC控制柜1     │ │    PLC控制柜2     │ │    PLC控制柜3     │
-│   (水处理+萃取)  │ │   (调配+均质)    │ │   (UHT+灌装)     │
-│   S7-1500 R/H     │ │   S7-1500 R/H    │ │   S7-1500 R/H    │
-│   CPU 1515-2 PN   │ │   CPU 1515-2 PN   │ │   CPU 1515-2 PN  │
-│   (冗余配置)      │ │   (冗余配置)     │ │   (冗余配置)     │
-└─────────┬─────────┘ └─────────┬─────────┘ └─────────┬─────────┘
-          │                       │                       │
-          ▼                       ▼                       ▼
-    ┌───────────┐          ┌───────────┐          ┌───────────┐
-    │  ET200SP  │          │  ET200SP  │          │  ET200SP  │
-    │  I/O模块  │          │  I/O模块  │          │  I/O模块  │
-    └───────────┘          └───────────┘          └───────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              SCADA监控层                                            │
+│                    (2×SCADA服务器 + 3×操作站 + 1×工程师站)                          │
+│                         TIA Portal WinCC Professional                                │
+└─────────────────────────────────┬───────────────────────────────────────────────────┘
+                                  │ Ethernet/IP (双网冗余)
+                                  │ 1000Mbps 光纤环网
+┌─────────────────────────────────┼─────────────────────────────────────────────────┐
+│                                 │                                                 │
+│  ┌─────────────────────────────┬┴─────────────────────────────┐                     │
+│  │         核心交换层           │      工段控制层             │                     │
+│  │     (工业级三层交换机)       │   (PROFINET环网)           │                     │
+│  └─────────────────────────────┬┴─────────────────────────────┘                     │
+│                                │                                                   │
+└────────────────────────────────┼────────────────────────────────────────────────────┘
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        │                        │                        │
+┌───────┴───────┐       ┌───────┴───────┐       ┌───────┴───────┐
+│   PLC控制柜1   │       │   PLC控制柜2   │       │   PLC控制柜3   │
+│   ┌─────────┐ │       │   ┌─────────┐ │       │   ┌─────────┐ │
+│   │ PLC-1  │ │       │   │ PLC-2  │ │       │   │ PLC-3  │ │
+│   │  WT    │ │       │   │  TH    │ │       │   │  EX    │ │
+│   │ 水处理  │ │       │   │ 茶叶前处理│       │   │  萃取   │ │
+│   │ S7-1500 │       │   │ S7-1500 │       │   │ S7-1500 │
+│   │  R/H    │ │       │   │  R/H    │ │       │   │  R/H    │
+│   │ CPU1517│ │       │   │ CPU1515 │ │       │   │ CPU1515 │
+│   └─────────┘ │       │   └─────────┘ │       │   └─────────┘ │
+│   冗余光纤环网 │       │   冗余光纤环网 │       │   冗余光纤环网 │
+└───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+        │                        │                        │
+        ▼                        ▼                        ▼
+   ┌─────────┐            ┌─────────┐            ┌─────────┐
+   │ ET200SP │            │ ET200SP │            │ ET200SP │
+   │ I/O模块 │            │ I/O模块 │            │ I/O模块 │
+   └─────────┘            └─────────┘            └─────────┘
+
+┌───────┬───────┐       ┌───────┬───────┐       ┌───────┬───────┐
+│   PLC控制柜4   │       │   PLC控制柜5   │       │   PLC控制柜6   │
+│   ┌─────────┐ │       │   ┌─────────┐ │       │   ┌─────────┐ │
+│   │ PLC-4  │ │       │   │ PLC-5  │ │       │   │ PLC-6  │ │
+│   │ FL+HM  │ │       │   │  BL    │ │       │   │  UH    │ │
+│   │ 过滤+均质│ │       │   │  调配   │ │       │   │ UHT杀菌 │ │
+│   │ S7-1500 │       │   │ S7-1500 │       │   │ S7-1500 │
+│   │  R/H    │ │       │   │  R/H    │ │       │   │  R/H    │
+│   │ CPU1515 │ │       │   │ CPU1517│ │       │   │ CPU1517│ │
+│   └─────────┘ │       │   └─────────┘ │       │   └─────────┘ │
+│   冗余光纤环网 │       │   冗余光纤环网 │       │   冗余光纤环网 │
+└───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+        │                        │                        │
+        ▼                        ▼                        ▼
+   ┌─────────┐            ┌─────────┐            ┌─────────┐
+   │ ET200SP │            │ ET200SP │            │ ET200SP │
+   │ I/O模块 │            │ I/O模块 │            │ I/O模块 │
+   └─────────┘            └─────────┘            └─────────┘
+
+┌───────┬───────┐       ┌───────┬───────┐       ┌───────┬───────┐
+│   PLC控制柜7   │       │   PLC控制柜8   │       │   PLC控制柜9   │
+│   ┌─────────┐ │       │   ┌─────────┐ │       │   ┌─────────┐ │
+│   │ PLC-7  │ │       │   │ PLC-8  │ │       │   │ PLC-9  │ │
+│   │  BF    │ │       │   │  PF    │ │       │   │  CG    │ │
+│   │  制瓶   │ │       │   │  灌装   │ │       │   │  旋盖   │ │
+│   │ S7-1500 │       │   │ S7-1500 │       │   │ S7-1500 │
+│   │  R/H    │ │       │   │  R/H    │ │       │   │  R/H    │
+│   │ CPU1515 │       │   │ CPU1517│ │       │   │ CPU1515 │
+│   └─────────┘ │       │   └─────────┘ │       │   └─────────┘ │
+│   冗余光纤环网 │       │   冗余光纤环网 │       │   冗余光纤环网 │
+└───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+        │                        │                        │
+        ▼                        ▼                        ▼
+   ┌─────────┐            ┌─────────┐            ┌─────────┐
+   │ ET200SP │            │ ET200SP │            │ ET200SP │
+   │ I/O模块 │            │ I/O模块 │            │ I/O模块 │
+   └─────────┘            └─────────┘            └─────────┘
+
+┌───────┬───────┐       ┌───────┬───────┐       ┌───────┬───────┐
+│  PLC控制柜10  │       │  PLC控制柜11  │       │  PLC控制柜12  │
+│   ┌─────────┐ │       │   ┌─────────┐ │       │   ┌─────────┐ │
+│   │ PLC-10 │ │       │   │ PLC-11 │ │       │   │ PLC-12 │ │
+│   │  LI    │ │       │   │  CI    │ │       │   │  LB    │ │
+│   │  灯检   │ │       │   │  喷码   │ │       │   │  贴标   │ │
+│   │ S7-1500 │       │   │ S7-1200 │ │       │   │ S7-1500 │
+│   │  R/H    │ │       │   │  标准   │ │       │   │  R/H    │
+│   │ CPU1515 │       │   │ CPU1215 │ │       │   │ CPU1515 │
+│   └─────────┘ │       │   └─────────┘ │       │   └─────────┘ │
+│   冗余光纤环网 │       │   冗余光纤环网 │       │   冗余光纤环网 │
+└───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+        │                        │                        │
+        ▼                        ▼                        ▼
+   ┌─────────┐            ┌─────────┐            ┌─────────┐
+   │ ET200SP │            │ ET200SP │            │ ET200SP │
+   │ I/O模块 │            │ I/O模块 │            │ I/O模块 │
+   └─────────┘            └─────────┘            └─────────┘
+
+┌─────────────────────────┐       ┌─────────────────────────┐
+│      PLC控制柜13          │       │      PLC控制柜14          │
+│   ┌─────────────────┐ │       │   ┌─────────────────┐ │
+│   │     PLC-13     │ │       │   │     PLC-14     │ │
+│   │       CA       │ │       │   │       PK       │ │
+│   │       装箱      │ │       │   │    膜包码垛    │ │
+│   │    S7-1500     │ │       │   │    S7-1500     │ │
+│   │      R/H       │ │       │   │      R/H       │ │
+│   │   CPU1515     │ │       │   │   CPU1515     │ │
+│   └─────────────────┘ │       │   └─────────────────┘ │
+│      冗余光纤环网       │       │      冗余光纤环网       │
+└───────────┬─────────┘       └───────────┬─────────┘
+            │                             │
+            ▼                             ▼
+       ┌─────────┐                  ┌─────────┐
+       │ ET200SP │                  │ ET200SP │
+       │ I/O模块  │                  │ I/O模块  │
+       └─────────┘                  └─────────┘
+
+┌─────────────────────────┐
+│      PLC控制柜15          │
+│   ┌─────────────────┐ │
+│   │     PLC-15     │ │
+│   │       CP       │ │
+│   │     CIP清洗     │ │
+│   │    S7-1500     │ │
+│   │      R/H       │ │
+│   │   CPU1515     │ │
+│   └─────────────────┘ │
+│      冗余光纤环网       │
+└───────────┬─────────┘
+            │
+            ▼
+       ┌─────────┐
+       │ ET200SP │
+       │ I/O模块  │
+       └─────────┘
 ```
 
 ### 1.2 PLC配置表
 
-| PLC编号 | 控制区域 | CPU型号 | 通讯接口 | 冗余方式 | I/O点数 |
-|---------|----------|---------|----------|----------|---------|
-| PLC-1 | 水处理+萃取 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | 约450点 |
-| PLC-2 | 调配+均质 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | 约380点 |
-| PLC-3 | UHT+灌装 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | 约420点 |
+| PLC编号 | 控制工段 | CPU型号 | 通讯接口 | 冗余方式 | I/O估算 | 备注 |
+|---------|----------|---------|----------|----------|---------|------|
+| PLC-1 | WT水处理 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~200点 | 公用工程 |
+| PLC-2 | TH茶叶前处理 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~100点 | 防爆区域 |
+| PLC-3 | EX萃取 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~180点 | 批次控制 |
+| PLC-4 | FL过滤+HM均质 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~160点 | 连续流程 |
+| PLC-5 | BL调配 | CPU 1517-2 PN | 2×PN | H-Sync光纤环网 | ~200点 | 核心批次 |
+| PLC-6 | UH UHT杀菌 | CPU 1517-2 PN | 2×PN | H-Sync光纤环网 | ~220点 | **CCP关键** |
+| PLC-7 | BF制瓶 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~150点 | 高速同步 |
+| PLC-8 | PF灌装 | CPU 1517-2 PN | 2×PN | H-Sync光纤环网 | ~180点 | **超高速** |
+| PLC-9 | CG旋盖 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~80点 | 跟随灌装 |
+| PLC-10 | LI灯检 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~60点 | 检测设备 |
+| PLC-11 | CI喷码 | CPU 1215C | 1×PN | 无 | ~40点 | 产品追溯 |
+| PLC-12 | LB贴标 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~60点 | 中等速度 |
+| PLC-13 | CA装箱 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~80点 | 批量控制 |
+| PLC-14 | PK膜包码垛 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~120点 | 末端设备 |
+| PLC-15 | CP CIP清洗 | CPU 1515-2 PN | 2×PN | H-Sync光纤环网 | ~140点 | 独立系统 |
+
+**I/O总计**: 约1970点
 
 ### 1.3 控制系统职责划分
 
-| PLC | 主要功能 | 与其他PLC关系 |
-|-----|----------|---------------|
-| PLC-1 | 水处理自动控制、萃取顺序控制、茶叶前处理 | 提供纯水给PLC-2/3 |
-| PLC-2 | 调配批次控制、均质机控制、CIP协调 | 接收PLC-1茶汁、发送调配完成信号给PLC-3 |
-| PLC-3 | UHT杀菌控制、灌装同步控制、包装协调 | 发送无菌料给灌装机、接收调配完成信号 |
+| PLC | 工段名称 | 主要控制任务 | 上游接口 | 下游接口 | 关键控制点 |
+|-----|----------|-------------|----------|----------|-----------|
+| PLC-1 | WT水处理 | 原水净化、纯水供应、反洗控制 | 原水 | PLC-3 | 电导率、液位 |
+| PLC-2 | TH茶叶前处理 | 茶叶粉碎、输送、除尘 | 茶叶原料 | PLC-3 | 粉尘浓度 |
+| PLC-3 | EX萃取 | 三级逆流萃取、温度控制 | PLC-1/2 | PLC-4 | 茶水比、温度曲线 |
+| PLC-4 | FL过滤+HM均质 | 膜过滤、均质压力控制 | PLC-3 | PLC-5 | 膜压差、压力20-25MPa |
+| PLC-5 | BL调配 | 批次配制、Brix/pH控制 | PLC-4 | PLC-6 | Brix±1.0、pH±0.5 |
+| PLC-6 | UH UHT杀菌 | **CCP温度曲线**、F₀值计算 | PLC-5 | PLC-7 | 135℃/15s |
+| PLC-7 | BF制瓶 | 模具控制、瓶胚输送 | PLC-6 | PLC-8 | 吹瓶曲线 |
+| PLC-8 | PF灌装 | **超高速同步**、液位控制 | PLC-6/7 | PLC-9 | 72ms/瓶周期 |
+| PLC-9 | CG旋盖 | 扭矩控制、位置同步 | PLC-8 | PLC-10 | 扭矩0.3-0.7Nm |
+| PLC-10 | LI灯检 | 视觉检测、缺陷剔除 | PLC-9 | PLC-11 | 剔除率统计 |
+| PLC-11 | CI喷码 | 日期打印、位置控制 | PLC-10 | PLC-12 | 喷印清晰度 |
+| PLC-12 | LB贴标 | 标签贴合、位置控制 | PLC-11 | PLC-13 | 位置精度 |
+| PLC-13 | CA装箱 | 纸箱成型、产品计数 | PLC-12 | PLC-14 | 装箱数量 |
+| PLC-14 | PK膜包码垛 | 膜包热缩、堆叠码垛 | PLC-13 | 出货 | 堆叠稳定性 |
+| PLC-15 | CP CIP清洗 | CIP清洗程序控制 | 独立系统 | 各工段 | 清洗效果 |
+
+### 1.4 PLC选型说明
+
+| CPU型号 | 应用PLC | 选型理由 |
+|---------|---------|----------|
+| CPU 1517-2 PN | PLC-5/6/8 | 高性能处理能力，满足批次控制和高速同步需求 |
+| CPU 1515-2 PN | PLC-1/2/3/4/7/9/10/12/13/14/15 | 标准性能，满足一般控制需求 |
+| CPU 1215C | PLC-11 | 入门级，喷码机通常自带PLC，仅需通讯对接 |
 
 ---
 
 ## 2. 程序架构
 
-### 2.1 项目结构
+### 2.1 项目总体结构
 
 ```
 SCADA_Project
-├── PLC_1_WT_EX                    (水处理+萃取)
-│   ├── PLC_1_WT_EX.config        (硬件配置)
-│   ├── Program_1                  (主程序)
-│   │   ├── MAIN                  (组织块OB1)
-│   │   ├── System_Startup         (系统启动初始化)
-│   │   └── Cyclic_Interrupt       (循环中断100ms)
-│   ├── Functions                  (工艺功能块)
-│   │   ├── WT_WaterTreatment      (水处理)
-│   │   ├── EX_Extraction          (萃取控制)
-│   │   ├── EX_CounterCurrent      (逆流萃取)
-│   │   └── TH_TeaFeed             (茶叶前处理)
-│   ├── FunctionBlocks             (功能块)
-│   │   ├── FB_PID_Control        (PID控制器)
-│   │   ├── FB_Valve_Control      (阀门控制)
-│   │   ├── FB_Pump_Control       (泵控制)
-│   │   └── FB_Level_Control      (液位控制)
-│   ├── DataBlocks                 (数据块)
-│   │   ├── DB_WT_Parameters      (水处理参数)
-│   │   ├── DB_EX_Parameters      (萃取参数)
-│   │   └── DB_Recipe_Data        (配方数据)
-│   └── TechnologyObjects          (工艺对象)
-│       └── TO_PressControl        (压力控制)
 │
-├── PLC_2_BL_HM                    (调配+均质)
-│   ├── PLC_2_BL_HM.config
-│   ├── Program_2
-│   │   ├── MAIN
-│   │   └── Cyclic_Interrupt
+├── PLC_1_WT_WaterTreatment              (水处理系统)
+│   ├── PLC_1_WT.config                 (硬件配置)
+│   ├── Program_1
+│   │   ├── OB1_Main                    (组织块OB1 - 主程序)
+│   │   ├── OB100_StartUp               (启动组织块)
+│   │   ├── OB35_Cyclic_100ms           (循环中断100ms)
+│   │   └── OB82_Diagnostic             (诊断中断)
 │   ├── Functions
-│   │   ├── BL_Blending            (调配控制)
-│   │   ├── BL_BatchControl       (批次控制)
-│   │   ├── HM_Homogenizer        (均质控制)
-│   │   └── CIP_Coordination      (CIP协调)
+│   │   ├── FC_WT_Filtration            (多介质过滤控制)
+│   │   ├── FC_WT_RO_Control            (RO反渗透控制)
+│   │   ├── FC_WT_IonExchange           (离子交换再生)
+│   │   └── FC_WT_UV_Monitor            (UV杀菌监控)
 │   ├── FunctionBlocks
-│   │   ├── FB_Brix_Control       (糖度控制)
-│   │   ├── FB_PH_Control         (pH控制)
-│   │   └── FB_HM_Pressure        (均质压力控制)
-│   └── DataBlocks
-│       ├── DB_BL_Parameters
-│       └── DB_HM_Parameters
+│   │   ├── FB_Valve_Ctrl               (阀门控制)
+│   │   ├── FB_Pump_Ctrl                (泵控制)
+│   │   ├── FB_Level_PID                (液位PID)
+│   │   ├── FB_Flow_PID                 (流量PID)
+│   │   └── FB_Conductivity_Monitor     (电导率监控)
+│   ├── DataBlocks
+│   │   ├── DB_WT_Parameters             (水处理参数)
+│   │   ├── DB_WT_Alarms                (报警记录)
+│   │   └── DB_WT_Statistics            (运行统计)
+│   └── SharedTypes
+│       └── UDT_WT_TankData             (水处理罐体数据结构)
 │
-└── PLC_3_UH_PF                    (UHT+灌装)
-    ├── PLC_3_UH_PF.config
-    ├── Program_3
-    │   ├── MAIN
-    │   ├── Cyclic_Interrupt
-    │   └── Time_Interrupt_10ms   (10ms高精度中断)
-    ├── Functions
-    │   ├── UH_UHT_Sterilizer      (UHT杀菌)
-    │   ├── UH_Temperature_Control (温度控制)
-    │   ├── PF_Filler_Control      (灌装控制)
-    │   └── PK_Packaging           (包装协调)
-    ├── FunctionBlocks
-    │   ├── FB_UHT_Temp_Profile   (UHT温度曲线)
-    │   ├── FB_Filling_Sync       (灌装同步)
-    │   └── FB_Speed_Master       (速度主控)
-    └── DataBlocks
-        ├── DB_UH_Parameters
-        └── DB_PF_Parameters
+├── PLC_2_TH_TeaHandling                (茶叶前处理系统)
+│   ├── PLC_2_TH.config
+│   ├── Program_2
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   └── OB35_Cyclic_100ms
+│   ├── Functions
+│   │   ├── FC_TH_Milling               (粉碎机控制)
+│   │   ├── FC_TH_Conveyor              (输送带控制)
+│   │   └── FC_TH_Dedust                (除尘系统)
+│   ├── FunctionBlocks
+│   │   ├── FB_Motor_VFD                (变频电机控制)
+│   │   ├── FB_Dust_Sensor              (粉尘传感器)
+│   │   └── FB_Explosion_Protection     (防爆监测)
+│   ├── DataBlocks
+│   │   ├── DB_TH_Parameters
+│   │   └── DB_TH_Alarms
+│   └── SharedTypes
+│       └── UDT_TH_ConveyorData
+│
+├── PLC_3_EX_Extraction                 (萃取系统)
+│   ├── PLC_3_EX.config
+│   ├── Program_3
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   └── OB32_Cyclic_50ms            (快速温度控制)
+│   ├── Functions
+│   │   ├── FC_EX_CounterCurrent        (逆流萃取控制)
+│   │   ├── FC_EX_Temperature_Profile   (温度曲线控制)
+│   │   ├── FC_EX_WaterRatio            (茶水比控制)
+│   │   └── FC_EX_Slag_Separation       (茶渣分离)
+│   ├── FunctionBlocks
+│   │   ├── FB_Batch_Sequencer          (批次顺序控制器)
+│   │   ├── FB_Temp_Profile_Ctrl        (温度曲线控制器)
+│   │   ├── FB_Level_Interlock          (液位联锁)
+│   │   └── FB_Stirrer_Ctrl             (搅拌器控制)
+│   ├── DataBlocks
+│   │   ├── DB_EX_Parameters
+│   │   ├── DB_EX_Recipe                (萃取配方数据)
+│   │   ├── DB_EX_BatchLog              (批次记录)
+│   │   └── DB_EX_Alarms
+│   └── SharedTypes
+│       └── UDT_EX_ExtractionData
+│
+├── PLC_4_BL_Blending                    (调配系统)
+│   ├── PLC_4_BL.config
+│   ├── Program_4
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   ├── OB32_Cyclic_50ms
+│   │   └── OB30_Cyclic_20ms            (快速Brix/pH控制)
+│   ├── Functions
+│   │   ├── FC_BL_Batch_Make            (调配批次控制)
+│   │   ├── FC_BL_Ingredient_Add         (原料添加控制)
+│   │   ├── FC_BL_Mixing                (搅拌混合)
+│   │   └── FC_BL_CIP_Ready             (CIP就绪检查)
+│   ├── FunctionBlocks
+│   │   ├── FB_Brix_Ctrl                (糖度控制器)
+│   │   ├── FB_PH_Ctrl                  (pH控制器)
+│   │   ├── FB_Cascade_Ctrl             (串级控制器)
+│   │   ├── FB_Batch_Manager            (批次管理器)
+│   │   └── FB_Recipe_Loader            (配方加载器)
+│   ├── DataBlocks
+│   │   ├── DB_BL_Parameters
+│   │   ├── DB_BL_Recipe
+│   │   ├── DB_BL_BatchLog
+│   │   ├── DB_BL_Alarms
+│   │   └── DB_BL_Statistics
+│   └── SharedTypes
+│       └── UDT_BL_BatchData
+│
+├── PLC_5_HM_Homogenizer                 (均质系统)
+│   ├── PLC_5_HM.config
+│   ├── Program_5
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   └── OB35_Cyclic_100ms
+│   ├── Functions
+│   │   ├── FC_HM_Pressure_Control       (均质压力控制)
+│   │   ├── FC_HM_Temp_Control           (均质温度控制)
+│   │   └── FC_HM_Valve_Sequence         (阀门顺序)
+│   ├── FunctionBlocks
+│   │   ├── FB_HM_Pressure_PID          (压力PID)
+│   │   ├── FB_HM_Temp_PID               (温度PID)
+│   │   └── FB_HM_Vibration_Monitor     (振动监控)
+│   ├── DataBlocks
+│   │   ├── DB_HM_Parameters
+│   │   ├── DB_HM_Alarms
+│   │   └── DB_HM_Statistics
+│   └── SharedTypes
+│       └── UDT_HM_HomogenizerData
+│
+├── PLC_6_UH_UHT                         (UHT杀菌系统 - CCP关键)
+│   ├── PLC_6_UH.config
+│   ├── Program_6
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms           (常规监控)
+│   │   ├── OB32_Cyclic_50ms            (温度监控)
+│   │   ├── OB30_Cyclic_20ms            (CCP关键控制)
+│   │   ├── OB80_TimeError              (时间错误中断)
+│   │   └── OB82_Diagnostic             (诊断中断)
+│   ├── Functions
+│   │   ├── FC_UH_Temp_Profile           (温度曲线控制)
+│   │   ├── FC_UH_F0_Calculation         (F₀值计算)
+│   │   ├── FC_UH_Hold_Time             (保温时间控制)
+│   │   ├── FC_UH_Cooling_Control        (冷却控制)
+│   │   ├── FC_UH_Sterilize_Logic        (杀菌逻辑)
+│   │   └── FC_UH_Startup_Permit        (启动许可检查)
+│   ├── FunctionBlocks
+│   │   ├── FB_UHT_Temp_Profile          (UHT温度曲线控制器)
+│   │   │       ├── Input: SetTemp, SetTime, FlowRate
+│   │   │       ├── Output: ActualTemp, F0_Value, CCP_Status
+│   │   │       └── Logic: 温度超出127℃立即关闭进料阀
+│   │   ├── FB_UHT_F0_Integrator         (F₀值积分器)
+│   │   │       ├── Input: Temp, Time
+│   │   │       └── Output: Cumulative_F0
+│   │   ├── FB_UHT_CCP_Monitor           (CCP监控器)
+│   │   │       ├── Input: Temp, Pressure, Flow
+│   │   │       └── Output: CCP_Alarm,进料阀状态
+│   │   ├── FB_UHT_Pressure_Safety       (压力安全联锁)
+│   │   └── FB_UHT_Product_Tracker       (产品追溯跟踪)
+│   ├── DataBlocks
+│   │   ├── DB_UH_Parameters             (UHT参数)
+│   │   ├── DB_UH_CCPSetup               (CCP配置)
+│   │   ├── DB_UH_TempLog                (温度记录)
+│   │   ├── DB_UH_F0Log                  (F₀记录)
+│   │   ├── DB_UH_ProductTrace           (产品追溯)
+│   │   ├── DB_UH_Alarms
+│   │   └── DB_UH_BatchLog
+│   └── SharedTypes
+│       ├── UDT_UH_TempProfileData
+│       └── UDT_UH_CCPStatus
+│
+├── PLC_7_BF_BottleMaking                (制瓶系统)
+│   ├── PLC_7_BF.config
+│   ├── Program_7
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   └── OB34_Cyclic_10ms            (高速同步)
+│   ├── Functions
+│   │   ├── FC_BF_Mold_Control           (模具控制)
+│   │   ├── FC_BF_Prefeeder              (瓶胚输送)
+│   │   ├── FC_BF_Air_Control            (吹瓶气压)
+│   │   └── FC_BF_Speed_Sync            (速度同步)
+│   ├── FunctionBlocks
+│   │   ├── FB_BF_Mold_Sequencer         (模具顺序控制器)
+│   │   ├── FB_BF_Blow_Curve             (吹瓶曲线控制器)
+│   │   ├── FB_BF_Speed_Master          (速度主令)
+│   │   └── FB_BF_Position_Sync         (位置同步)
+│   ├── DataBlocks
+│   │   ├── DB_BF_Parameters
+│   │   ├── DB_BF_MoldData               (模具数据)
+│   │   ├── DB_BF_Alarms
+│   │   └── DB_BF_Statistics
+│   └── SharedTypes
+│       └── UDT_BF_MoldCycleData
+│
+├── PLC_8_PF_Packing                     (灌装系统 - 超高速)
+│   ├── PLC_8_PF.config
+│   ├── Program_8
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms           (常规监控)
+│   │   ├── OB32_Cyclic_50ms            (液位控制)
+│   │   ├── OB34_Cyclic_10ms            (高速同步控制)
+│   │   └── OB80_TimeError              (时间同步监控)
+│   ├── Functions
+│   │   ├── FC_PF_Filling_Control        (灌装控制)
+│   │   ├── FC_PF_Level_Metering         (液位计量)
+│   │   ├── FC_PF_Speed_Sync            (速度同步)
+│   │   ├── FC_PF_Nozzle_Control         (灌装阀组)
+│   │   └── FC_PF_Cleaning_Logic        (CIP清洗)
+│   ├── FunctionBlocks
+│   │   ├── FB_PF_Filling_Valve         (灌装阀控制)
+│   │   │       ├── Input: FillCommand, BottlePresent, LevelSetpoint
+│   │   │       ├── Output: ValvePosition, ActualVolume, FillTime
+│   │   │       └── Logic: 72ms内完成500ml灌装，精度±1.5%
+│   │   ├── FB_PF_Volume_Metering       (体积计量)
+│   │   ├── FB_PF_Speed_Sync            (速度同步)
+│   │   │       ├── Input: MasterSpeed, MasterPosition
+│   │   │       ├── Output: FollowSpeed, SyncError
+│   │   │       └── Logic: 72ms周期同步，误差<1ms
+│   │   ├── FB_PF_Bottle_Tracker        (瓶位跟踪)
+│   │   └── FB_PF_Overflow_Protection   (溢瓶保护)
+│   ├── DataBlocks
+│   │   ├── DB_PF_Parameters
+│   │   ├── DB_PF_FillData               (灌装数据)
+│   │   ├── DB_PF_SpeedData              (速度数据)
+│   │   ├── DB_PF_Alarms
+│   │   ├── DB_PF_Statistics
+│   │   └── DB_PF_ProductTrace
+│   └── SharedTypes
+│       ├── UDT_PF_FillStationData
+│       └── UDT_PF_SpeedSyncData
+│
+├── PLC_9_CG_Capping                     (旋盖系统)
+│   ├── PLC_9_CG.config
+│   ├── Program_9
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   └── OB34_Cyclic_10ms            (扭矩同步)
+│   ├── Functions
+│   │   ├── FC_CG_Torque_Control         (扭矩控制)
+│   │   ├── FC_CG_Chuck_Control          (卡爪控制)
+│   │   └── FC_CG_Speed_Sync            (速度同步)
+│   ├── FunctionBlocks
+│   │   ├── FB_CG_Torque_Monitor        (扭矩监控器)
+│   │   ├── FB_CG_Cap_Feeder            (盖子供给)
+│   │   └── FB_CG_Speed_Follower       (速度跟随)
+│   ├── DataBlocks
+│   │   ├── DB_CG_Parameters
+│   │   ├── DB_CG_Alarms
+│   │   └── DB_CG_Statistics
+│   └── SharedTypes
+│       └── UDT_CG_CappingData
+│
+├── PLC_10_LI_Inspection                 (灯检系统)
+│   ├── PLC_10_LI.config
+│   ├── Program_10
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   └── OB35_Cyclic_100ms
+│   ├── Functions
+│   │   ├── FC_LI_Vision_Trigger        (视觉触发)
+│   │   ├── FC_LI_Defect_Detect         (缺陷检测)
+│   │   └── FC_LI_Rejection_Control     (剔除控制)
+│   ├── FunctionBlocks
+│   │   ├── FB_LI_Camera_Interface      (相机接口)
+│   │   ├── FB_LI_Defect_Classifier    (缺陷分类)
+│   │   └── FB_LI_Reject_Solenoid      (剔除阀)
+│   ├── DataBlocks
+│   │   ├── DB_LI_Parameters
+│   │   ├── DB_LI_InspectionLog
+│   │   ├── DB_LI_Alarms
+│   │   └── DB_LI_Statistics
+│   └── SharedTypes
+│       └── UDT_LI_InspectionResult
+│
+├── PLC_11_CI_Coding                      (喷码系统)
+│   ├── PLC_11_CI.config
+│   ├── Program_11
+│   │   ├── OB1_Main
+│   │   └── OB100_StartUp
+│   ├── Functions
+│   │   ├── FC_CI_Print_Control         (打印控制)
+│   │   └── FC_CI_Buffer_Manage        (缓存管理)
+│   ├── FunctionBlocks
+│   │   ├── FB_CI_Print_Trigger        (打印触发)
+│   │   └── FB_CI_Communication       (通讯接口)
+│   ├── DataBlocks
+│   │   ├── DB_CI_Parameters
+│   │   └── DB_CI_PrintLog
+│   └── SharedTypes
+│       └── UDT_CI_PrintData
+│
+├── PLC_12_LB_Labeling                    (贴标系统)
+│   ├── PLC_12_LB.config
+│   ├── Program_12
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   └── OB34_Cyclic_10ms
+│   ├── Functions
+│   │   ├── FC_LB_Label_Apply           (贴标控制)
+│   │   ├── FC_LB_Speed_Sync            (速度同步)
+│   │   └── FC_LB_Plate_Change         (换版控制)
+│   ├── FunctionBlocks
+│   │   ├── FB_LB_Label_Sensor          (标签传感器)
+│   │   ├── FB_LB_Apply_Cylinder       (贴标气缸)
+│   │   └── FB_LB_Speed_Follower       (速度跟随)
+│   ├── DataBlocks
+│   │   ├── DB_LB_Parameters
+│   │   ├── DB_LB_Alarms
+│   │   └── DB_LB_Statistics
+│   └── SharedTypes
+│       └── UDT_LB_LabelData
+│
+├── PLC_13_CA_Cartoning                   (装箱系统)
+│   ├── PLC_13_CA.config
+│   ├── Program_13
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   └── OB35_Cyclic_100ms
+│   ├── Functions
+│   │   ├── FC_CA_Carton_Forming        (纸箱成型)
+│   │   ├── FC_CA_Product_Infeed       (产品输入)
+│   │   ├── FC_CA_Counting             (产品计数)
+│   │   └── FC_CA_Sealing              (纸箱封合)
+│   ├── FunctionBlocks
+│   │   ├── FB_CA_Carton_Former        (成型器)
+│   │   ├── FB_CA_Product_Counter      (产品计数器)
+│   │   └── FB_CA_Sealer_Control      (封合控制)
+│   ├── DataBlocks
+│   │   ├── DB_CA_Parameters
+│   │   ├── DB_CA_Alarms
+│   │   └── DB_CA_Statistics
+│   └── SharedTypes
+│       └── UDT_CA_CartonData
+│
+├── PLC_14_PK_Palletizing                  (膜包码垛系统)
+│   ├── PLC_14_PK.config
+│   ├── Program_14
+│   │   ├── OB1_Main
+│   │   ├── OB100_StartUp
+│   │   ├── OB35_Cyclic_100ms
+│   │   └── OB32_Cyclic_50ms
+│   ├── Functions
+│   │   ├── FC_PK_Shrink_Wrap          (膜包热缩)
+│   │   ├── FC_PK_Pallet_Forming       (托盘成型)
+│   │   ├── FC_PK_Stacking             (堆叠控制)
+│   │   ├── FC_PK_Conveyor             (输送控制)
+│   │   └── FC_PK_Pallet_Tracker      (托盘跟踪)
+│   ├── FunctionBlocks
+│   │   ├── FB_PK_Shrink_Oven         (热缩炉控制)
+│   │   ├── FB_PK_Stacker_Control     (堆垛机控制)
+│   │   ├── FB_PK_Pallet_Magazine    (托盘仓)
+│   │   └── FB_PK_Pallet_Clamp       (托盘夹爪)
+│   ├── DataBlocks
+│   │   ├── DB_PK_Parameters
+│   │   ├── DB_PK_Alarms
+│   │   └── DB_PK_Statistics
+│   └── SharedTypes
+│       └── UDT_PK_PalletData
+│
+├── Common_Libraries
+│   ├── Utility_Functions
+│   │   ├── FC_Convert_Units            (单位转换)
+│   │   ├── FC_Limit_Check              (限位检查)
+│   │   └── FC_Ramp_Function            (斜坡函数)
+│   ├── Alarm_Functions
+│   │   ├── FC_Alarm_Generate           (报警生成)
+│   │   ├── FC_Alarm_Acknowledge        (报警确认)
+│   │   └── FC_Alarm_History_Log        (报警历史)
+│   └── DataLogger
+│       ├── FC_Data_Log_Write           (数据日志写入)
+│       └── FC_Data_Log_Read           (数据日志读取)
+│
+└── Global_DataBlocks
+    ├── DB_System_Config                (系统配置)
+    ├── DB_Recipe_Management           (配方管理)
+    ├── DB_Production_Summary           (生产汇总)
+    ├── DB_User_Management             (用户管理)
+    └── DB_System_Time_Sync            (时间同步)
 ```
 
-### 2.2 组织块(OB)配置
+### 2.2 组织块(OB)配置总表
 
-| OB块 | 类型 | 周期/触发 | 功能说明 |
-|------|------|-----------|----------|
-| OB1 | Main | 循环调用 | 主程序，顺序执行各工艺块 |
-| OB35 | Cyclic Interrupt | 100ms | 常规PID控制、状态监控 |
-| OB32 | Cyclic Interrupt | 50ms | 快速液位控制 |
-| OB30 | Cyclic Interrupt | 20ms | UHT温度控制(关键) |
-| OB10 | Time Interrupt | 每日00:00 | 日志归档、数据统计 |
-| OB82 | Hardware Interrupt | 故障触发 | I/O故障诊断 |
-| OB86 | Hardware Interrupt | 冗余切换 | CPU冗余状态处理 |
-| OB100 | Startup | 上电 | 系统初始化、参数加载 |
-| OB121 | Programming Error | 错误触发 | 编程错误处理 |
-| OB122 | Access Error | 错误触发 | I/O访问错误处理 |
+| OB块 | 类型 | 周期/触发 | 应用PLC | 功能说明 |
+|------|------|-----------|---------|----------|
+| OB1 | Main | 循环调用 | 全部 | 主程序，顺序执行各工艺块 |
+| OB35 | Cyclic Interrupt | 100ms | 全部 | 常规PID控制、状态监控 |
+| OB32 | Cyclic Interrupt | 50ms | PLC-3/4/6/14 | 快速液位/温度控制 |
+| OB34 | Cyclic Interrupt | 10ms | PLC-7/8/9/12 | **高速同步控制** |
+| OB30 | Cyclic Interrupt | 20ms | PLC-4/6 | **CCP关键控制** |
+| OB10 | Time Interrupt | 每日00:00 | 全部 | 日志归档、数据统计 |
+| OB80 | Time Error | 时间超时 | PLC-6/8 | 同步超时处理 |
+| OB82 | Hardware Interrupt | 故障触发 | 全部 | I/O故障诊断 |
+| OB86 | Hardware Interrupt | 冗余切换 | 全部 | CPU冗余状态处理 |
+| OB100 | Startup | 上电 | 全部 | 系统初始化、参数加载 |
+| OB121 | Programming Error | 错误触发 | 全部 | 编程错误处理 |
+| OB122 | Access Error | 错误触发 | 全部 | I/O访问错误处理 |
 
 ### 2.3 冗余机制
 
-#### 2.3.1 CPU冗余
+#### 2.3.1 CPU冗余配置
 
-| 项目 | 配置 | 说明 |
-|------|------|------|
-| 冗余类型 | 软件冗余(SWR) | S7-1500 R/H |
-| 同步方式 | 光纤H-Sync | 环形网络 |
+| 项目 | S7-1500 R/H 配置 | 说明 |
+|------|-------------------|------|
+| 冗余类型 | 软件冗余(SWR) | S7-1500 R/H System |
+| 同步方式 | 光纤H-Sync | 环形网络，红色光纤 |
 | 切换时间 | <100ms | 故障切换时间 |
 | 数据同步 | 过程映像区 | 关键数据实时同步 |
+| 同步内容 | 输入/输出/标志/数据块 | 完整状态同步 |
 
-#### 2.3.2 网络冗余
+#### 2.3.2 网络冗余架构
 
-| 网络层级 | 冗余方式 | 故障切换 |
-|----------|----------|----------|
-| SCADA-PLC | 双网口绑定 | 自动切换 |
-| PLC-CPU | H-Sync光纤 | 自动切换 |
-| PLC-I/O | PROFINET环网 | MRP协议 |
+| 网络层级 | 冗余方式 | 故障切换时间 | 协议 |
+|----------|----------|--------------|------|
+| SCADA-PLC | 双网口绑定(Teaming) | <1s | Ethernet/IP |
+| PLC-CPU | H-Sync光纤环网 | <100ms | PROFINET |
+| PLC-I/O | PROFINET环网(MRP) | <200ms | PROFINET |
+| 交换机间 | 聚合链路(LACP) | <1s | Ethernet |
+
+#### 2.3.3 冗余切换逻辑
+
+```
+故障检测 → 冗余判断 → 切换授权 → 数据同步 → 负载接管
+    │           │           │           │
+    ▼           ▼           ▼           ▼
+  硬件告警   工程师确认  自动/手动    毫秒级
+  软件诊断   故障确认   同步完成    无感切换
+```
 
 ---
 
@@ -164,122 +639,226 @@ SCADA_Project
 #### 3.1.1 工艺流程
 
 ```
-原水 → 多介质过滤 → 活性炭过滤 → RO反渗透 → 离子交换 → UV杀菌 → 纯水储罐
+原水箱 → 原水泵 → 多介质过滤(MF) → 活性炭过滤(AC) → RO反渗透 → 离子交换(IX) → UV杀菌 → 纯水储罐
+   │                    │                  │                            │
+   │                    ▼                  ▼                            ▼
+   │              自动反洗控制         自动反洗控制                 再生触发
+   │                    │                  │                            │
+   └────────────────────┴──────────────────┴────────────────────────────┘
+                                    排污
 ```
 
 #### 3.1.2 控制功能
 
-| 功能 | 说明 | 控制方式 |
-|------|------|----------|
-| 多介质过滤器反洗 | 压差达到设定值或定时8h | 自动/手动 |
-| 活性炭过滤器反洗 | 压差达到设定值或定时24h | 自动/手动 |
-| RO系统控制 | 产水流量、电导率监控 | PID+逻辑 |
-| 离子交换再生 | 电导率超标或定时72h | 自动提示+手动 |
-| 纯水储罐液位 | 液位30%-90%控制 | PID控制 |
-| UV杀菌监控 | 功率、灭菌效率监测 | 状态监控 |
+| 功能 | 控制对象 | 控制方式 | 控制参数 |
+|------|----------|----------|----------|
+| 多介质过滤器反洗 | MF-101~104 | 自动/手动 | 压差>0.08MPa或定时8h |
+| 活性炭过滤器反洗 | AC-101~102 | 自动/手动 | 压差>0.06MPa或定时24h |
+| RO系统控制 | RO-101 | PID+逻辑 | 产水流量2.5m³/h，电导率<10μS/cm |
+| 离子交换再生 | IX-101~102 | 自动提示+手动 | 电导率>10μS/cm或定时72h |
+| 纯水储罐液位 | TK-101 | PID控制 | 液位30%-90% |
+| UV杀菌监控 | UV-101 | 状态监控 | 功率>70%，灭菌效率>99.9% |
 
 #### 3.1.3 关键监控点
 
-| 位号 | 描述 | 报警 | 联锁 |
-|------|------|------|------|
-| WT-105-CtT | 离子交换水电导率 | H:10μS/cm | 超标报警+再生提示 |
-| WT-107-LT | 纯水储罐液位 | LL:10%, HH:95% | 低液位停泵 |
-| WT-102-PT | RO前压力 | H:0.8MPa | 高压泵保护 |
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| WT-101-FT | 原水流量 | AI | L:5m³/h | 低流量报警 |
+| WT-102-PT | MF前压力 | AI | H:0.6MPa | 高压保护停泵 |
+| WT-103-PT | RO前压力 | AI | H:0.8MPa | 高压泵变频降速 |
+| WT-105-CtT | 离子交换水电导率 | AI | H:10μS/cm | 报警+再生提示 |
+| WT-107-LT | 纯水储罐液位 | AI | LL:10%, HH:95% | 低液位停泵 |
+| WT-108-CtT | UV后电导率 | AI | H:5μS/cm | 报警并切换管路 |
 
-### 3.2 萃取系统(EX) - PLC-1
+#### 3.1.4 顺序控制时序
+
+```
+【多介质过滤器反洗序列】
+
+T=0:     发出反洗指令，关闭进水阀
+T=10s:   打开反洗进水阀
+T=20s:   启动反洗泵，缓慢开启
+T=30s:   反洗泵达到100%，反洗流量维持在12m³/h
+T=300s:  停止反洗泵
+T=310s:  关闭反洗进水阀
+T=320s:  打开正洗排水阀
+T=330s:  打开进水阀，正洗流量8m³/h
+T=600s:  正洗电导率<100μS/cm，关闭排水阀
+T=610s:  恢复运行状态
+```
+
+### 3.2 茶叶前处理系统(TH) - PLC-2
 
 #### 3.2.1 工艺流程
 
 ```
-茶叶 → 粉碎 → 逆流萃取(3级) → 茶渣分离 → 冷却 → 茶汁储罐
+茶叶原料 → 投料仓 → 粉碎机 → 磁选器 → 计量仓 → 输送绞龙 → 萃取罐
+              │                          │
+              ▼                          ▼
+         袋式除尘器                  金属检测器
+         (防爆区域)                  (剔除装置)
 ```
 
 #### 3.2.2 控制功能
 
-| 功能 | 说明 | 控制方式 |
-|------|------|----------|
-| 三级逆流萃取 | 温度、时间、茶水比控制 | 批次顺序控制 |
-| 萃取液位控制 | 各罐液位90%限值 | 逻辑联锁 |
-| 茶渣分离 | 离心机速度、温度控制 | PID控制 |
-| 冷却控制 | 冷却器出口温度≤25℃ | PID控制 |
-| 搅拌控制 | 萃取罐搅拌速度可调 | PID控制 |
+| 功能 | 控制对象 | 控制方式 | 说明 |
+|------|----------|----------|------|
+| 茶叶粉碎 | TH-101 | 变频控制 | 粒度80-100目可调 |
+| 输送控制 | TH-102 | 变频控制 | 输送量与萃取批次匹配 |
+| 除尘系统 | TH-103 | 连锁控制 | 粉碎机启动前先开除尘器 |
+| 防爆监测 | TH-104 | 连续监控 | 粉尘浓度<爆炸下限50% |
+| 金属检测 | TH-105 | 剔除控制 | 检测到金属立即剔除 |
 
-#### 3.2.3 顺序控制时序
+#### 3.2.3 关键监控点
 
-```
-T=0:   启动萃取批次
-T=0-60s: 开排水阀EV-106，液位<10%后关闭
-T=60-180s: 开进水阀EV-101，液位达到90%后关闭
-T=180-300s: 开进茶阀EV-103，进茶量达到设定值
-T=300-330s: 启动搅拌电机M-EX01，设定转速
-T=330:  启动温度控制，TT达到设定值后开始计时
-T=设定时间: 打开EV-106，泵送茶汁至EX-106
-T=批次结束: 茶渣排放准备
-```
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| TH-101-MT | 粉碎机转速 | AI | L:800rpm | 低速报警 |
+| TH-103-PT | 除尘器压差 | AI | H:1500Pa | 滤袋堵塞报警 |
+| TH-104-ST | 粉尘浓度 | AI | H:50%LEL | 停粉碎机 |
+| TH-105-MT | 金属检测信号 | DI | 检出报警 | 剔除阀动作 |
 
-#### 3.2.4 关键监控点
-
-| 位号 | 描述 | 报警 | 联锁 |
-|------|------|------|------|
-| EX-101-TT | 萃取罐1温度 | L:75℃, H:100℃ | LL停加热，HH停批次 |
-| EX-103-LT | 萃取罐3液位 | H:95% | HH关闭进料阀 |
-| EX-106-TT | 茶汁储罐温度 | H:40℃ | HH开启冷却 |
-
-### 3.3 调配系统(BL) - PLC-2
+### 3.3 萃取系统(EX) - PLC-3
 
 #### 3.3.1 工艺流程
 
 ```
-茶汁 + 糖浆 + 酸液 + 香精 → 调配罐 → 搅拌混合 → 均质
+茶叶 ──→ 计量 ──→ 萃取罐1 ──→ 萃取罐2 ──→ 萃取罐3 ──→ 茶渣分离 ──→ 冷却 ──→ 茶汁储罐
+  │         │         ▲              ▲              │
+  │         │         │              │              │
+  └─────────┴─────────┴──────────────┴──────────────┘
+                    逆流热水
 ```
 
-#### 3.3.2 批次控制
+#### 3.3.2 三级逆流萃取时序
 
-| 步骤 | 操作 | 时间 | 判定条件 |
+| 阶段 | 时间 | 动作 | 判定条件 |
 |------|------|------|----------|
-| 1 | 添加纯水 | 5min | 液位达到30% |
-| 2 | 添加茶浓缩汁 | 10min | Brix达到2.5°Brix |
-| 3 | 添加糖浆 | 5min | Brix达到目标值±1.0 |
-| 4 | 添加酸液 | 3min | pH达到目标值±0.5 |
-| 5 | 添加香精 | 1min | 时间到 |
-| 6 | 补水至目标量 | 3min | 液位100% |
-| 7 | 搅拌混合 | 15min | 时间到 |
+| 进茶 | 0-120s | 茶叶进入萃取罐1 | 茶叶重量达到设定值 |
+| 补水 | 120-180s | 热水进入萃取罐1 | 液位达到90% |
+| 加热 | 180-240s | 温度上升至85℃ | 温度TT≥85℃ |
+| 萃取 | 240-1140s | 搅拌保持 | 时间到或温度曲线完成 |
+| 转移 | 1140-1320s | 茶汁泵送至下一级 | 液位<10% |
+| 排渣 | 1320-1500s | 茶渣排出 | 重量<50kg |
 
-#### 3.3.3 关键控制点
+#### 3.3.3 关键监控点
 
-| 位号 | 描述 | 控制方式 | 容差 |
-|------|------|----------|------|
-| BL-101-AT | 调配罐1 pH值 | PID | ±0.5 |
-| BL-101-BT | 调配罐1 Brix值 | PID | ±1.0°Brix |
-| BL-103-BT | 糖浆Brix值 | 监控 | 65±2°Brix |
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| EX-101-TT | 萃取罐1温度 | AI | L:80℃, H:95℃ | LL停加热，HH开冷却 |
+| EX-102-LT | 萃取罐1液位 | AI | H:95% | HH关闭进茶阀 |
+| EX-103-TT | 萃取罐3温度 | AI | L:80℃ | 低于80℃延长萃取时间 |
+| EX-104-FT | 茶水流量 | AI | L:500L/h | 低流量报警 |
+| EX-105-WT | 茶叶重量 | AI | ±5%设定 | 超差报警 |
+| EX-106-TT | 茶汁冷却温度 | AI | H:30℃ | HH开冷却水 |
 
-### 3.4 均质系统(HM) - PLC-2
+### 3.4 调配系统(BL) - PLC-4
 
-#### 3.4.1 控制功能
+#### 3.4.1 工艺流程
 
-| 功能 | 说明 | 控制方式 |
-|------|------|----------|
-| 均质压力控制 | 20-25MPa可调 | PID控制 |
-| 进料温度控制 | 65±5℃ | PID控制 |
-| 阀门顺序控制 | BV-107/BV-108开关顺序 | 逻辑控制 |
-| 报警监测 | 压力、温度、振动 | 状态监控 |
+```
+茶浓缩汁 ──┐
+糖浆 ──────┼──→ 调配罐BL-101 ──→ 调配罐BL-102 ──→ 均质机HM-101
+酸液 ──────┤     │                      │
+香精 ──────┘     │                      │
+                 ▼                      ▼
+           搅拌混合15min          搅拌混合5min
+```
 
-#### 3.4.2 关键监控点
+#### 3.4.2 批次配制顺序
 
-| 位号 | 描述 | 报警 | 联锁 |
-|------|------|------|------|
-| HM-101-PT2 | 均质工作压力 | L:18MPa, H:27MPa | LL/HH停机 |
-| HM-101-TT | 均质进口温度 | L:55℃, H:75℃ | 温度保护 |
+| 步骤 | 操作 | 时间 | 判定条件 | 容差 |
+|------|------|------|----------|------|
+| 1 | 添加纯水 | 5min | 液位30% | ±2% |
+| 2 | 添加茶浓缩汁 | 10min | Brix 2.5°Bx | ±0.5°Bx |
+| 3 | 添加糖浆 | 5min | Brix目标值 | ±1.0°Bx |
+| 4 | 添加酸液 | 3min | pH目标值 | ±0.5 |
+| 5 | 添加香精 | 1min | 时间到 | - |
+| 6 | 补水至目标量 | 3min | 液位100% | ±1% |
+| 7 | 搅拌混合 | 15min | 时间到 | - |
+| 8 | 转移至均质 | - | 下一级接收就绪 | - |
 
-### 3.5 UHT杀菌系统(UH) - PLC-3
+#### 3.4.3 串级控制回路
+
+```
+        ┌─────────────┐
+        │  外环:Brix  │
+        │   主控制器   │
+        │ SP: 5.5°Bx  │
+        └──┬───────┬──┘
+           │       │
+           │       │ 输出
+           ▼       ▼
+     ┌─────────────┐     ┌─────────────┐
+     │  内环:阀门  │     │   阀门 FV   │
+     │   副控制器  │────▶│   BL-103   │
+     │   输出4-20mA│     └─────────────┘
+     └─────────────┘
+```
+
+#### 3.4.4 关键监控点
+
+| 位号 | 描述 | 类型 | 控制方式 | 容差/报警 |
+|------|------|------|----------|-----------|
+| BL-101-AT | 调配罐1 pH值 | AI | PID | ±0.5 |
+| BL-101-BT | 调配罐1 Brix值 | AI | 串级PID | ±1.0°Bx |
+| BL-102-AT | 调配罐2 pH值 | AI | PID | ±0.5 |
+| BL-102-BT | 调配罐2 Brix值 | AI | 串级PID | ±1.0°Bx |
+| BL-103-BT | 糖浆Brix值 | AI | 监控 | 65±2°Bx |
+| BL-104-FT | 调配液流量 | AI | 累计 | ±1% |
+
+### 3.5 均质系统(HM) - PLC-5
 
 #### 3.5.1 工艺流程
 
 ```
-调配液 → 预热(80℃) → 杀菌(135℃/15s) → 保温(≥130℃) → 冷却(25℃) → 无菌储罐
+调配液 → 预热 → 均质机 → 保温 → 冷却 → UHT
+          │       │        │      │
+          ▼       ▼        ▼      ▼
+        温度控制  压力控制  F0监测  温度控制
 ```
 
-#### 3.5.2 温度控制曲线
+#### 3.5.2 均质控制参数
+
+| 参数 | 设定值 | 控制方式 | 备注 |
+|------|--------|----------|------|
+| 均质压力 | 20-25MPa | PID控制 | 可调 |
+| 进料温度 | 65±5℃ | PID控制 | 影响均质效果 |
+| 出料温度 | <70℃ | 监控 | 温度过高报警 |
+| 振动值 | <4.5mm/s | 监控 | 轴承状态 |
+
+#### 3.5.3 阀门顺序控制
+
+| 步骤 | 时间 | BV-107 | BV-108 | BV-109 | 说明 |
+|------|------|--------|--------|--------|------|
+| 启动准备 | 0-5s | 关闭 | 关闭 | 关闭 | 确认状态 |
+| 启动填充 | 5-30s | 开30% | 关闭 | 关闭 | 低速填充 |
+| 升压 | 30-60s | 开50% | 开30% | 关闭 | 缓慢升压 |
+| 正常运行 | 60s+ | 开100% | 开100% | 关闭 | 目标压力 |
+| 停机泄压 | 0-30s | 关50% | 关50% | 开100% | 顺序泄压 |
+
+#### 3.5.4 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| HM-101-PT1 | 均质进口压力 | AI | H:5MPa | 超过联锁值 |
+| HM-101-PT2 | 均质工作压力 | AI | L:18MPa, H:27MPa | LL/HH停机 |
+| HM-101-TT1 | 均质进口温度 | AI | L:55℃, H:75℃ | 温度保护 |
+| HM-101-TT2 | 均质出口温度 | AI | H:75℃ | 超温报警 |
+| HM-101-VT | 振动值 | AI | H:4.5mm/s | 轴承预警 |
+
+### 3.6 UHT杀菌系统(UH) - PLC-6
+
+#### 3.6.1 工艺流程
+
+```
+调配液 → 预热段(80℃) → 杀菌段(135℃/15s) → 保温段(≥130℃) → 冷却段(25℃) → 无菌储罐
+            │              │                    │              │
+            ▼              ▼                    ▼              ▼
+         温度控制      **CCP关键控制**          F0监测         冷却控制
+```
+
+#### 3.6.2 温度控制曲线
 
 ```
 温度(℃)
@@ -287,7 +866,7 @@ T=批次结束: 茶渣排放准备
       │                   ╱│
   130 ┤                  ╱ └─── 保温段(≥130℃)
       │                 ╱
-   80 ┤──────────────╱────── 预热段(80℃)
+   80 ┤──────────────╱────── 预热段(80℃±5℃)
       │            ╱
    25 ┤────────╱───────────── 冷却段(≤35℃)
       └──────────────────────────────→ 时间(s)
@@ -296,52 +875,316 @@ T=批次结束: 茶渣排放准备
          预热 杀菌 保温 冷却
 ```
 
-#### 3.5.3 关键控制点(CCP)
+#### 3.6.3 CCP关键控制点定义
 
-| 位号 | 描述 | 控制要求 | 联锁动作 |
-|------|------|----------|----------|
-| UH-101-TT2 | 杀菌段温度 | ≥130℃ | <130℃关闭进料阀UV-101 |
-| UH-101-PT2 | 杀菌压力 | 0.2-0.5MPa | 超压打开UV-106泄压 |
-| UH-101-FT | 产品流量 | 2.5-3.5m³/h | 关联杀菌时间 |
+| CCP点 | 控制参数 | 设定值 | 监控周期 | 超出响应 |
+|-------|----------|--------|----------|----------|
+| CCP-1 | 杀菌段温度 | ≥130℃ | 10ms | 立即关闭进料阀 |
+| CCP-2 | 保温段时间 | ≥15s | 10ms | 延长保温时间 |
+| CCP-3 | F₀值 | ≥6.0 | 100ms | 产品隔离 |
+| CCP-4 | 压力控制 | 0.2-0.5MPa | 50ms | 超压泄压 |
 
-#### 3.5.4 启动允许条件
+#### 3.6.4 F₀值计算逻辑
 
-| 条件 | 要求 | 检查信号 |
-|------|------|----------|
-| CIP完成 | CIP-OK=1 | CIP程序执行完毕 |
-| 无菌罐液位 | 30%<LT<90% | UH-105-LT |
-| 无菌罐温度 | TT<35℃ | UH-105-TT |
-| 无菌罐压力 | PT<0.03MPa | UH-105-PT |
-| 蒸汽压力 | PT>0.6MPa | UH-102-PT |
-| 冷却水温度 | <30℃ | - |
+```
+F₀ = ∫10^((T-121.1)/10) × dt
 
-### 3.6 灌装系统(PF) - PLC-3
+判定条件：
+- F₀ ≥ 6.0：产品合格，放行
+- F₀ < 6.0：产品隔离，报警
+- 温度<127℃持续>5s：立即关闭进料阀
+```
 
-#### 3.6.1 控制功能
+#### 3.6.5 启动允许条件
 
-| 功能 | 说明 | 控制方式 |
-|------|------|----------|
-| 灌装速度同步 | 与输送链速度同步 | 主令控制 |
-| 灌装液位控制 | 目标容量500ml±1.5% | PID |
-| 旋盖扭矩控制 | 0.3-0.7Nm | 扭矩监控 |
-| 瓶盖供应计数 | 瓶盖数量统计 | 计数器 |
+| 条件 | 要求 | 检查信号 | 状态 |
+|------|------|----------|------|
+| CIP完成 | CIP-OK=1 | CIP程序执行完毕 | 必选 |
+| 无菌罐液位 | 30%<LT<90% | UH-105-LT | 必选 |
+| 无菌罐温度 | TT<35℃ | UH-105-TT | 必选 |
+| 无菌罐压力 | PT<0.03MPa | UH-105-PT | 必选 |
+| 蒸汽压力 | PT>0.6MPa | UH-102-PT | 必选 |
+| 冷却水温度 | <30℃ | - | 可选 |
+| 密封系统 | 正常 | - | 必选 |
 
-#### 3.6.2 速度同步逻辑
+#### 3.6.6 关键监控点
+
+| 位号 | 描述 | 类型 | 控制要求 | 联锁动作 |
+|------|------|------|----------|----------|
+| UH-101-TT1 | 预热段温度 | AI | 80±5℃ | PID控制 |
+| UH-101-TT2 | **杀菌段温度** | AI | ≥130℃ | **CCP，<127℃关阀** |
+| UH-101-TT3 | 保温段温度 | AI | ≥130℃ | CCP监控 |
+| UH-101-PT2 | 杀菌压力 | AI | 0.2-0.5MPa | 超压打开UV-106 |
+| UH-101-FT | 产品流量 | AI | 2.5-3.5m³/h | 关联杀菌时间 |
+| UH-101-F0 | F₀累积值 | AI | ≥6.0 | 低于放行值隔离 |
+| UH-102-PT | 蒸汽压力 | AI | >0.6MPa | 低于停蒸汽阀 |
+| UH-105-LT | 无菌罐液位 | AI | 30-90% | 液位保护 |
+
+### 3.7 制瓶系统(BF) - PLC-7
+
+#### 3.7.1 工艺流程
+
+```
+瓶胚 → 加热炉 → 吹瓶机 → 瓶子检测 → 输送链 → 灌装机
+   │         │         │          │
+   ▼         ▼         ▼          ▼
+  排列   温度曲线   模具控制    质量检测
+```
+
+#### 3.7.2 吹瓶曲线控制
+
+| 阶段 | 时间 | 气压 | 说明 |
+|------|------|------|------|
+| 预吹 | 0-50ms | 0.3MPa | 瓶胚定位 |
+| 低压吹 | 50-150ms | 0.8MPa | 瓶身成型 |
+| 高压吹 | 150-300ms | 2.5MPa | 瓶底成型 |
+| 排气 | 300-350ms | 0MPa | 释放压力 |
+| 取瓶 | 350-400ms | - | 输送带走 |
+
+#### 3.7.3 速度同步逻辑
 
 | 设备 | 基准速度 | 同步方式 | 允许偏差 |
 |------|----------|----------|----------|
 | 吹瓶机 | 54000瓶/h | 速度主令 | ±5% |
 | 灌装机 | 跟随吹瓶机 | 主令跟随 | ±3% |
 | 旋盖机 | 跟随灌装机 | 主令跟随 | ±2% |
-| 贴标机 | 跟随主链 | 主令跟随 | ±3% |
-| 装箱机 | 跟随主链 | 主令跟随 | ±5% |
 
-#### 3.6.3 关键监控点
+#### 3.7.4 关键监控点
 
-| 位号 | 描述 | 报警 | 说明 |
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| BF-101-ST | 吹瓶速度 | AI | L:50000, H:58000 | 同步控制 |
+| BF-101-PT | 吹瓶压力 | AI | L:2.0MPa, H:2.8MPa | 瓶质量监控 |
+| BF-101-TT | 加热炉温度 | AI | ±10℃ | 温度曲线 |
+| BF-102-SQ | 瓶位检测 | DI | 位置检测 | 同步信号 |
+| BF-103-SQ | 瓶子质量 | DI | 缺陷检测 | 剔除信号 |
+
+### 3.8 灌装系统(PF) - PLC-8
+
+#### 3.8.1 工艺流程
+
+```
+空瓶 → 拨轮分瓶 → 灌装阀组 → 液位控制 → 旋盖 → 成品瓶
+         │           │           │          │
+         ▼           ▼           ▼          ▼
+      速度同步    72ms周期    精度±1.5%   扭矩控制
+```
+
+#### 3.8.2 灌装阀控制时序
+
+| 阶段 | 时间 | 动作 | 控制精度 |
+|------|------|------|----------|
+| 瓶位检测 | 0-5ms | 确认瓶就位 | - |
+| 开阀 | 5-10ms | 阀芯开启 | ±0.5ms |
+| 灌装 | 10-60ms | 液位上升 | ±1.5% |
+| 关阀 | 60-65ms | 阀芯关闭 | ±0.5ms |
+| 溢流 | 65-70ms | 溢流回收 | - |
+| 完成 | 70-72ms | 等待下一瓶 | 周期精度 |
+
+#### 3.8.3 高速同步控制
+
+```
+同步控制架构：
+
+         SCADA/PLC-8
+              │
+              │ 速度主令(0-10V / 0-20mA)
+              │
+              ▼
+    ┌──────────────────┐
+    │   速度主令发生器  │
+    │  Master Speed    │
+    │  50000-54000 B/H  │
+    └────────┬─────────┘
+             │
+             │ PROFINET IRT
+             │ 1ms同步周期
+             │
+    ┌────────┴─────────┐
+    │   电子凸轮控制器  │
+    │  Electronic Cam  │
+    │  相位差补偿       │
+    └────────┬─────────┘
+             │
+    ┌────────┴─────────┐
+    │   位置比较器      │
+    │  72ms周期        │
+    └────────┬─────────┘
+             │
+    ┌────────┴─────────┐
+    │   灌装阀阵列      │
+    │   48个灌装头     │
+    └─────────────────┘
+```
+
+#### 3.8.4 液位控制回路
+
+```
+液位控制：PID控制，精度±1.5%
+
+设定值: 500ml ± 7.5ml
+控制周期: 10ms
+响应时间: <20ms
+超调量: <2%
+```
+
+#### 3.8.5 关键监控点
+
+| 位号 | 描述 | 类型 | 控制要求 | 说明 |
+|------|------|------|----------|------|
+| PF-101-ST | 灌装速度 | AI | 50000-54000B/H | 同步控制 |
+| PF-101-LT | 液位高度 | AI | ±1.5% | 精度控制 |
+| PF-102-PT | 灌装压力 | AI | 0.1-0.3MPa | 稳定灌装 |
+| PF-103-FT | 瞬时流量 | AI | 实时监控 | 计量 |
+| PF-104-SQ | 瓶到位检测 | DI | 位置确认 | 同步信号 |
+| PF-105-SQ | 缺瓶检测 | DI | 停止灌装 | 安全联锁 |
+
+### 3.9 旋盖系统(CG) - PLC-9
+
+#### 3.9.1 工艺流程
+
+```
+盖子 → 盖仓 → 盖供给器 → 戴盖 → 旋盖 → 扭矩检测 → 成品
+       │       │          │       │         │
+       ▼       ▼          ▼       ▼         ▼
+    盖存量   负压吸盖    位置    0.3-0.7Nm  扭矩记录
+```
+
+#### 3.9.2 扭矩控制参数
+
+| 参数 | 设定值 | 控制方式 | 备注 |
+|------|--------|----------|------|
+| 旋盖扭矩 | 0.3-0.7Nm | PID控制 | 可调 |
+| 旋盖速度 | 1000-1500rpm | 变频 | 与灌装同步 |
+| 盖子位置 | ±1mm | 位置控制 | 盖平整度 |
+| 扭矩公差 | ±15% | 统计 | CPK>1.33 |
+
+#### 3.9.3 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 联锁动作 |
+|------|------|------|----------|----------|
+| CG-101-TT | 扭矩传感器 | AI | L:0.2Nm, H:0.8Nm | 不合格剔除 |
+| CG-102-SQ | 盖到位检测 | DI | 位置确认 | 旋盖启动 |
+| CG-103-FT | 盖子供给计数 | DI | 缺盖报警 | 停机预警 |
+
+### 3.10 灯检系统(LI) - PLC-10
+
+#### 3.10.1 检测功能
+
+| 检测项目 | 检测方法 | 精度 | 处理方式 |
+|----------|----------|------|----------|
+| 液位不足 | 视觉检测 | 99.5% | 剔除 |
+| 瓶内异物 | 视觉检测 | 99.0% | 剔除 |
+| 瓶身破损 | 视觉检测 | 99.8% | 剔除 |
+| 瓶盖缺陷 | 视觉检测 | 99.5% | 剔除 |
+| 标签缺失 | 视觉检测 | 99.9% | 剔除 |
+
+#### 3.10.2 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 说明 |
+|------|------|------|----------|------|
+| LI-101-SQ | 相机触发 | DI | - | 同步触发 |
+| LI-102-SQ | 合格品 | DI | - | 计数 |
+| LI-103-SQ | 不合格品 | DI | 剔除报警 | 剔除计数 |
+| LI-104-FT | 剔除率 | AI | H:5% | 质量监控 |
+
+### 3.11 喷码系统(CI) - PLC-11
+
+#### 3.11.1 喷印内容
+
+| 字段 | 位置 | 格式 | 说明 |
 |------|------|------|------|
-| PF-101-ST | 灌装速度 | L:50000, H:58000 | 同步控制 |
-| PF-101-PT | 吹瓶压力 | L:2.0MPa, H:2.8MPa | 瓶质量监控 |
+| 生产日期 | 瓶身正面 | YYYY-MM-DD | - |
+| 生产时间 | 瓶身正面 | HH:MM | - |
+| 批次号 | 瓶身正面 | LOT+8位数字 | 追溯码 |
+| 保质期 | 瓶身正面 | YYYY-MM-DD | - |
+
+#### 3.11.2 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 说明 |
+|------|------|------|----------|------|
+| CI-101-SQ | 打印触发 | DI | - | 位置触发 |
+| CI-102-SQ | 打印完成 | DI | - | 确认信号 |
+| CI-103-AL | 墨水压力 | AI | L:低报警 | 喷印质量 |
+| CI-104-AL | 计数器 | DI | 缺计数 | 同步计数 |
+
+### 3.12 贴标系统(LB) - PLC-12
+
+#### 3.12.1 贴标工艺
+
+| 步骤 | 时间 | 动作 | 精度要求 |
+|------|------|------|----------|
+| 标纸供给 | 0-30ms | 标签剥离 | ±0.5mm |
+| 位置检测 | 30-40ms | 电眼检测 | - |
+| 贴标气缸 | 40-80ms | 贴标动作 | ±1mm |
+| 标签压合 | 80-100ms | 压合辊压合 | 平整无气泡 |
+
+#### 3.12.2 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 说明 |
+|------|------|------|----------|------|
+| LB-101-SQ | 标签检测 | DI | 缺标报警 | 纸仓检测 |
+| LB-102-SQ | 瓶子检测 | DI | 位置确认 | 同步信号 |
+| LB-103-SQ | 贴标完成 | DI | - | 完成确认 |
+| LB-104-AL | 标签计数器 | DI | 缺标签报警 | 统计 |
+
+### 3.13 装箱系统(CA) - PLC-13
+
+#### 3.13.1 装箱流程
+
+```
+纸箱 → 成型 → 产品装入(6瓶/箱) → 计数 → 封合 → 输送
+   │      │         │            │       │       │
+   ▼      ▼         ▼            ▼       ▼       ▼
+ 纸仓   成型器    6-12瓶可调    计数准确  热熔胶  计数统计
+```
+
+#### 3.13.2 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 说明 |
+|------|------|------|----------|------|
+| CA-101-SQ | 纸箱到位 | DI | 缺箱报警 | 成型触发 |
+| CA-102-SQ | 产品计数 | DI | 数量确认 | 6/12瓶切换 |
+| CA-103-SQ | 封合检测 | DI | 封合不良 | 报警 |
+| CA-104-FT | 装箱速度 | AI | 实时统计 | 产能统计 |
+
+### 3.14 膜包码垛系统(PK) - PLC-14
+
+#### 3.14.1 工艺流程
+
+```
+纸箱 → 膜包机 → 热缩炉 → 冷却段 → 码垛机 → 托盘 → 缠膜 → 成品
+   │       │        │        │        │       │      │
+   ▼       ▼        ▼        ▼        ▼       ▼      ▼
+  计数   膜包热缩  温度曲线  风冷    堆叠控制  托盘仓  拉伸膜
+```
+
+#### 3.14.2 热缩炉温度曲线
+
+| 区域 | 温度设定 | 时间 | 说明 |
+|------|----------|------|------|
+| 预热区 | 120℃ | 30s | 膜软化 |
+| 加热区 | 180℃ | 45s | 热缩成型 |
+| 冷却区 | 60℃ | 30s | 定型 |
+| 出口 | 常温 | - | 自然冷却 |
+
+#### 3.14.3 码垛模式
+
+| 模式 | 每层瓶数 | 层数 | 每托盘总数 | 堆叠形式 |
+|------|----------|------|------------|----------|
+| 4×3 | 12 | 4 | 48 | 交叉堆叠 |
+| 4×4 | 16 | 4 | 64 | 交叉堆叠 |
+| 5×4 | 20 | 4 | 80 | 交叉堆叠 |
+
+#### 3.14.4 关键监控点
+
+| 位号 | 描述 | 类型 | 报警设置 | 说明 |
+|------|------|------|----------|------|
+| PK-101-TT | 热缩炉温度 | AI | ±10℃ | 温度曲线 |
+| PK-102-SQ | 膜包到位 | DI | 位置检测 | 码垛触发 |
+| PK-103-SQ | 托盘到位 | DI | 位置检测 | 堆叠开始 |
+| PK-104-FT | 码垛计数 | DI | 数量确认 | 满垛信号 |
+| PK-105-AL | 缠膜张力 | AI | ±20% | 张力控制 |
 
 ---
 
@@ -349,49 +1192,163 @@ T=批次结束: 茶渣排放准备
 
 ### 4.1 PLC之间通讯
 
-| 通讯方向 | 数据内容 | 通讯方式 |
-|----------|----------|----------|
-| PLC-1 → PLC-2 | 纯水产水量、茶汁流量、萃取批次完成 | PROFINET I-Device |
-| PLC-2 → PLC-3 | 调配批次完成、调配液流量 | PROFINET I-Device |
-| PLC-3 → PLC-1/2 | 急停信号、清洗请求 | PROFINET I-Device |
+| 通讯方向 | 通讯方式 | 数据内容 | 刷新周期 | 备注 |
+|----------|----------|----------|----------|------|
+| PLC-1 → PLC-3 | PROFINET I-Device | 纯水产水量、茶原料量 | 100ms | 实时同步 |
+| PLC-1 → PLC-4 | PROFINET I-Device | 纯水产水量 | 100ms | 调配用水 |
+| PLC-3 → PLC-4 | PROFINET I-Device | 茶汁流量、温度、批次完成 | 50ms | 批次信号 |
+| PLC-4 → PLC-5 | PROFINET I-Device | 调配液流量、批次完成 | 50ms | 批次信号 |
+| PLC-5 → PLC-6 | PROFINET I-Device | 流量、压力、温度 | 20ms | 高速同步 |
+| PLC-6 → PLC-7 | PROFINET I-Device | 无菌料信号、速度主令 | 10ms | **超高速** |
+| PLC-7 → PLC-8 | PROFINET I-Device | 瓶速、瓶位 | 10ms | 同步控制 |
+| PLC-8 → PLC-9 | PROFINET I-Device | 旋盖速度、扭矩设定 | 10ms | 同步控制 |
+| PLC-9 → PLC-10 | PROFINET I-Device | 产品计数、合格信号 | 50ms | 检测触发 |
+| PLC-10 → PLC-11 | PROFINET I-Device | 剔除信号 | 50ms | 不合格跳过 |
+| PLC-11 → PLC-12 | PROFINET I-Device | 喷码内容、打印完成 | 50ms | 标签信息 |
+| PLC-12 → PLC-13 | PROFINET I-Device | 产品计数 | 100ms | 装箱触发 |
+| PLC-13 → PLC-14 | PROFINET I-Device | 纸箱计数 | 100ms | 码垛触发 |
+| PLC-8 → PLC-1~6 | 急停/清洗请求 | 急停信号、CIP信号 | 10ms | 安全联锁 |
 
 ### 4.2 PLC与SCADA通讯
 
-| 通讯内容 | 点位数量 | 通讯协议 |
-|----------|----------|----------|
-| 过程数据(AI/AO/DI/DO) | 约1800点 | Ethernet/IP |
-| 报警事件 | 实时 | Ethernet/IP |
-| 配方参数 | 读写 | OPC UA |
-| 历史数据 | 归档存储 | Ethernet/IP |
+| 通讯内容 | 点位数量 | 通讯协议 | 刷新周期 | 说明 |
+|----------|----------|----------|----------|------|
+| 过程数据(AI) | ~350点 | Ethernet/IP | 100ms | 传感器数据 |
+| 过程数据(AO) | ~80点 | Ethernet/IP | 100ms | 设定值输出 |
+| 过程数据(DI) | ~800点 | Ethernet/IP | 50ms | 开关状态 |
+| 过程数据(DO) | ~500点 | Ethernet/IP | 50ms | 控制输出 |
+| 报警事件 | 实时 | Ethernet/IP | <1s | 主动上报 |
+| 配方参数 | 100+组 | OPC UA | 按需 | 读写操作 |
+| 历史数据 | 归档 | Ethernet/IP | 1min | 趋势记录 |
+| 批次记录 | 批量 | OPC UA | 批次结束 | 数据采集 |
 
 ### 4.3 数据区规划
 
-#### PLC-1 数据区
+#### PLC-1 数据区(WT水处理)
 
 | 数据类型 | 地址区 | 点数 | 说明 |
 |----------|--------|------|------|
-| DI | I0.0 - I25.7 | 208 | 开关输入 |
-| DO | Q0.0 - Q25.7 | 208 | 开关输出 |
-| AI | IW0 - IW62 | 32 | 模拟输入 |
-| AO | QW0 - QW30 | 16 | 模拟输出 |
+| DI | I0.0 - I12.7 | 104 | 开关输入 |
+| DO | Q0.0 - Q12.7 | 104 | 开关输出 |
+| AI | IW0 - IW30 | 16 | 模拟输入 |
+| AO | QW0 - QW14 | 8 | 模拟输出 |
 
-#### PLC-2 数据区
-
-| 数据类型 | 地址区 | 点数 | 说明 |
-|----------|--------|------|------|
-| DI | I0.0 - I19.7 | 160 | 开关输入 |
-| DO | Q0.0 - Q19.7 | 160 | 开关输出 |
-| AI | IW0 - IW46 | 24 | 模拟输入 |
-| AO | QW0 - QW22 | 12 | 模拟输出 |
-
-#### PLC-3 数据区
+#### PLC-2 数据区(TH茶叶前处理)
 
 | 数据类型 | 地址区 | 点数 | 说明 |
 |----------|--------|------|------|
-| DI | I0.0 - I22.7 | 184 | 开关输入 |
-| DO | Q0.0 - Q22.7 | 184 | 开关输出 |
-| AI | IW0 - IW54 | 28 | 模拟输入 |
-| AO | QW0 - QW26 | 14 | 模拟输出 |
+| DI | I0.0 - I6.7 | 52 | 开关输入 |
+| DO | Q0.0 - Q6.7 | 52 | 开关输出 |
+| AI | IW0 - IW18 | 10 | 模拟输入 |
+| AO | QW0 - QW6 | 4 | 模拟输出 |
+
+#### PLC-3 数据区(EX萃取)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I11.7 | 92 | 开关输入 |
+| DO | Q0.0 - Q11.7 | 92 | 开关输出 |
+| AI | IW0 - IW34 | 18 | 模拟输入 |
+| AO | QW0 - QW14 | 8 | 模拟输出 |
+
+#### PLC-4 数据区(BL调配)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I12.7 | 104 | 开关输入 |
+| DO | Q0.0 - Q12.7 | 104 | 开关输出 |
+| AI | IW0 - IW38 | 20 | 模拟输入 |
+| AO | QW0 - QW16 | 9 | 模拟输出 |
+
+#### PLC-5 数据区(HM均质)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I5.7 | 44 | 开关输入 |
+| DO | Q0.0 - Q5.7 | 44 | 开关输出 |
+| AI | IW0 - IW14 | 8 | 模拟输入 |
+| AO | QW0 - QW6 | 4 | 模拟输出 |
+
+#### PLC-6 数据区(UH UHT)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I13.7 | 108 | 开关输入 |
+| DO | Q0.0 - Q13.7 | 108 | 开关输出 |
+| AI | IW0 - IW42 | 22 | 模拟输入 |
+| AO | QW0 - QW18 | 10 | 模拟输出 |
+
+#### PLC-7 数据区(BF制瓶)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I9.7 | 76 | 开关输入 |
+| DO | Q0.0 - Q9.7 | 76 | 开关输出 |
+| AI | IW0 - IW26 | 14 | 模拟输入 |
+| AO | QW0 - QW12 | 7 | 模拟输出 |
+
+#### PLC-8 数据区(PF灌装)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I11.7 | 92 | 开关输入 |
+| DO | Q0.0 - Q11.7 | 92 | 开关输出 |
+| AI | IW0 - IW34 | 18 | 模拟输入 |
+| AO | QW0 - QW16 | 9 | 模拟输出 |
+
+#### PLC-9 数据区(CG旋盖)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I5.7 | 44 | 开关输入 |
+| DO | Q0.0 - Q5.7 | 44 | 开关输出 |
+| AI | IW0 - IW14 | 8 | 模拟输入 |
+| AO | QW0 - QW6 | 4 | 模拟输出 |
+
+#### PLC-10 数据区(LI灯检)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I4.7 | 36 | 开关输入 |
+| DO | Q0.0 - Q4.7 | 36 | 开关输出 |
+| AI | IW0 - IW8 | 5 | 模拟输入 |
+| AO | QW0 - QW2 | 2 | 模拟输出 |
+
+#### PLC-11 数据区(CI喷码)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I3.7 | 28 | 开关输入 |
+| DO | Q0.0 - Q3.7 | 28 | 开关输出 |
+| AI | IW0 - IW4 | 3 | 模拟输入 |
+| AO | QW0 - QW2 | 2 | 模拟输出 |
+
+#### PLC-12 数据区(LB贴标)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I4.7 | 36 | 开关输入 |
+| DO | Q0.0 - Q4.7 | 36 | 开关输出 |
+| AI | IW0 - IW8 | 5 | 模拟输入 |
+| AO | QW0 - QW2 | 2 | 模拟输出 |
+
+#### PLC-13 数据区(CA装箱)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I5.7 | 44 | 开关输入 |
+| DO | Q0.0 - Q5.7 | 44 | 开关输出 |
+| AI | IW0 - IW12 | 7 | 模拟输入 |
+| AO | QW0 - QW4 | 3 | 模拟输出 |
+
+#### PLC-14 数据区(PK膜包码垛)
+
+| 数据类型 | 地址区 | 点数 | 说明 |
+|----------|--------|------|------|
+| DI | I0.0 - I7.7 | 60 | 开关输入 |
+| DO | Q0.0 - Q7.7 | 60 | 开关输出 |
+| AI | IW0 - IW22 | 12 | 模拟输入 |
+| AO | QW0 - QW10 | 6 | 模拟输出 |
 
 ---
 
@@ -399,60 +1356,79 @@ T=批次结束: 茶渣排放准备
 
 ### 5.1 安全联锁等级
 
-| 等级 | 名称 | 响应时间 | 处理方式 |
-|------|------|----------|----------|
-| L0 | 紧急停止 | ≤100ms | 立即停止所有相关设备 |
-| L1 | 安全联锁 | ≤500ms | 停止故障设备及上游设备 |
-| L2 | 关键报警 | ≤1s | 停止生产线，报警提示 |
-| L3 | 工艺报警 | ≤1s | 报警提示，允许手动处理 |
+| 等级 | 名称 | 响应时间 | 处理方式 | 复位要求 |
+|------|------|----------|----------|----------|
+| **L0** | 紧急停止 | ≤100ms | 立即停止所有相关设备 | 工程师现场确认 |
+| **L1** | 安全联锁 | ≤500ms | 停止故障设备及上游设备 | 工程师确认 |
+| **L2** | 关键报警 | ≤1s | 停止生产线，报警提示 | 班长确认 |
+| **L3** | 工艺报警 | ≤1s | 报警提示，允许手动处理 | 操作员确认 |
 
-### 5.2 紧急停止(ESD)
+### 5.2 L0紧急停止(ESD)
 
-| 触发源 | 位置 | 动作 |
-|--------|------|------|
-| 急停按钮 | 各操作员站 | L0级停止 |
-| 急停按钮 | UHT现场 | L0级停止 |
-| 急停按钮 | 灌装现场 | L0级停止 |
-| 急停按钮 | 包装现场 | L0级停止 |
-| 皮带撕裂检测 | 输送链 | L0级停止 |
-| 电机过载 | 任意电机 | L1级停止 |
+| 触发源 | 位置 | 检测方式 | 动作范围 |
+|--------|------|----------|----------|
+| 急停按钮 | 各操作员站 | DI直接接入 | 全线L0停止 |
+| 急停按钮 | UHT现场 | DI直接接入 | 全线L0停止 |
+| 急停按钮 | 灌装现场 | DI直接接入 | 全线L0停止 |
+| 急停按钮 | 包装现场 | DI直接接入 | 全线L0停止 |
+| 皮带撕裂检测 | 输送链 | 开关量 | 区域L0停止 |
+| 电机热过载 | 任意电机 | 电机保护器 | 故障电机停止 |
+| 气体泄漏检测 | 防爆区域 | 气体探测器 | 区域L0停止 |
+| 消防火警 | 消防系统 | 火灾报警 | 全线L0停止 |
 
-### 5.3 联锁复位权限
+### 5.3 L1安全联锁
 
-| 等级 | 复位权限 | 确认要求 |
-|------|----------|----------|
-| L0 | 工程师 | 现场确认后可复位 |
-| L1 | 工程师/班长 | 故障排除后复位 |
-| L2 | 班长/工艺员 | 确认后可复位 |
-| L3 | 操作员 | 直接复位 |
+| 联锁条件 | 触发设备 | 动作 | 停止范围 |
+|----------|----------|------|----------|
+| UHT温度不足 | UH-101-TT2 | 关闭进料阀 | UHT及下游停止 |
+| 均质压力过低 | HM-101-PT2 | 停均质机 | 均质及上游停止 |
+| 灌装机缺瓶 | PF-105-SQ | 停止灌装 | 灌装停止 |
+| CIP进行中 | CIP系统 | 禁止生产 | 全线停止 |
+| 无菌罐满 | UH-105-LT | 关闭进料 | UHT停止 |
+| 除尘器故障 | TH-103 | 停粉碎机 | TH停止 |
+
+### 5.4 联锁复位权限
+
+| 等级 | 复位权限 | 确认要求 | 记录要求 |
+|------|----------|----------|----------|
+| L0 | 工程师 | 现场确认后可复位 | 必须记录 |
+| L1 | 工程师/班长 | 故障排除后复位 | 必须记录 |
+| L2 | 班长/工艺员 | 确认后可复位 | 建议记录 |
+| L3 | 操作员 | 直接复位 | 无 |
 
 ---
 
 ## 6. 命名规范
 
-### 6.1 变量命名
+### 6.1 变量命名规则
 
 | 类型 | 前缀 | 示例 | 说明 |
 |------|------|------|------|
-| 输入 | i | iValve_Open | 阀门打开状态 |
-| 输出 | q | qPump_Start | 泵启动命令 |
+| 数字输入 | i | iValve_Open | 阀门打开状态 |
+| 数字输出 | q | qPump_Start | 泵启动命令 |
 | 模拟输入 | iw | iwTemperature | 温度值 |
 | 模拟输出 | qw | qwValve_Position | 阀门开度 |
-| 定时器 | t | tExtraction_Timer | 萃取计时器 |
-| 计数器 | c | cBatch_Counter | 批次计数器 |
+| 定时器 | ton/TON | tonFilling_Timer | 接通延时 |
+| 计数器 | cnt/CNT | cntBatch_Counter | 批次计数 |
 | 配方数据 | r | rGreenTea_WaterRatio | 绿茶茶水比 |
 | 报警 | a | aUH_Temp_High | UHT温度高报警 |
+| 批次数据 | batch | batchStart_Time | 批次开始时间 |
+| 产品追溯 | trace | traceProduct_ID | 产品追溯码 |
 
 ### 6.2 功能块命名
 
-| 功能块 | 命名 | 版本 |
-|--------|------|------|
-| 阀门控制 | FB_Valve_Ctrl | V1.0 |
-| 泵控制 | FB_Pump_Ctrl | V1.0 |
-| PID控制 | FB_PID | V1.0 |
-| 液位控制 | FB_Level_Ctrl | V1.0 |
-| 温度控制 | FB_Temp_Ctrl | V1.0 |
-| 批次控制 | FB_Batch_Ctrl | V1.0 |
+| 功能块 | 命名 | 版本 | 功能说明 |
+|--------|------|------|----------|
+| 阀门控制 | FB_Valve_Ctrl | V1.0 | 阀门开关控制 |
+| 泵控制 | FB_Pump_Ctrl | V1.0 | 泵启停控制 |
+| PID控制 | FB_PID | V1.0 | 通用PID控制器 |
+| 液位控制 | FB_Level_Ctrl | V1.0 | 液位PID控制 |
+| 温度控制 | FB_Temp_Ctrl | V1.0 | 温度PID控制 |
+| 批次控制 | FB_Batch_Ctrl | V1.0 | 批次顺序控制 |
+| 速度同步 | FB_Speed_Sync | V1.0 | 高速同步控制 |
+| 扭矩控制 | FB_Torque_Ctrl | V1.0 | 旋盖扭矩控制 |
+| 糖度控制 | FB_Brix_Ctrl | V1.0 | Brix值控制 |
+| pH控制 | FB_PH_Ctrl | V1.0 | pH值控制 |
 
 ### 6.3 数据块命名
 
@@ -462,17 +1438,55 @@ T=批次结束: 茶渣排放准备
 | 报警记录 | DB_Alarm_Log | 报警历史 |
 | 批次记录 | DB_Batch_Log | 批次生产记录 |
 | 系统参数 | DB_System | 系统配置参数 |
+| 统计记录 | DB_Statistics | 生产统计数据 |
+| 产品追溯 | DB_Trace | 产品追溯数据 |
+
+### 6.4 位号编码规则
+
+| 代码 | 工段 | 示例 |
+|------|------|------|
+| WT | 水处理 | WT-101-LT, WT-102-PT |
+| TH | 茶叶前处理 | TH-101-MT, TH-102-FT |
+| EX | 萃取 | EX-101-TT, EX-102-LT |
+| BL | 调配 | BL-101-AT, BL-102-BT |
+| HM | 均质 | HM-101-PT, HM-102-TT |
+| UH | UHT | UH-101-TT, UH-102-PT |
+| BF | 制瓶 | BF-101-ST, BF-102-PT |
+| PF | 灌装 | PF-101-LT, PF-102-FT |
+| CG | 旋盖 | CG-101-TT, CG-102-SQ |
+| LI | 灯检 | LI-101-SQ, LI-102-FT |
+| CI | 喷码 | CI-101-SQ, CI-102-AL |
+| LB | 贴标 | LB-101-SQ, LB-102-AL |
+| CA | 装箱 | CA-101-SQ, CA-102-FT |
+| PK | 膜包码垛 | PK-101-TT, PK-102-SQ |
 
 ---
 
 ## 7. 程序版本管理
 
+### 7.1 版本记录
+
 | 版本 | 日期 | 作者 | 变更内容 |
 |------|------|------|----------|
-| v1.0 | 2026-04-29 | SCADA系统 | 初始版本 |
+| v1.0 | 2026-04-29 | SCADA系统 | 初始版本(3 PLC架构) |
+| v2.0 | 2026-04-29 | SCADA系统 | 重大更新 - 修正为14个独立PLC架构 |
+
+### 7.2 架构变更说明(v1.0 → v2.0)
+
+| 项目 | v1.0 | v2.0 | 变更理由 |
+|------|------|------|----------|
+| PLC数量 | 3个 | 14个 | 每个工段独立控制，符合行业实践 |
+| 控制负载 | 不均衡 | 均衡 | UHT+灌装分开，避免负载过重 |
+| 同步精度 | 较低 | 高 | 高速工段独立PLC，10ms同步周期 |
+| 维护性 | 差 | 好 | 故障隔离，工段独立调试 |
+| 扩展性 | 差 | 好 | 可独立增加/替换PLC |
 
 ---
 
-**文档状态**: 初稿
+**文档状态**: 正式版
 **版本历史**:
 - v1.0 (2026-04-29): 初始版本
+- v2.0 (2026-04-29): 重大更新 - 14个PLC分布式架构
+
+**审核状态**: 待审核
+**批准人**: -

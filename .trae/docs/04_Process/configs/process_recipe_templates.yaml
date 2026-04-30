@@ -1,0 +1,623 @@
+# SCADA 工艺配方模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 更新日期: 2026-04-29
+# 说明: 定义工艺配方模板，用于自动生成工艺配方参数文件
+
+meta:
+  version: "v1.0"
+  created: "2026-04-28"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "茶饮料生产线工艺流程设计.md"
+  project_name: "茶饮料生产线SCADA系统"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+
+process_recipes:
+
+  water_treatment:
+    name: "水处理工艺"
+    section: "WT"
+    recipe_id: "PR-WT-001"
+
+    parameters:
+      raw_water:
+        temp: 25
+        temp_unit: "℃"
+        pressure_min: 0.3
+        pressure_max: 0.5
+        pressure_unit: "MPa"
+
+      multimedia_filter:
+        flow_rate: 10
+        flow_rate_unit: "m³/h"
+        backwash_interval: 8
+        backwash_interval_unit: "h"
+        filter_media: "石英砂+无烟煤"
+
+      active_carbon_filter:
+        flow_rate: 10
+        flow_rate_unit: "m³/h"
+        backwash_interval: 24
+        backwash_interval_unit: "h"
+
+      ro_system:
+        flow_rate_product: 5
+        flow_rate_unit: "m³/h"
+        recovery_rate_min: 75
+        recovery_rate_unit: "%"
+        conductivity_max: 10
+        conductivity_unit: "μS/cm"
+        pressure_normal: 1.2
+        pressure_unit: "MPa"
+
+      ion_exchange:
+        conductivity_max: 10
+        conductivity_unit: "μS/cm"
+        regeneration_interval: 72
+        regeneration_interval_unit: "h"
+
+      uv_sterilizer:
+        power: 40
+        power_unit: "W"
+        efficacy_min: 99.9
+        efficacy_unit: "%"
+
+      storage_tank:
+        temp_max: 30
+        temp_unit: "℃"
+        temp_alarm_high: 35
+
+    cleaning_recipe: "CIP-WT"
+
+  extraction_process:
+    name: "三级逆流萃取工艺"
+    section: "EX"
+    recipe_id: "PR-EX-001"
+
+    parameters:
+      stage_1:
+        name: "一级萃取罐"
+        tank_id: "EX-101"
+        water_temp: 85
+        water_temp_range: [80, 95]
+        water_temp_unit: "℃"
+        tea_load: 200
+        tea_load_unit: "kg"
+        water_volume: 3.5
+        water_volume_unit: "m³"
+        extraction_time: 10
+        extraction_time_unit: "min"
+        agitation_speed: 50
+        agitation_speed_unit: "rpm"
+
+      stage_2:
+        name: "二级萃取罐"
+        tank_id: "EX-102"
+        water_temp: 90
+        water_temp_range: [85, 95]
+        water_temp_unit: "℃"
+        tea_load: 150
+        tea_load_unit: "kg"
+        water_volume: 3.0
+        water_volume_unit: "m³"
+        extraction_time: 8
+        extraction_time_unit: "min"
+        agitation_speed: 60
+        agitation_speed_unit: "rpm"
+
+      stage_3:
+        name: "三级萃取罐"
+        tank_id: "EX-103"
+        water_temp: 95
+        water_temp_range: [90, 98]
+        water_temp_unit: "℃"
+        tea_load: 100
+        tea_load_unit: "kg"
+        water_volume: 2.5
+        water_volume_unit: "m³"
+        extraction_time: 5
+        extraction_time_unit: "min"
+        agitation_speed: 55
+        agitation_speed_unit: "rpm"
+
+      separation:
+        temperature: 80
+        temperature_unit: "℃"
+        centrifuge_speed: 6000
+        centrifuge_speed_unit: "rpm"
+        separation_factor: 9000
+
+      cooling:
+        target_temp: 25
+        target_temp_unit: "℃"
+        cooling_time_max: 30
+        cooling_time_unit: "min"
+
+    batch_size:
+      green_tea:
+        value: 600
+        unit: "L/batch"
+      red_tea:
+        value: 650
+        unit: "L/batch"
+      oolong_tea:
+        value: 620
+        unit: "L/batch"
+
+    cleaning_recipe: "CIP-EX"
+
+  filtration_process:
+    name: "过滤净化工艺"
+    section: "FL"
+    recipe_id: "PR-FL-001"
+
+    parameters:
+      disc_centrifuge:
+        model: "DF-616"
+        capacity: 6000
+        capacity_unit: "L/h"
+        speed: 6500
+        speed_unit: "rpm"
+        separation_factor: 9000
+        inlet_pressure_max: 0.25
+        inlet_pressure_unit: "MPa"
+
+      ultrafiltration:
+        membrane_type: "陶瓷膜"
+        pore_size: 0.1
+        pore_size_unit: "μm"
+        capacity: 6000
+        capacity_unit: "L/h"
+        inlet_pressure_normal: 0.3
+        inlet_pressure_unit: "MPa"
+        inlet_pressure_max: 0.35
+        trans_membrane_pressure_max: 0.15
+        trans_membrane_pressure_unit: "MPa"
+        temperature_range: [55, 75]
+        temperature_unit: "℃"
+        flux_normal: 50
+        flux_unit: "L/(m²·h)"
+        backwash_interval: 30
+        backwash_interval_unit: "min"
+
+    cleaning_recipe: "CIP-FL"
+
+  blending_process:
+    name: "产品调配工艺"
+    section: "BL"
+    recipe_id: "PR-BL-001"
+
+    parameters:
+      tea_concentrate:
+        brix: 2.5
+        brix_range: [2.3, 2.7]
+        brix_unit: "°Brix"
+        ph: 5.8
+        ph_range: [5.5, 6.2]
+        temp_max: 30
+        temp_unit: "℃"
+
+      sugar_syrup:
+        brix: 65
+        brix_range: [63, 67]
+        brix_unit: "°Brix"
+        temp: 60
+        temp_unit: "℃"
+        dissolution_time: 30
+        dissolution_time_unit: "min"
+
+      citric_acid_solution:
+        concentration: 50
+        concentration_unit: "%"
+        temp: 40
+        temp_unit: "℃"
+
+      target_blend:
+        brix: 10
+        brix_range: [9, 11]
+        brix_tolerance: "±1.0"
+        brix_unit: "°Brix"
+        ph: 5.5
+        ph_range: [5.0, 6.0]
+        ph_tolerance: "±0.5"
+        temp: 25
+        temp_range: [20, 30]
+        temp_unit: "℃"
+
+      blending_sequence:
+        - step: 1
+          action: "添加纯水"
+          volume: 30
+          volume_unit: "%"
+        - step: 2
+          action: "添加茶浓缩汁"
+          volume: 40
+          volume_unit: "%"
+        - step: 3
+          action: "添加糖浆"
+          target_brix: 10
+          tolerance: "±1.0"
+        - step: 4
+          action: "添加酸液"
+          target_ph: 5.5
+          tolerance: "±0.5"
+        - step: 5
+          action: "添加香精"
+          volume: 0.1
+          volume_unit: "%"
+        - step: 6
+          action: "补水至目标量"
+          volume: 100
+          volume_unit: "%"
+        - step: 7
+          action: "搅拌混合"
+          time: 15
+          time_unit: "min"
+          speed: 80
+          speed_unit: "rpm"
+
+      quality_check:
+        - parameter: "Brix"
+          instrument: "在线糖度计"
+          frequency: "每5分钟"
+        - parameter: "pH"
+          instrument: "在线pH计"
+          frequency: "连续监控"
+
+    batch_size:
+      tank_1:
+        value: 5000
+        unit: "L/batch"
+      tank_2:
+        value: 5000
+        unit: "L/batch"
+
+    cleaning_recipe: "CIP-BL"
+
+  homogenization_process:
+    name: "高压均质工艺"
+    section: "HM"
+    recipe_id: "PR-HM-001"
+
+    parameters:
+      inlet:
+        temp: 65
+        temp_range: [60, 70]
+        temp_unit: "℃"
+        pressure_min: 0.2
+        pressure_unit: "MPa"
+
+      homogenizer:
+        model: "GYB-3000"
+        pressure_setpoint: 22
+        pressure_range: [20, 25]
+        pressure_unit: "MPa"
+        pressure_alarm_low: 18
+        pressure_alarm_high: 27
+        capacity: 3000
+        capacity_unit: "L/h"
+        motor_power: 75
+        motor_power_unit: "kW"
+
+      outlet:
+        temp_max: 75
+        temp_unit: "℃"
+        pressure_normal: 0.3
+        pressure_unit: "MPa"
+
+      valve_group:
+        inlet_valve: "BV-107"
+        outlet_valve: "BV-108"
+        bypass_valve: "BV-109"
+        startup_sequence:
+          - "打开BV-108"
+          - "打开BV-107"
+          - "启动均质机"
+        shutdown_sequence:
+          - "停均质机"
+          - "关闭BV-107"
+          - "关闭BV-108"
+
+      particle_size:
+        target: 1.5
+        target_unit: "μm"
+        max: 2.0
+        measurement: "粒度分析仪"
+
+    cleaning_recipe: "CIP-BL"
+
+  uht_process:
+    name: "UHT超高温瞬时杀菌工艺"
+    section: "UH"
+    recipe_id: "PR-UH-001"
+
+    parameters:
+      preheating:
+        temp_setpoint: 80
+        temp_range: [75, 85]
+        temp_unit: "℃"
+        hold_time: 10
+        hold_time_unit: "s"
+
+      sterilization:
+        temp_setpoint: 135
+        temp_range: [133, 137]
+        temp_unit: "℃"
+        time: 15
+        time_unit: "s"
+        critical_limit: 130
+        critical_limit_unit: "℃"
+
+      holding:
+        temp_min: 130
+        temp_min_unit: "℃"
+        time: 15
+        time_unit: "s"
+
+      cooling:
+        stage_1_temp: 90
+        stage_1_temp_unit: "℃"
+        stage_2_temp: 50
+        stage_2_temp_unit: "℃"
+        outlet_temp: 25
+        outlet_temp_max: 35
+        outlet_temp_unit: "℃"
+
+      system:
+        flow_rate: 3000
+        flow_rate_unit: "L/h"
+        flow_rate_tolerance: "±10%"
+        back_pressure: 0.35
+        back_pressure_range: [0.2, 0.5]
+        back_pressure_unit: "MPa"
+
+      quality:
+        sterility: "商业无菌"
+        f0_value_min: 8
+        shelf_life: 12
+        shelf_life_unit: "月"
+
+      aseptic_tank:
+        tank_id: "UH-105"
+        capacity: 3000
+        capacity_unit: "L"
+        temp_max: 35
+        temp_unit: "℃"
+        pressure_max: 0.05
+        pressure_unit: "MPa"
+        pressure_normal: 0.02
+
+    cleaning_recipe: "CIP-UH"
+
+  filling_process:
+    name: "热灌装工艺"
+    section: "PF"
+    recipe_id: "PR-PF-001"
+
+    parameters:
+      bottle:
+        material: "PET"
+        volume_nominal: 500
+        volume_unit: "ml"
+        volume_actual_range: [495, 505]
+        temperature: 87
+        temperature_range: [85, 88]
+        temperature_unit: "℃"
+
+      filler:
+        model: "SBL-FG54000"
+        heads: 72
+        speed_nominal: 54000
+        speed_range: [50000, 58000]
+        speed_unit: "瓶/h"
+        fill_volume: 500
+        fill_volume_unit: "ml"
+        fill_accuracy: "±1.5%"
+        level_accuracy: "±5mm"
+
+      capper:
+        model: "12头旋盖机"
+        heads: 12
+        torque_min: 0.3
+        torque_max: 0.7
+        torque_unit: "Nm"
+        seal_check: "扭矩监控"
+
+      cooling:
+        inlet_temp: 87
+        outlet_temp_max: 38
+        tunnel_length: 40
+        tunnel_length_unit: "m"
+        cooling_method: "风冷+水冷"
+
+      quality:
+        leak_rate_max: 0.1
+        leak_rate_unit: "%"
+        headspace_height: 15
+        headspace_height_unit: "mm"
+
+    cleaning_recipe: "CIP-PF"
+
+  tea_handing_process:
+    name: "茶叶前处理工艺"
+    section: "TH"
+    recipe_id: "PR-TH-001"
+
+    parameters:
+      storage:
+        tank_id: "TH-101"
+        capacity: 5000
+        capacity_unit: "kg"
+        temp_range: [15, 25]
+        temp_unit: "℃"
+        humidity_max: 65
+        humidity_unit: "%"
+        inspection_interval: 72
+        inspection_interval_unit: "h"
+
+      magnetic_separator:
+        model: "RC-75"
+        magnetic_strength: 12000
+        magnetic_strength_unit: "Gauss"
+        belt_speed: 1.5
+        belt_speed_unit: "m/s"
+        capacity: 3000
+        capacity_unit: "kg/h"
+
+      metal_detector:
+        model: "M3000"
+        sensitivity: 1.5
+        sensitivity_unit: "mm"
+        detection_type: "Fe/Non-Fe/Sus"
+        reject_mode: "气动翻板"
+        belt_speed: 1.2
+        belt_speed_unit: "m/s"
+
+      conveyor:
+        type: "链板式"
+        width: 800
+        width_unit: "mm"
+        length: 10
+        length_unit: "m"
+        speed_range: [0.5, 2.0]
+        speed_unit: "m/s"
+        Inclination_angle: 15
+        inclination_angle_unit: "°"
+
+      dust_collector:
+        model: "DC-500"
+        airflow: 5000
+        airflow_unit: "m³/h"
+        filter_area: 20
+        filter_area_unit: "m²"
+        filtration_accuracy: 99.9
+        filtration_accuracy_unit: "%"
+
+      weighing:
+        model: "ICS-450"
+        weighing_range: [0, 3000]
+        weighing_range_unit: "kg"
+        accuracy: 0.5
+        accuracy_unit: "kg"
+        calibration_interval: 24
+        calibration_interval_unit: "h"
+
+    cleaning_recipe: "CIP-EX"
+
+  cip_station_process:
+    name: "CIP清洗站工艺"
+    section: "CP"
+    recipe_id: "PR-CP-001"
+
+    parameters:
+      cip_tank:
+        acid_tank_id: "CP-201"
+        acid_tank_capacity: 2000
+        acid_tank_capacity_unit: "L"
+        alkali_tank_id: "CP-202"
+        alkali_tank_capacity: 2000
+        alkali_tank_capacity_unit: "L"
+        water_tank_id: "CP-203"
+        water_tank_capacity: 3000
+        water_tank_capacity_unit: "L"
+
+      dosing_system:
+        acid_pump: "DP-125"
+        acid_pump_capacity: 500
+        acid_pump_capacity_unit: "L/h"
+        alkali_pump: "DP-126"
+        alkali_pump_capacity: 500
+        alkali_pump_capacity_unit: "L/h"
+        conductivity_sensor: "CE-101"
+        concentration_accuracy: 0.1
+        concentration_accuracy_unit: "%"
+
+      supply_unit:
+        supply_pump: "CP-301"
+        supply_pump_capacity: 20
+        supply_pump_capacity_unit: "m³/h"
+        supply_pressure: 0.4
+        supply_pressure_unit: "MPa"
+        return_pump: "CP-302"
+        return_pump_capacity: 20
+        return_pump_capacity_unit: "m³/h"
+        flow_meter: "FT-101"
+        flow_range: [0, 20]
+        flow_range_unit: "m³/h"
+
+      heating_system:
+        heater_type: "板式换热器"
+        heater_capacity: 150
+        heater_capacity_unit: "kW"
+        temp_max: 95
+        temp_max_unit: "℃"
+        heating_rate: 5
+        heating_rate_unit: "℃/min"
+
+    cleaning_recipe: "CIP-CP"
+
+  packaging_process:
+    name: "膜包码垛工艺"
+    section: "PK"
+    recipe_id: "PR-PK-001"
+
+    parameters:
+      film_wrapper:
+        model: "FW-450"
+        film_width: 450
+        film_width_unit: "mm"
+        film_thickness_range: [0.03, 0.08]
+        film_thickness_range_unit: "mm"
+        package_size_range: [200, 400]
+        package_size_range_unit: "mm"
+        package_speed: 60
+        package_speed_unit: "包/min"
+
+      robot_palletizer:
+        model: "PR-1250"
+        payload: 1250
+        payload_unit: "kg"
+        reach: 3200
+        reach_unit: "mm"
+        axes: 6
+        cycle_time: 4.5
+        cycle_time_unit: "s"
+        position_accuracy: 0.5
+        position_accuracy_unit: "mm"
+
+      conveyor_system:
+        type: "滚筒式"
+        width: 600
+        width_unit: "mm"
+        length: 15
+        length_unit: "m"
+        speed: 15
+        speed_unit: "m/min"
+        load_capacity: 50
+        load_capacity_unit: "kg/roller"
+
+      pallet:
+        type: "塑料托盘"
+        size: "1200×1000"
+        size_unit: "mm"
+        height: 150
+        height_unit: "mm"
+        max_load: 1000
+        max_load_unit: "kg"
+        stack_layers: 5
+        stack_layers_unit: "层"
+
+      quality:
+        film_tension: 50
+        film_tension_unit: "N"
+        seal_temp: 180
+        seal_temp_unit: "℃"
+        wrap_force: 40
+        wrap_force_unit: "N"
+        pallet_height_max: 2200
+        pallet_height_max_unit: "mm"
+
+    cleaning_recipe: "CIP-PK"

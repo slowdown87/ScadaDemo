@@ -1,15 +1,20 @@
 # SCADA PLC功能块规格书模板
 # 文档版本: v1.0
 # 创建日期: 2026-04-29
+# 更新日期: 2026-04-29
 # 说明: 定义所有PLC功能块的输入输出参数、接口定义、逻辑说明
 
 meta:
   version: "v1.0"
   created: "2026-04-29"
-  project: "茶饮料生产线SCADA系统"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "PLC_Architecture.md"
+  project_name: "茶饮料生产线SCADA系统"
   plc_version: "Siemens S7-1500"
   programming_standard: "IEC 61131-3"
-  author: "SCADA系统"
 
 # ============================================================================
 # 基础控制功能块
@@ -1227,10 +1232,199 @@ uht_function_blocks:
         action: "温度低于限值10s关闭进料阀"
 
 # ============================================================================
+# 灌装系统专用功能块 (v2.0新增)
+# ============================================================================
+filling_function_blocks:
+
+  # --------------------------------------------------------------------------
+  # 高速速度同步功能块 (用于BF/PF/CG三PLC同步)
+  # --------------------------------------------------------------------------
+  FB_Speed_Sync:
+    name: "高速速度同步功能块"
+    description: "用于吹瓶机、灌装机、旋盖机之间的速度同步控制"
+    version: "v2.0"
+    category: "灌装控制"
+
+    interface:
+      inputs:
+        - name: "iMaster_Speed"
+          type: "REAL"
+          desc: "主令速度 瓶/h"
+        - name: "iMaster_Actual"
+          type: "REAL"
+          desc: "主令实际速度"
+        - name: "iSlave1_Actual"
+          type: "REAL"
+          desc: "从机1实际速度"
+        - name: "iSlave2_Actual"
+          type: "REAL"
+          desc: "从机2实际速度"
+        - name: "iSync_Enable"
+          type: "BOOL"
+          desc: "同步使能"
+        - name: "iMaster_Ready"
+          type: "BOOL"
+          desc: "主令就绪"
+        - name: "iEmergency_Stop"
+          type: "BOOL"
+          desc: "急停信号"
+          default: "FALSE"
+
+      outputs:
+        - name: "qMaster_Speed_SP"
+          type: "REAL"
+          desc: "主令速度设定"
+        - name: "qSlave1_Speed_SP"
+          type: "REAL"
+          desc: "从机1速度设定"
+        - name: "qSlave2_Speed_SP"
+          type: "REAL"
+          desc: "从机2速度设定"
+        - name: "qSync_Status"
+          type: "INT"
+          desc: "同步状态 0=停止,1=同步,2=偏差报警,3=故障"
+        - name: "qDeviation"
+          type: "REAL"
+          desc: "速度偏差 ‰"
+        - name: "qSync_OK"
+          type: "BOOL"
+          desc: "同步正常"
+
+    parameters:
+      - name: "Sync_Tolerance"
+        type: "REAL"
+        default: 3.0
+        desc: "同步偏差允许值 ‰"
+      - name: "Response_Time"
+        type: "TIME"
+        default: "T#10ms"
+        desc: "响应时间 <10ms"
+      - name: "Master_Speed_Min"
+        type: "REAL"
+        default: 50000.0
+        desc: "最低速度 瓶/h"
+      - name: "Master_Speed_Max"
+        type: "REAL"
+        default: 58000.0
+        desc: "最高速度 瓶/h"
+
+    logic:
+      - step: "1.主令速度计算"
+        desc: "根据主令编码器计算实际速度"
+      - step: "2.从机速度采集"
+        desc: "采集两个从机的实际速度"
+      - step: "3.偏差计算"
+        desc: "计算与主令的速度偏差"
+      - step: "4.同步判定"
+        desc: "偏差<3‰判定为同步正常"
+      - step: "5.故障处理"
+        desc: "偏差超限或急停进入故障状态"
+
+    diagnostics:
+      - code: "SS001"
+        desc: "速度偏差超限"
+      - code: "SS002"
+        desc: "主令速度异常"
+      - code: "SS003"
+        desc: "从机响应超时"
+
+  # --------------------------------------------------------------------------
+  # 旋盖扭矩控制功能块
+  # --------------------------------------------------------------------------
+  FB_Capping_Torque:
+    name: "旋盖扭矩控制功能块"
+    description: "用于控制旋盖机的扭矩，确保瓶盖密封性"
+    version: "v2.0"
+    category: "灌装控制"
+
+    interface:
+      inputs:
+        - name: "iTorque_PV"
+          type: "REAL"
+          desc: "扭矩过程值 Nm"
+        - name: "iTorque_SP"
+          type: "REAL"
+          desc: "扭矩设定值 Nm"
+          default: 0.5
+        - name: "iSpeed_PV"
+          type: "REAL"
+          desc: "旋盖速度 瓶/h"
+        - name: "iAuto_Mode"
+          type: "BOOL"
+          desc: "自动模式"
+        - name: "iStart"
+          type: "BOOL"
+          desc: "启动命令"
+        - name: "iStop"
+          type: "BOOL"
+          desc: "停止命令"
+
+      outputs:
+        - name: "qTorque_Output"
+          type: "REAL"
+          desc: "扭矩输出 0-100%"
+        - name: "qSpeed_Output"
+          type: "REAL"
+          desc: "速度输出 0-100%"
+        - name: "qTorque_OK"
+          type: "BOOL"
+          desc: "扭矩合格"
+        - name: "qTorque_Status"
+          type: "INT"
+          desc: "状态 0=停止,1=运行,2=扭矩低,3=扭矩高,4=故障"
+        - name: "qAlarm_L"
+          type: "BOOL"
+          desc: "扭矩低报警 <0.3Nm"
+        - name: "qAlarm_H"
+          type: "BOOL"
+          desc: "扭矩高报警 >0.7Nm"
+        - name: "qReject"
+          type: "BOOL"
+          desc: "剔除信号"
+
+    parameters:
+      - name: "Torque_Min"
+        type: "REAL"
+        default: 0.3
+        desc: "扭矩下限 Nm"
+      - name: "Torque_Max"
+        type: "REAL"
+        default: 0.7
+        desc: "扭矩上限 Nm"
+      - name: "Kp"
+        type: "REAL"
+        default: 2.0
+        desc: "比例增益"
+      - name: "Deadband"
+        type: "REAL"
+        default: 0.05
+        desc: "死区 Nm"
+
+    logic:
+      - step: "1.扭矩监测"
+        desc: "实时监测旋盖扭矩"
+      - step: "2.范围判定"
+        desc: "判断扭矩是否在0.3-0.7Nm范围内"
+      - step: "3.速度调节"
+        desc: "根据扭矩偏差调节电机速度"
+      - step: "4.剔除判定"
+        desc: "扭矩超限产品剔除"
+      - step: "5.报警输出"
+        desc: "扭矩异常报警"
+
+    diagnostics:
+      - code: "CT001"
+        desc: "扭矩低于下限"
+      - code: "CT002"
+        desc: "扭矩高于上限"
+      - code: "CT003"
+        desc: "连续5个扭矩异常"
+
+# ============================================================================
 # 版本管理
 # ============================================================================
 version_management:
-  current_version: "v1.0"
+  current_version: "v2.0"
   effective_date: "2026-04-29"
   author: "SCADA系统"
   approver: "待确认"
@@ -1240,4 +1434,9 @@ version_management:
       date: "2026-04-29"
       author: "SCADA系统"
       changes: "初始版本"
+      status: "draft"
+    - version: "v2.0"
+      date: "2026-04-29"
+      author: "SCADA系统"
+      changes: "新增灌装系统功能块(速度同步、扭矩控制)，支持BF/PF/CG三PLC同步架构"
       status: "draft"

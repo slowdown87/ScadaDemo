@@ -1,0 +1,221 @@
+# 萃取系统 (EX) 设备清单
+# 工段: EX, PLC: PLC-3, IP: 192.168.1.13
+
+devices_ex:
+  - id: "EX-101"
+    name: "萃取罐1"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度95℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐1温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "FT"
+        name: "萃取罐1进水量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+      - code: "MT"
+        name: "萃取罐1搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-101"
+        name: "萃取罐1进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-103"
+        name: "萃取罐1进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX01"
+        name: "萃取罐1搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-102"
+    name: "萃取罐2"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度90℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐2温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "MT"
+        name: "萃取罐2搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-102"
+        name: "萃取罐2进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-104"
+        name: "萃取罐2进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX02"
+        name: "萃取罐2搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-103"
+    name: "萃取罐3"
+    type: tank
+    section: EX
+    model: "ET-2000"
+    spec: "2m³, 夹套加热, 温度85℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "萃取罐3温度"
+        type: "温度计"
+        range: [0, 120]
+        unit: "℃"
+        alarm: {L: 75, H: 100}
+        is_key_point: true
+      - code: "MT"
+        name: "萃取罐3搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "EV-105"
+        name: "萃取罐3进水阀"
+        type: "气动调节阀"
+        control: "自动/PID"
+      - id: "EV-106"
+        name: "萃取罐3进茶阀"
+        type: "气动阀"
+        control: "自动"
+    motors:
+      - id: "M-EX03"
+        name: "萃取罐3搅拌"
+        power_kw: 3.0
+        is_inverter: true
+
+  - id: "EX-104"
+    name: "茶渣分离器"
+    type: filter
+    section: EX
+    model: "CS-500"
+    spec: "筛网60目, 离心式"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "茶渣分离流量"
+        type: "流量计"
+        range: [0, 5]
+        unit: "m³/h"
+        alarm: {L: 2}
+      - code: "TT"
+        name: "茶汁出口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 85}
+    valves:
+      - id: "EV-107"
+        name: "茶渣分离排放阀"
+        type: "气动阀"
+        control: "手动"
+
+  - id: "EX-105"
+    name: "茶汁冷却器"
+    type: heat_exchanger
+    section: EX
+    model: "PL-3000"
+    spec: "板式换热器, 冷却水冷却"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "PT"
+        name: "冷却器出口压力"
+        type: "压力计"
+        range: [0, 0.5]
+        unit: "MPa"
+        alarm: {H: 0.4}
+      - code: "TT"
+        name: "冷却器出口温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+
+  - id: "EX-106"
+    name: "萃取液储罐"
+    type: tank
+    section: EX
+    model: "SS304, 3m³"
+    spec: "带搅拌, 冷藏储存"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20, H: 90}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+        note: "冷藏储存"
+
+  - id: "P-EX01"
+    name: "茶汁输送泵"
+    type: pump
+    section: EX
+    model: "卫生级离心泵"
+    spec: "3m³/h"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: false
+    control: "批次控制"

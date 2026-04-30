@@ -1,0 +1,184 @@
+# 冷却包装系统 (PK) 设备清单
+# 工段: PK, PLC: PLC-14, IP: 192.168.1.24
+
+devices_pk:
+  - id: "PK-101"
+    name: "冷却隧道"
+    type: heat_exchanger
+    section: PK
+    model: "CL-40"
+    spec: "长度40m, 风冷+水冷"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "TT"
+        name: "冷却隧道入口温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {H: 70}
+
+  - id: "PK-102"
+    name: "灯检台"
+    type: packaging
+    section: PK
+    model: "LJ-4"
+    spec: "4工位, 人工目检"
+    quantity: 2
+    supplier: "国产"
+    sensors:
+      - code: "ST"
+        name: "输送速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+
+  - id: "PK-103"
+    name: "贴标机"
+    type: packaging
+    section: PK
+    model: "LB-54000"
+    spec: "54000B/H, 定位精度±1mm"
+    quantity: 1
+    supplier: "进口"
+    power_kw: 5.5
+    is_inverter: true
+    sensors:
+      - code: "ST"
+        name: "贴标机速度"
+        type: "编码器"
+        range: [0, 60000]
+        unit: "瓶/h"
+      - code: "PT"
+        name: "标签纸剩余量"
+        type: "液位计"
+        alarm: {L: 10}
+    motors:
+      - id: "M-PK01"
+        name: "贴标机"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "PK-104"
+    name: "喷码机"
+    type: packaging
+    section: PK
+    model: "CIJ-200"
+    spec: "速度54000B/H, 小字符"
+    quantity: 2
+    supplier: "进口"
+    sensors:
+      - code: "DT"
+        name: "喷码机状态"
+        type: "状态"
+
+  - id: "PK-105"
+    name: "纸箱成型机"
+    type: packaging
+    section: PK
+    model: "CM-30"
+    spec: "30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 4.0
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "纸箱供应计数"
+        type: "计数"
+        unit: "个"
+      - code: "DT"
+        name: "纸箱成型状态"
+        type: "状态"
+    motors:
+      - id: "M-PK02"
+        name: "纸箱成型机"
+        power_kw: 4.0
+        is_inverter: true
+
+  - id: "PK-106"
+    name: "装箱机"
+    type: packaging
+    section: PK
+    model: "MC-30"
+    spec: "24瓶/箱, 30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 5.5
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "装箱速度"
+        type: "计数"
+        range: [0, 60]
+        unit: "箱/min"
+        alarm: {L: 25, H: 40}
+      - code: "CT"
+        name: "装箱计数"
+        type: "计数"
+        unit: "箱"
+    motors:
+      - id: "M-PK03"
+        name: "装箱机"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "PK-107"
+    name: "重量检测机"
+    type: packaging
+    section: PK
+    model: "GC-30"
+    spec: "精度±5g, 速度30箱/分钟"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "DT"
+        name: "重量检测机状态"
+        type: "状态"
+        alarm_action: "超差报警"
+      - code: "WT"
+        name: "实际重量"
+        type: "重量计"
+        range: [0, 30]
+        unit: "kg"
+
+  - id: "PK-108"
+    name: "码垛机"
+    type: packaging
+    section: PK
+    model: "PL-80"
+    spec: "80箱/分钟, 机器人式"
+    quantity: 1
+    supplier: "进口"
+    power_kw: 15
+    is_inverter: true
+    sensors:
+      - code: "ST"
+        name: "码垛机速度"
+        type: "编码器"
+        range: [0, 100]
+        unit: "箱/min"
+        alarm: {L: 70, H: 90}
+    motors:
+      - id: "M-PK04"
+        name: "码垛机"
+        power_kw: 15
+        is_inverter: true
+
+  - id: "PK-109"
+    name: "托盘库"
+    type: tank
+    section: PK
+    model: "PS-500"
+    spec: "储存500个托盘"
+    quantity: 1
+    supplier: "国产"
+
+  - id: "PK-110"
+    name: "缠绕机"
+    type: packaging
+    section: PK
+    model: "RW-2000"
+    spec: "拉伸膜缠绕"
+    quantity: 1
+    supplier: "国产"

@@ -1,0 +1,228 @@
+# 茶饮料生产线设备主数据 - 元数据与工段定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 更新日期: 2026-04-29
+# 说明: 拆分后的元数据与工段定义文件
+
+meta:
+  version: "v1.0"
+  created: "2026-04-28"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "茶饮料生产线设备清单.md"
+  project_name: "茶饮料生产线SCADA系统"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+  split_date: "2026-04-29"
+  split_reason: "原devices.yaml过长(2298行)，按工段拆分为多个文件便于维护"
+
+# ============================================================================
+# 工段定义
+# 说明: 共15个工段，分配到15个独立PLC
+# ============================================================================
+sections:
+  WT:
+    name: "水处理系统"
+    name_en: "Water Treatment"
+    prefix: "WT"
+    number_range: [101, 199]
+    plc: "PLC-1"
+    plc_ip: "192.168.1.11"
+  TH:
+    name: "茶叶前处理系统"
+    name_en: "Tea Handling"
+    prefix: "TH"
+    number_range: [201, 299]
+    plc: "PLC-2"
+    plc_ip: "192.168.1.12"
+  EX:
+    name: "萃取系统"
+    name_en: "Extraction"
+    prefix: "EX"
+    number_range: [301, 399]
+    plc: "PLC-3"
+    plc_ip: "192.168.1.13"
+  FL:
+    name: "过滤净化系统"
+    name_en: "Filtration"
+    prefix: "FL"
+    number_range: [401, 499]
+    plc: "PLC-4"
+    plc_ip: "192.168.1.14"
+  BL:
+    name: "调配系统"
+    name_en: "Blending"
+    prefix: "BL"
+    number_range: [501, 599]
+    plc: "PLC-5"
+    plc_ip: "192.168.1.15"
+  HM:
+    name: "均质系统"
+    name_en: "Homogenization"
+    prefix: "HM"
+    number_range: [601, 699]
+    plc: "PLC-4"
+    plc_ip: "192.168.1.14"
+  UH:
+    name: "UHT杀菌系统"
+    name_en: "UHT Processing"
+    prefix: "UH"
+    number_range: [701, 799]
+    plc: "PLC-6"
+    plc_ip: "192.168.1.16"
+  BF:
+    name: "制瓶系统"
+    name_en: "Bottle Forming"
+    prefix: "BF"
+    number_range: [801, 899]
+    plc: "PLC-7"
+    plc_ip: "192.168.1.17"
+  PF:
+    name: "灌装系统"
+    name_en: "Packaging Fill"
+    prefix: "PF"
+    number_range: [901, 999]
+    plc: "PLC-8"
+    plc_ip: "192.168.1.18"
+  CG:
+    name: "旋盖系统"
+    name_en: "Capping"
+    prefix: "CG"
+    number_range: [1001, 1099]
+    plc: "PLC-9"
+    plc_ip: "192.168.1.19"
+  LI:
+    name: "灯检系统"
+    name_en: "Light Inspection"
+    prefix: "LI"
+    number_range: [1101, 1199]
+    plc: "PLC-10"
+    plc_ip: "192.168.1.20"
+  CI:
+    name: "喷码系统"
+    name_en: "Coding"
+    prefix: "CI"
+    number_range: [1201, 1299]
+    plc: "PLC-11"
+    plc_ip: "192.168.1.21"
+  LB:
+    name: "贴标系统"
+    name_en: "Labeling"
+    prefix: "LB"
+    number_range: [1301, 1399]
+    plc: "PLC-12"
+    plc_ip: "192.168.1.22"
+  CA:
+    name: "装箱系统"
+    name_en: "Cartoning"
+    prefix: "CA"
+    number_range: [1401, 1499]
+    plc: "PLC-13"
+    plc_ip: "192.168.1.23"
+  PK:
+    name: "膜包码垛系统"
+    name_en: "Packing"
+    prefix: "PK"
+    number_range: [1501, 1599]
+    plc: "PLC-14"
+    plc_ip: "192.168.1.24"
+  CP:
+    name: "CIP清洗系统"
+    name_en: "Cleaning In Place"
+    prefix: "CP"
+    number_range: [1601, 1699]
+    plc: "PLC-15"
+    plc_ip: "192.168.1.25"
+
+# ============================================================================
+# 设备分类模板
+# ============================================================================
+device_types:
+  tank:
+    name: "储罐/容器"
+    has_level_sensor: true
+    has_temp_sensor: true
+    standard_sensors: ["LT", "TT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  pump:
+    name: "输送泵"
+    has_status: true
+    has_running_status: true
+    standard_sensors: ["DT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  motor:
+    name: "电机/搅拌"
+    has_status: true
+    has_temp_sensor: true
+    has_speed_sensor: false
+    standard_sensors: ["DT", "MT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  valve:
+    name: "阀门"
+    has_status: true
+    has_open_feedback: true
+    has_close_feedback: true
+    standard_sensors: ["DT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  heat_exchanger:
+    name: "换热器/冷却器"
+    has_temp_sensor: true
+    has_pressure_sensor: true
+    standard_sensors: ["TT", "PT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  filter:
+    name: "过滤器/超滤"
+    has_pressure_sensor: true
+    has_diff_pressure: true
+    has_flow_sensor: true
+    standard_sensors: ["PT", "DPT", "FT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  uht:
+    name: "UHT杀菌锅"
+    has_multi_temp: true
+    has_pressure_sensor: true
+    has_flow_sensor: true
+    standard_sensors: ["TT1", "TT2", "TT3", "TT4", "TT5", "PT1", "PT2", "FT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  filler:
+    name: "灌装机"
+    has_speed_sensor: true
+    has_temp_sensor: true
+    has_pressure_sensor: true
+    has_flow_sensor: true
+    standard_sensors: ["ST", "TT", "PT", "FT", "LT"]
+    valves: []
+    pumps: []
+    motors: []
+
+  packaging:
+    name: "包装设备"
+    has_speed_sensor: true
+    has_status: true
+    standard_sensors: ["ST", "DT"]
+    valves: []
+    pumps: []
+    motors: []

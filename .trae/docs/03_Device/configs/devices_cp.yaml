@@ -1,0 +1,121 @@
+# CIP清洗系统 (CP) 设备清单
+# 工段: CP, PLC: PLC-15, IP: 192.168.1.25
+
+devices_cp:
+  - id: "CP-101"
+    name: "CIP碱液罐"
+    type: tank
+    section: CP
+    model: "SS304, 2m³"
+    spec: "2% NaOH溶液"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+      - code: "CtT"
+        name: "碱液浓度"
+        type: "电导率仪"
+        range: [0, 5]
+        unit: "%"
+        alarm: {L: 1.5, H: 2.5}
+        note: "2%浓度"
+      - code: "TT"
+        name: "碱液温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 80, H: 90}
+        note: "85℃清洗"
+
+  - id: "CP-102"
+    name: "CIP酸液罐"
+    type: tank
+    section: CP
+    model: "SS304, 1m³"
+    spec: "1% HNO₃溶液"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+      - code: "CtT"
+        name: "酸液浓度"
+        type: "电导率仪"
+        range: [0, 3]
+        unit: "%"
+        alarm: {L: 0.8, H: 1.5}
+        note: "1%浓度"
+      - code: "TT"
+        name: "酸液温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 55, H: 65}
+        note: "60℃清洗"
+
+  - id: "CP-103"
+    name: "CIP热水罐"
+    type: tank
+    section: CP
+    model: "SS304, 3m³"
+    spec: "85℃热水, 保温"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 50}
+      - code: "TT"
+        name: "热水罐温度"
+        type: "温度计"
+        range: [0, 100]
+        unit: "℃"
+        alarm: {L: 80}
+        note: "85℃"
+
+  - id: "CP-104"
+    name: "CIP输送泵"
+    type: pump
+    section: CP
+    model: "卫生级离心泵"
+    spec: "5m³/h, SS316, 变频"
+    quantity: 2
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "CIP回水流速"
+        type: "流量计"
+        range: [0, 10]
+        unit: "m³/h"
+        alarm: {L: 3}
+        note: "清洗效果判定"
+      - code: "CtT"
+        name: "CIP回水电导率"
+        type: "电导率仪"
+        range: [0, 500]
+        unit: "μS/cm"
+        alarm: {H: 100}
+        note: "最终冲洗水"
+
+  - id: "CP-105"
+    name: "电导率仪"
+    type: sensor
+    section: CP
+    model: "在线式"
+    spec: "0-2000μS/cm"
+    quantity: 2
+    supplier: "进口"

@@ -1,56 +1,205 @@
 # SCADA 通讯接口模板定义
 # 文档版本: v1.0
 # 创建日期: 2026-04-28
+# 更新日期: 2026-04-29
 # 说明: 定义通讯接口模板，用于自动生成通讯接口规格书
 
 meta:
-  version: "1.0"
+  version: "v1.0"
   created: "2026-04-28"
-  source_doc: "通讯接口规格书.md"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "通讯接口规格书.md"
   project_name: "茶饮料生产线SCADA监控系统"
   product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
-  capacity_rated: "50000B/H (额定)"
-  capacity_max: "54000B/H (最大)"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
 
 # ============================================================================
 # PLC配置
+# 说明: 共15个独立PLC，每个工段独立控制
 # ============================================================================
 plc_config:
   - id: "PLC-1"
     name: "S7-1500 R/H"
     ip: "192.168.1.11"
-    sections: ["WT", "TH", "EX"]
-    section_names: ["水处理", "茶叶前处理", "萃取"]
+    sections: ["WT"]
+    section_names: ["水处理"]
     redundant: true
     data_area:
-      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
-      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
-      ai: {start: "IW0", end: "IW254", points: 128, desc: "温度、压力、流量"}
-      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "液位、温度、电导率"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
 
   - id: "PLC-2"
     name: "S7-1500 R/H"
     ip: "192.168.1.12"
-    sections: ["FL", "BL", "HM"]
-    section_names: ["过滤净化", "调配", "均质"]
+    sections: ["TH"]
+    section_names: ["茶叶前处理"]
     redundant: true
     data_area:
-      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
-      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
-      ai: {start: "IW0", end: "IW254", points: 128, desc: "pH、Brix、温度"}
-      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+      di: {start: "I0.0", end: "I31.7", points: 256, desc: "设备状态"}
+      do: {start: "Q0.0", end: "Q15.7", points: 128, desc: "电机控制"}
+      ai: {start: "IW0", end: "IW62", points: 32, desc: "温度、流量"}
+      ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
 
   - id: "PLC-3"
     name: "S7-1500 R/H"
     ip: "192.168.1.13"
-    sections: ["UH", "CP", "PF", "PK"]
-    section_names: ["UHT杀菌", "CIP清洗", "灌装", "冷却包装"]
+    sections: ["EX"]
+    section_names: ["萃取"]
     redundant: true
     data_area:
-      di: {start: "I0.0", end: "I127.7", points: 1024, desc: "设备状态、阀门反馈"}
-      do: {start: "Q0.0", end: "Q63.7", points: 512, desc: "阀门控制、泵控制"}
-      ai: {start: "IW0", end: "IW254", points: 128, desc: "温度、压力、速度"}
-      ao: {start: "QW0", end: "QW63", points: 64, desc: "调节阀输出"}
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、搅拌控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "温度、液位、流量"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
+
+  - id: "PLC-4"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.14"
+    sections: ["FL", "HM"]
+    section_names: ["过滤净化", "均质"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "压力、压差、流量、温度"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
+
+  - id: "PLC-5"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.15"
+    sections: ["BL"]
+    section_names: ["调配"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、计量泵"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "pH、Brix、温度、液位"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
+
+  - id: "PLC-6"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.16"
+    sections: ["UH"]
+    section_names: ["UHT杀菌"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW254", points: 128, desc: "多段温度、压力、流量"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
+
+  - id: "PLC-7"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.17"
+    sections: ["BF"]
+    section_names: ["制瓶"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I47.7", points: 384, desc: "设备状态、模具反馈"}
+      do: {start: "Q0.0", end: "Q23.7", points: 192, desc: "模具控制、阀岛控制"}
+      ai: {start: "IW0", end: "IW94", points: 48, desc: "压力、速度、温度"}
+      ao: {start: "QW0", end: "QW23", points: 24, desc: "比例阀输出"}
+
+  - id: "PLC-8"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.18"
+    sections: ["PF"]
+    section_names: ["灌装"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、液位反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "灌装阀岛控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "速度、温度、压力、液位"}
+      ao: {start: "QW0", end: "QW63", points: 64, desc: "高速阀岛控制"}
+
+  - id: "PLC-9"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.19"
+    sections: ["CG"]
+    section_names: ["旋盖"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I31.7", points: 256, desc: "设备状态、扭矩反馈"}
+      do: {start: "Q0.0", end: "Q15.7", points: 128, desc: "旋盖控制、剔除控制"}
+      ai: {start: "IW0", end: "IW62", points: 32, desc: "扭矩、温度、速度"}
+      ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
+
+  - id: "PLC-10"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.20"
+    sections: ["LI"]
+    section_names: ["灯检"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I31.7", points: 256, desc: "设备状态、视觉反馈"}
+      do: {start: "Q0.0", end: "Q15.7", points: 128, desc: "剔除控制、输送控制"}
+      ai: {start: "IW0", end: "IW62", points: 32, desc: "速度"}
+      ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
+
+  - id: "PLC-11"
+    name: "CPU 1215C"
+    ip: "192.168.1.21"
+    sections: ["CI"]
+    section_names: ["喷码"]
+    redundant: false
+    data_area:
+      di: {start: "I0.0", end: "I15.7", points: 128, desc: "设备状态"}
+      do: {start: "Q0.0", end: "Q7.7", points: 64, desc: "喷印控制"}
+      ai: {start: "IW0", end: "IW30", points: 16, desc: "计数器"}
+      ao: {start: "QW0", end: "QW7", points: 8, desc: "预留"}
+
+  - id: "PLC-12"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.22"
+    sections: ["LB"]
+    section_names: ["贴标"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I31.7", points: 256, desc: "设备状态、标签检测"}
+      do: {start: "Q0.0", end: "Q15.7", points: 128, desc: "贴标控制、剔除控制"}
+      ai: {start: "IW0", end: "IW62", points: 32, desc: "速度、温度"}
+      ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
+
+  - id: "PLC-13"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.23"
+    sections: ["CA"]
+    section_names: ["装箱"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I31.7", points: 256, desc: "设备状态、纸箱检测"}
+      do: {start: "Q0.0", end: "Q15.7", points: 128, desc: "纸箱成型、装箱控制"}
+      ai: {start: "IW0", end: "IW62", points: 32, desc: "速度、重量"}
+      ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
+
+  - id: "PLC-14"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.24"
+    sections: ["PK"]
+    section_names: ["膜包码垛"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I47.7", points: 384, desc: "设备状态、膜包检测"}
+      do: {start: "Q0.0", end: "Q23.7", points: 192, desc: "膜包控制、码垛控制"}
+      ai: {start: "IW0", end: "IW94", points: 48, desc: "速度、温度"}
+      ao: {start: "QW0", end: "QW23", points: 24, desc: "变频器速度"}
+
+  - id: "PLC-15"
+    name: "S7-1500 R/H"
+    ip: "192.168.1.25"
+    sections: ["CP"]
+    section_names: ["CIP清洗"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I47.7", points: 384, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "CIP阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "温度、浓度、电导率、流量"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
 
 # ============================================================================
 # 通讯协议参数
@@ -348,6 +497,54 @@ ip_planning:
       gateway: "192.168.1.1"
     - device: "PLC-3"
       ip: "192.168.1.13"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-4"
+      ip: "192.168.1.14"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-5"
+      ip: "192.168.1.15"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-6"
+      ip: "192.168.1.16"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-7"
+      ip: "192.168.1.17"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-8"
+      ip: "192.168.1.18"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-9"
+      ip: "192.168.1.19"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-10"
+      ip: "192.168.1.20"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-11"
+      ip: "192.168.1.21"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-12"
+      ip: "192.168.1.22"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-13"
+      ip: "192.168.1.23"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-14"
+      ip: "192.168.1.24"
+      mask: "255.255.255.0"
+      gateway: "192.168.1.1"
+    - device: "PLC-15"
+      ip: "192.168.1.25"
       mask: "255.255.255.0"
       gateway: "192.168.1.1"
 

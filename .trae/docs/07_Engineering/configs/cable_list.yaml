@@ -1,0 +1,131 @@
+# Cable_List 电缆清单 配置
+
+meta:
+  version: "v1.0"
+  created: "2026-04-29"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  description: "电缆清单配置 - 现场设备与PLC柜之间的电缆连接"
+  data_source: "../_templates/devices.yaml"
+  source_docs:
+    - "devices.yaml"
+  project_name: "茶饮料生产线SCADA系统"
+
+template:
+  type: "excel"
+  engine: "openpyxl"
+  sheets:
+    - name: "电缆清单总表"
+      header:
+        - "序号"
+        - "电缆编号"
+        - "起点设备"
+        - "起点位置"
+        - "终点设备"
+        - "终点位置"
+        - "电缆型号"
+        - "电缆规格"
+        - "长度(m)"
+        - "数量"
+        - "敷设方式"
+        - "备注"
+
+    - name: "动力电缆"
+      header:
+        - "序号"
+        - "电缆编号"
+        - "设备名称"
+        - "功率(kW)"
+        - "电缆型号"
+        - "规格"
+        - "芯数×截面"
+        - "长度(m)"
+        - "起点"
+        - "终点"
+        - "敷设方式"
+
+    - name: "控制电缆"
+      header:
+        - "序号"
+        - "电缆编号"
+        - "用途"
+        - "电缆型号"
+        - "规格"
+        - "芯数×截面"
+        - "长度(m)"
+        - "起点"
+        - "终点"
+        - "备注"
+
+    - name: "通讯电缆"
+      header:
+        - "序号"
+        - "电缆编号"
+        - "类型"
+        - "协议"
+        - "起点"
+        - "终点"
+        - "长度(m)"
+        - "型号"
+        - "备注"
+
+data_sources:
+  motor_cables:
+    source: "devices"
+    path: "motors"
+    transform:
+      - tag: "M{{ loop.index }}"
+        name: "{{ item.name }}"
+        power: "{{ item.power_kw }}"
+        cable_type: "动力电缆"
+        spec: "YJV-0.6/1kV"
+        cores: "4×{{ item.power_kw < 7.5 and '2.5' or item.power_kw < 15 and '4' or '6' }}"
+        length: "{{ item.power_kw < 7.5 and 30 or item.power_kw < 15 and 40 or 50 }}"
+        from: "{{ item.section }}-MCC柜"
+        to: "{{ item.name }}电机"
+
+  pump_cables:
+    source: "devices"
+    path: "pumps"
+    transform:
+      - tag: "P{{ loop.index }}"
+        name: "{{ item.name }}"
+        power: "{{ item.power_kw }}"
+        cable_type: "动力电缆"
+        spec: "YJV-0.6/1kV"
+        cores: "4×{{ item.power_kw < 7.5 and '2.5' or item.power_kw < 15 and '4' or '6' }}"
+        length: "{{ item.power_kw < 7.5 and 30 or item.power_kw < 15 and 40 or 50 }}"
+        from: "{{ item.section }}-MCC柜"
+        to: "{{ item.name }}"
+
+  signal_cables:
+    source: "devices"
+    path: "devices[].sensors"
+    filter: "code.startsWith('TT') or code.startsWith('PT') or code.startsWith('LT') or code.startsWith('FT')"
+    transform:
+      - tag: "S{{ loop.index }}"
+        cable_type: "控制电缆"
+        spec: "KVV-450/750V"
+        cores: "4×1.5"
+        length: "30"
+        from: "{{ device.section }}-PLC柜"
+        to: "{{ device.id }}-{{ code }}"
+        purpose: "{{ device.name }}{{ name }}"
+
+  network_cables:
+    source: "comm_templates"
+    path: "plc_config"
+    transform:
+      - tag: "N{{ loop.index }}"
+        cable_type: "通讯电缆"
+        protocol: "PROFINET"
+        spec: "工业以太网"
+        length: "100"
+        from: "SCADA服务器"
+        to: "{{ item.id }}"
+        remark: "{{ item.id }}/{{ item.ip }}"
+
+output:
+  path: "../07_Engineering/Cable_List_auto.xlsx"
+  overwrite: true

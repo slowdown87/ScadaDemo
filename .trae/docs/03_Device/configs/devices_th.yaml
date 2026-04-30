@@ -1,0 +1,58 @@
+# 茶叶前处理系统 (TH) 设备清单
+# 工段: TH, PLC: PLC-2, IP: 192.168.1.12
+
+devices_th:
+  - id: "TH-101"
+    name: "茶叶储罐"
+    type: tank
+    section: TH
+    model: "SS304, 2m³"
+    spec: "螺旋输送, 真空吸料"
+    quantity: 2
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20}
+
+  - id: "TH-102"
+    name: "茶叶粉碎机"
+    type: motor
+    section: TH
+    model: "CF-200"
+    spec: "产量200kg/h, 细度60目"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 7.5
+    is_inverter: true
+    sensors:
+      - code: "FT"
+        name: "茶叶粉碎流量"
+        type: "流量计"
+        range: [0, 300]
+        unit: "kg/h"
+        alarm: {L: 150, H: 250}
+      - code: "ST"
+        name: "粉碎机转速"
+        type: "转速计"
+        range: [0, 3000]
+        unit: "rpm"
+        alarm: {H: 2800}
+      - code: "MT"
+        name: "粉碎机电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+
+  - id: "TH-103"
+    name: "茶叶暂存斗"
+    type: tank
+    section: TH
+    model: "SS304, 0.5m³"
+    spec: "不锈钢制, 振动给料"
+    quantity: 1
+    supplier: "国产"

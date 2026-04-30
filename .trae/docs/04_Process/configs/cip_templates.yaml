@@ -1,12 +1,18 @@
 # SCADA CIP清洗程序模板定义
 # 文档版本: v1.0
 # 创建日期: 2026-04-28
+# 更新日期: 2026-04-29
 # 说明: 定义CIP清洗程序模板，用于自动生成CIP清洗程序规格书
 
 meta:
-  version: "1.0"
+  version: "v1.0"
   created: "2026-04-28"
-  source_doc: "CIP清洗程序规格书.md"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "CIP清洗程序规格书.md"
+  project_name: "茶饮料生产线SCADA系统"
 
 # ============================================================================
 # CIP系统配置

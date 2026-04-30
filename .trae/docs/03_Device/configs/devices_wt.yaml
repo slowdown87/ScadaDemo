@@ -1,0 +1,177 @@
+# 水处理系统 (WT) 设备清单
+# 工段: WT, PLC: PLC-1, IP: 192.168.1.11
+
+devices_wt:
+  - id: "WT-101"
+    name: "原水箱"
+    type: tank
+    section: WT
+    model: "SS304, 10m³"
+    spec: "Φ2000×3500mm, 带液位计"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {LL: 10, L: 20, H: 90, HH: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+
+  - id: "P-WT01"
+    name: "原水输送泵"
+    type: pump
+    section: WT
+    model: "卫生级离心泵"
+    spec: "5m³/h, SS316, 变频"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 5.5
+    is_inverter: true
+    control: "液位连锁"
+
+  - id: "P-WT02"
+    name: "纯水输送泵"
+    type: pump
+    section: WT
+    model: "卫生级离心泵"
+    spec: "5m³/h, SS316, 变频"
+    quantity: 1
+    supplier: "国产"
+    power_kw: 5.5
+    is_inverter: true
+    control: "压力控制"
+
+  - id: "WT-102"
+    name: "多介质过滤器"
+    type: filter
+    section: WT
+    model: "Φ1200×2400"
+    spec: "滤速10m/h, 石英砂+无烟煤"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "过滤流量"
+        type: "流量计"
+        range: [0, 15]
+        unit: "m³/h"
+        alarm: {L: 5}
+      - code: "PT"
+        name: "RO前压力"
+        type: "压力计"
+        range: [0, 1]
+        unit: "MPa"
+        alarm: {H: 0.8}
+        note: "高压泵前"
+
+  - id: "WT-103"
+    name: "活性炭过滤器"
+    type: filter
+    section: WT
+    model: "Φ1000×2000"
+    spec: "活性炭填充量1.5m³"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "FT"
+        name: "活性炭过滤流量"
+        type: "流量计"
+        range: [0, 15]
+        unit: "m³/h"
+        alarm: {L: 5}
+      - code: "PT"
+        name: "高压泵压力"
+        type: "压力计"
+        range: [0, 2]
+        unit: "MPa"
+        alarm: {H: 1.6}
+
+  - id: "WT-104"
+    name: "RO反渗透系统"
+    type: filter
+    section: WT
+    model: "BWRO-5000"
+    spec: "产水5m³/h, 脱盐率≥97%"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "PT"
+        name: "RO段压力"
+        type: "压力计"
+        range: [0, 1.5]
+        unit: "MPa"
+        alarm: {H: 1.2}
+      - code: "FT"
+        name: "RO产水流量"
+        type: "流量计"
+        range: [0, 10]
+        unit: "m³/h"
+        alarm: {L: 3, H: 7}
+
+  - id: "WT-105"
+    name: "离子交换柱"
+    type: tank
+    section: WT
+    model: "Φ800×2000"
+    spec: "阳离子+阴离子树脂"
+    quantity: 2
+    supplier: "国产"
+    sensors:
+      - code: "PT"
+        name: "离子交换后压力"
+        type: "压力计"
+        range: [0, 0.5]
+        unit: "MPa"
+        alarm: {H: 0.4}
+      - code: "CtT"
+        name: "离子交换水电导率"
+        type: "电导率仪"
+        range: [0, 50]
+        unit: "μS/cm"
+        alarm: {H: 10}
+        is_key_point: true
+
+  - id: "WT-106"
+    name: "UV紫外线杀菌器"
+    type: heat_exchanger
+    section: WT
+    model: "UV-40GPM"
+    spec: "40W, 杀菌率99.9%"
+    quantity: 1
+    supplier: "进口"
+    sensors:
+      - code: "TT"
+        name: "UV前温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 40}
+
+  - id: "WT-107"
+    name: "纯水储罐"
+    type: tank
+    section: WT
+    model: "SS304, 10m³"
+    spec: "Φ2000×3500mm, 带呼吸器"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {LL: 20, L: 30, H: 85, HH: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}

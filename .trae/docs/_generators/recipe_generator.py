@@ -24,10 +24,11 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-TEMPLATES_DIR = SCRIPT_DIR.parent / "_templates"
 OUTPUT_DIR = SCRIPT_DIR.parent
 
-RECIPE_FILE = TEMPLATES_DIR / "recipe_templates.yaml"
+CONFIG_PRODUCT = OUTPUT_DIR / "05_Product" / "configs" / "product_recipe_templates.yaml"
+CONFIG_PROCESS = OUTPUT_DIR / "04_Process" / "configs" / "process_recipe_templates.yaml"
+CONFIG_CIP = OUTPUT_DIR / "04_Process" / "configs" / "cip_recipe_templates.yaml"
 
 OUTPUT_PRODUCT = OUTPUT_DIR / "05_Product" / "产品配方_auto.md"
 OUTPUT_PROCESS = OUTPUT_DIR / "04_Process" / "工艺配方_auto.md"
@@ -39,19 +40,20 @@ def load_yaml(file_path):
         return yaml.safe_load(f)
 
 
-def get_recipe_data():
-    return load_yaml(RECIPE_FILE)
+def get_meta_data(config_file):
+    data = load_yaml(config_file)
+    return data.get('meta', {})
 
 
-def generate_header(doc_type, version="v1.0"):
-    meta = get_recipe_data().get('meta', {})
+def generate_header(doc_type, config_file, version="v1.0"):
+    meta = get_meta_data(config_file)
     now = datetime.now().strftime("%Y-%m-%d")
     return f"""# 茶饮料生产线{doc_type}
 
 > 文档版本: {version}
 > 创建日期: {now}
 > 更新日期: {now}
-> 数据来源: scada_data/recipe_templates.yaml (自动生成)
+> 数据来源: {config_file.name} (自动生成)
 > 项目名称: {meta.get('project_name', '茶饮料生产线SCADA系统')}
 > 产能: {meta.get('capacity', '50000B/H')}
 
@@ -62,12 +64,12 @@ def generate_header(doc_type, version="v1.0"):
 
 def generate_product_recipe():
     """生成产品配方文档"""
-    data = get_recipe_data()
+    data = load_yaml(CONFIG_PRODUCT)
     products = data.get('product_recipes', {})
     acceptance = data.get('acceptance_standards', {})
 
     output = []
-    output.append(generate_header("产品配方"))
+    output.append(generate_header("产品配方", CONFIG_PRODUCT))
 
     output.append("## 1. 产品配方汇总\n")
     output.append("| 产品名称 | 产品代码 | 状态 | 茶多酚要求 | 目标Brix | 目标pH | 清洗配方 |")
@@ -219,11 +221,11 @@ def generate_product_recipe():
 
 def generate_process_recipe():
     """生成工艺配方文档"""
-    data = get_recipe_data()
+    data = load_yaml(CONFIG_PROCESS)
     processes = data.get('process_recipes', {})
 
     output = []
-    output.append(generate_header("工艺配方"))
+    output.append(generate_header("工艺配方", CONFIG_PROCESS))
 
     output.append("## 1. 工艺配方汇总\n")
     output.append("| 配方ID | 工艺名称 | 工段 | 关联清洗 |")
@@ -232,7 +234,7 @@ def generate_process_recipe():
     section_names = {
         'WT': '水处理', 'TH': '茶叶前处理', 'EX': '萃取',
         'FL': '过滤', 'BL': '调配', 'HM': '均质',
-        'UH': 'UHT杀菌', 'PF': '灌装', 'PK': '包装'
+        'UH': 'UHT杀菌', 'PF': '灌装', 'CP': 'CIP站', 'PK': '包装'
     }
 
     for key, proc in processes.items():
@@ -310,6 +312,163 @@ def generate_process_recipe():
             output.append("|------|------|------|")
             output.append(f"| 温度上限 | {storage.get('temp_max', '')} | {storage.get('temp_unit', '')} |")
             output.append(f"| 温度报警值 | {storage.get('temp_alarm_high', '')} | ℃ |")
+            output.append("")
+
+        elif section == 'TH':
+            storage = params.get('storage', {})
+            output.append("### 2.1 储茶罐\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 罐体ID | {storage.get('tank_id', '')} | - |")
+            output.append(f"| 容量 | {storage.get('capacity', '')} | {storage.get('capacity_unit', '')} |")
+            output.append(f"| 温度范围 | {storage.get('temp_range', ['',''])[0]}-{storage.get('temp_range', ['',''])[1]} | {storage.get('temp_unit', '')} |")
+            output.append(f"| 湿度上限 | {storage.get('humidity_max', '')} | {storage.get('humidity_unit', '')} |")
+            output.append("")
+
+            mag = params.get('magnetic_separator', {})
+            output.append("### 2.2 磁选机\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {mag.get('model', '')} | - |")
+            output.append(f"| 磁场强度 | {mag.get('magnetic_strength', '')} | {mag.get('magnetic_strength_unit', '')} |")
+            output.append(f"| 皮带速度 | {mag.get('belt_speed', '')} | {mag.get('belt_speed_unit', '')} |")
+            output.append(f"| 处理量 | {mag.get('capacity', '')} | {mag.get('capacity_unit', '')} |")
+            output.append("")
+
+            metal = params.get('metal_detector', {})
+            output.append("### 2.3 金属检测器\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {metal.get('model', '')} | - |")
+            output.append(f"| 灵敏度 | {metal.get('sensitivity', '')} | {metal.get('sensitivity_unit', '')} |")
+            output.append(f"| 检测类型 | {metal.get('detection_type', '')} | - |")
+            output.append(f"| 剔除方式 | {metal.get('reject_mode', '')} | - |")
+            output.append("")
+
+            conveyor = params.get('conveyor', {})
+            output.append("### 2.4 输送机\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 类型 | {conveyor.get('type', '')} | - |")
+            output.append(f"| 宽度 | {conveyor.get('width', '')} | {conveyor.get('width_unit', '')} |")
+            output.append(f"| 长度 | {conveyor.get('length', '')} | {conveyor.get('length_unit', '')} |")
+            output.append(f"| 速度范围 | {conveyor.get('speed_range', ['',''])[0]}-{conveyor.get('speed_range', ['',''])[1]} | {conveyor.get('speed_unit', '')} |")
+            output.append("")
+
+            dust = params.get('dust_collector', {})
+            output.append("### 2.5 除尘器\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {dust.get('model', '')} | - |")
+            output.append(f"| 风量 | {dust.get('airflow', '')} | {dust.get('airflow_unit', '')} |")
+            output.append(f"| 过滤精度 | {dust.get('filtration_accuracy', '')} | {dust.get('filtration_accuracy_unit', '')} |")
+            output.append("")
+
+            weighing = params.get('weighing', {})
+            output.append("### 2.6 称重系统\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {weighing.get('model', '')} | - |")
+            output.append(f"| 称重范围 | {weighing.get('weighing_range', ['',''])[0]}-{weighing.get('weighing_range', ['',''])[1]} | {weighing.get('weighing_range_unit', '')} |")
+            output.append(f"| 精度 | {weighing.get('accuracy', '')} | {weighing.get('accuracy_unit', '')} |")
+            output.append("")
+
+        elif section == 'CP':
+            cip_tank = params.get('cip_tank', {})
+            output.append("### 2.1 CIP罐\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 酸罐ID | {cip_tank.get('acid_tank_id', '')} | - |")
+            output.append(f"| 酸罐容量 | {cip_tank.get('acid_tank_capacity', '')} | {cip_tank.get('acid_tank_capacity_unit', '')} |")
+            output.append(f"| 碱罐ID | {cip_tank.get('alkali_tank_id', '')} | - |")
+            output.append(f"| 碱罐容量 | {cip_tank.get('alkali_tank_capacity', '')} | {cip_tank.get('alkali_tank_capacity_unit', '')} |")
+            output.append(f"| 水罐ID | {cip_tank.get('water_tank_id', '')} | - |")
+            output.append(f"| 水罐容量 | {cip_tank.get('water_tank_capacity', '')} | {cip_tank.get('water_tank_capacity_unit', '')} |")
+            output.append("")
+
+            dosing = params.get('dosing_system', {})
+            output.append("### 2.2 配药系统\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 酸泵 | {dosing.get('acid_pump', '')} | - |")
+            output.append(f"| 酸泵容量 | {dosing.get('acid_pump_capacity', '')} | {dosing.get('acid_pump_capacity_unit', '')} |")
+            output.append(f"| 碱泵 | {dosing.get('alkali_pump', '')} | - |")
+            output.append(f"| 碱泵容量 | {dosing.get('alkali_pump_capacity', '')} | {dosing.get('alkali_pump_capacity_unit', '')} |")
+            output.append(f"| 电导率传感器 | {dosing.get('conductivity_sensor', '')} | - |")
+            output.append("")
+
+            supply = params.get('supply_unit', {})
+            output.append("### 2.3 供给单元\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 供给泵 | {supply.get('supply_pump', '')} | - |")
+            output.append(f"| 供给泵容量 | {supply.get('supply_pump_capacity', '')} | {supply.get('supply_pump_capacity_unit', '')} |")
+            output.append(f"| 供给压力 | {supply.get('supply_pressure', '')} | {supply.get('supply_pressure_unit', '')} |")
+            output.append(f"| 回流泵 | {supply.get('return_pump', '')} | - |")
+            output.append(f"| 流量计 | {supply.get('flow_meter', '')} | - |")
+            output.append("")
+
+            heating = params.get('heating_system', {})
+            output.append("### 2.4 加热系统\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 加热器类型 | {heating.get('heater_type', '')} | - |")
+            output.append(f"| 加热能力 | {heating.get('heater_capacity', '')} | {heating.get('heater_capacity_unit', '')} |")
+            output.append(f"| 最高温度 | {heating.get('temp_max', '')} | {heating.get('temp_max_unit', '')} |")
+            output.append(f"| 升温速率 | {heating.get('heating_rate', '')} | {heating.get('heating_rate_unit', '')} |")
+            output.append("")
+
+        elif section == 'PK':
+            film = params.get('film_wrapper', {})
+            output.append("### 2.1 膜包机\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {film.get('model', '')} | - |")
+            output.append(f"| 膜宽 | {film.get('film_width', '')} | {film.get('film_width_unit', '')} |")
+            output.append(f"| 膜厚范围 | {film.get('film_thickness_range', ['',''])[0]}-{film.get('film_thickness_range', ['',''])[1]} | {film.get('film_thickness_range_unit', '')} |")
+            output.append(f"| 包装速度 | {film.get('package_speed', '')} | {film.get('package_speed_unit', '')} |")
+            output.append("")
+
+            robot = params.get('robot_palletizer', {})
+            output.append("### 2.2 码垛机器人\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 型号 | {robot.get('model', '')} | - |")
+            output.append(f"| 负载 | {robot.get('payload', '')} | {robot.get('payload_unit', '')} |")
+            output.append(f"| 臂展 | {robot.get('reach', '')} | {robot.get('reach_unit', '')} |")
+            output.append(f"| 轴数 | {robot.get('axes', '')} | - |")
+            output.append(f"| 循环时间 | {robot.get('cycle_time', '')} | {robot.get('cycle_time_unit', '')} |")
+            output.append(f"| 定位精度 | {robot.get('position_accuracy', '')} | {robot.get('position_accuracy_unit', '')} |")
+            output.append("")
+
+            conveyor_sys = params.get('conveyor_system', {})
+            output.append("### 2.3 输送系统\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 类型 | {conveyor_sys.get('type', '')} | - |")
+            output.append(f"| 宽度 | {conveyor_sys.get('width', '')} | {conveyor_sys.get('width_unit', '')} |")
+            output.append(f"| 长度 | {conveyor_sys.get('length', '')} | {conveyor_sys.get('length_unit', '')} |")
+            output.append(f"| 速度 | {conveyor_sys.get('speed', '')} | {conveyor_sys.get('speed_unit', '')} |")
+            output.append("")
+
+            pallet = params.get('pallet', {})
+            output.append("### 2.4 托盘\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 类型 | {pallet.get('type', '')} | - |")
+            output.append(f"| 尺寸 | {pallet.get('size', '')} | {pallet.get('size_unit', '')} |")
+            output.append(f"| 最大负载 | {pallet.get('max_load', '')} | {pallet.get('max_load_unit', '')} |")
+            output.append(f"| 堆叠层数 | {pallet.get('stack_layers', '')} | {pallet.get('stack_layers_unit', '')} |")
+            output.append("")
+
+            quality_pk = params.get('quality', {})
+            output.append("### 2.5 质量指标\n")
+            output.append("| 参数 | 规格 | 单位 |")
+            output.append("|------|------|------|")
+            output.append(f"| 膜张力 | {quality_pk.get('film_tension', '')} | {quality_pk.get('film_tension_unit', '')} |")
+            output.append(f"| 封口温度 | {quality_pk.get('seal_temp', '')} | {quality_pk.get('seal_temp_unit', '')} |")
+            output.append(f"| 裹包力 | {quality_pk.get('wrap_force', '')} | {quality_pk.get('wrap_force_unit', '')} |")
+            output.append(f"| 托盘高度上限 | {quality_pk.get('pallet_height_max', '')} | {quality_pk.get('pallet_height_max_unit', '')} |")
             output.append("")
 
         elif section == 'EX':
@@ -636,11 +795,11 @@ def generate_process_recipe():
 
 def generate_cip_recipe():
     """生成CIP配方文档"""
-    data = get_recipe_data()
+    data = load_yaml(CONFIG_CIP)
     cip_recipes = data.get('cip_recipes', {})
 
     output = []
-    output.append(generate_header("CIP清洗配方"))
+    output.append(generate_header("CIP清洗配方", CONFIG_CIP))
 
     output.append("## 1. CIP配方汇总\n")
     output.append("| 配方ID | 名称 | 区域 | 适用工段 | 预计时间 |")
@@ -766,7 +925,7 @@ def main():
     args = parser.parse_args()
 
     print(f"SCADA 配方生成器")
-    print(f"模板目录: {TEMPLATES_DIR}")
+    print(f"配置文件目录: {OUTPUT_DIR}")
     print("-" * 50)
 
     if args.generate in ['all', 'product']:

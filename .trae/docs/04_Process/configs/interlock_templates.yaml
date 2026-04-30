@@ -1,18 +1,21 @@
 # SCADA 联锁逻辑模板定义
-# 文档版本: v1.1
+# 文档版本: v1.0
 # 创建日期: 2026-04-28
-# 更新日期: 2026-04-28
+# 更新日期: 2026-04-29
 # 说明: 定义标准联锁逻辑模板，用于自动生成联锁逻辑说明书
 # 来源: 联锁逻辑说明书.md (完整内容)
 
 meta:
-  version: "1.1"
+  version: "v1.0"
   created: "2026-04-28"
-  source_doc: "联锁逻辑说明书.md"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "联锁逻辑说明书.md"
   project_name: "茶饮料生产线SCADA监控系统"
   product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
-  capacity_rated: "50000B/H (额定)"
-  capacity_max: "54000B/H (最大)"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
 
 # ============================================================================
 # 联锁级别定义
@@ -596,19 +599,20 @@ interlock_templates:
         reset_condition: "温度<100℃后手动"
 
   # --------------------------------------------------------------------------
-  # 灌装系统联锁
+  # 灌装系统联锁 (PF)
+  # 说明: 灌装系统独立控制，与制瓶(BF)、旋盖(CG)解耦
   # --------------------------------------------------------------------------
   PF:
     name: "灌装系统"
     interlock_prefix: "PF"
-    section_index: 7
+    section_index: 8
 
-    critical_points_desc: "灌装温度和旋盖扭矩是食品安全和密封性的关键。"
+    critical_points_desc: "灌装温度、液位和背压是保证灌装质量的关键参数。"
 
     interlocks:
       - id: "PF-01"
         trigger_desc: "灌装温度TT < 80℃"
-        trigger_tag: "PF-104-TT"
+        trigger_tag: "PF-101-TT"
         condition: "< 80"
         level: "L1"
         alarm_level: "HH"
@@ -616,12 +620,11 @@ interlock_templates:
           - "1.停止灌装机"
           - "2.停止P-PF01"
           - "3.报警提示"
-          - "4.停旋盖机"
         reset_condition: "温度>82℃后手动"
 
       - id: "PF-02"
         trigger_desc: "灌装温度TT > 92℃"
-        trigger_tag: "PF-104-TT"
+        trigger_tag: "PF-101-TT"
         condition: "> 92"
         level: "L2"
         alarm_level: "H"
@@ -631,65 +634,19 @@ interlock_templates:
         reset_condition: "温度<90℃后自动"
 
       - id: "PF-03"
-        trigger_desc: "旋盖扭矩TT < 0.3Nm"
-        trigger_tag: "PF-105-TT"
-        condition: "< 0.3"
-        level: "L1"
-        alarm_level: "HH"
-        actions:
-          - "1.停止生产线"
-          - "2.报警提示"
-          - "3.不合格品追踪"
-        reset_condition: "扭矩调好后手动"
-
-      - id: "PF-04"
-        trigger_desc: "旋盖扭矩TT > 0.7Nm"
-        trigger_tag: "PF-105-TT"
-        condition: "> 0.7"
-        level: "L1"
-        alarm_level: "HH"
-        actions:
-          - "1.停止生产线"
-          - "2.报警提示"
-          - "3.不合格品追踪"
-        reset_condition: "扭矩调好后手动"
-
-      - id: "PF-05"
-        trigger_desc: "吹瓶速度ST < 50000瓶/h"
-        trigger_tag: "PF-101-ST"
-        condition: "< 50000"
-        level: "L2"
-        alarm_level: "L"
-        actions:
-          - "1.报警提示"
-          - "2.降低灌装速度匹配"
-        reset_condition: "速度恢复后自动"
-
-      - id: "PF-06"
-        trigger_desc: "吹瓶速度ST > 58000瓶/h"
-        trigger_tag: "PF-101-ST"
-        condition: "> 58000"
-        level: "L2"
-        alarm_level: "H"
-        actions:
-          - "1.报警提示"
-          - "2.降低吹瓶速度"
-        reset_condition: "速度恢复后自动"
-
-      - id: "PF-07"
         trigger_desc: "灌装液位LT < 50%"
-        trigger_tag: "PF-104-LT"
+        trigger_tag: "PF-101-LT"
         condition: "< 50"
         level: "L2"
         alarm_level: "L"
         actions:
           - "1.报警提示"
-          - "2.检查均质系统"
+          - "2.检查上游均质系统"
         reset_condition: "液位>60%后确认"
 
-      - id: "PF-08"
-        trigger_desc: "灌装压力PT > 0.3MPa"
-        trigger_tag: "PF-104-PT"
+      - id: "PF-04"
+        trigger_desc: "灌装背压PT > 0.3MPa"
+        trigger_tag: "PF-101-PT"
         condition: "> 0.3"
         level: "L2"
         alarm_level: "H"
@@ -698,54 +655,44 @@ interlock_templates:
           - "2.检查背压阀PV-102"
         reset_condition: "压力恢复后确认"
 
-      - id: "PF-09"
-        trigger_desc: "金属检测报警DT=1"
-        trigger_tag: "PF-103-DT"
-        condition: "=1"
-        level: "L1"
-        alarm_level: "HH"
+      - id: "PF-05"
+        trigger_desc: "灌装速度ST < 50000瓶/h"
+        trigger_tag: "PF-101-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
         actions:
-          - "1.剔除不合格瓶"
-          - "2.计数CNT-010+1"
-          - "3.报警提示"
-        reset_condition: "自动"
+          - "1.报警提示"
+          - "2.检查上游来料"
+        reset_condition: "速度恢复后自动"
 
-      - id: "PF-10"
-        trigger_desc: "空瓶缺失"
-        trigger_tag: "PF-空瓶检测"
-        condition: "缺失"
+      - id: "PF-06"
+        trigger_desc: "灌装速度ST > 58000瓶/h"
+        trigger_tag: "PF-101-ST"
+        condition: "> 58000"
         level: "L2"
         alarm_level: "H"
         actions:
-          - "1.灌装机暂停"
+          - "1.报警提示"
+          - "2.降低灌装速度"
+        reset_condition: "速度恢复后自动"
+
+      - id: "PF-07"
+        trigger_desc: "灌装机主电机温度MT > 130℃"
+        trigger_tag: "PF-101-MT"
+        condition: "> 130"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止灌装机"
           - "2.报警提示"
-        reset_condition: "人工确认"
+        reset_condition: "温度<100℃后手动"
 
     speed_sync:
-      - device: "吹瓶机PF-101"
+      - device: "灌装机PF-101"
         base_speed: "54000B/H"
-        sync_mode: "主令"
-        tolerance: "±5%"
-      - device: "灌装机PF-104"
-        base_speed: "跟随吹瓶机"
-        sync_mode: "从动"
+        sync_mode: "从动(跟随BF制瓶速度)"
         tolerance: "±3%"
-      - device: "旋盖机PF-105"
-        base_speed: "跟随灌装机"
-        sync_mode: "从动"
-        tolerance: "±2%"
-      - device: "贴标机PK-103"
-        base_speed: "跟随灌装机"
-        sync_mode: "从动"
-        tolerance: "±3%"
-      - device: "装箱机PK-106"
-        base_speed: "跟随灌装机/24"
-        sync_mode: "从动"
-        tolerance: "±5%"
-      - device: "码垛机PK-108"
-        base_speed: "跟随装箱机"
-        sync_mode: "从动"
-        tolerance: "±5%"
 
   # --------------------------------------------------------------------------
   # 水处理系统联锁
@@ -1075,51 +1022,467 @@ reset_flow: |
 # 联锁点汇总（用于自动生成）
 # ============================================================================
 interlock_summary:
-  - section: "UHT"
+  - section: "UH"
     l0: 1
     l1: 3
     l2: 5
     l3: 1
     l4: 0
-  - section: "萃取"
+  - section: "EX"
     l0: 0
     l1: 1
     l2: 4
     l3: 1
     l4: 0
-  - section: "均质"
+  - section: "HM"
     l0: 1
     l1: 3
     l2: 2
     l3: 0
     l4: 0
-  - section: "调配"
+  - section: "BL"
     l0: 0
     l1: 3
     l2: 5
     l3: 0
     l4: 0
-  - section: "灌装"
-    l0: 0
-    l1: 4
-    l2: 4
-    l3: 0
-    l4: 0
-  - section: "水处理"
+  - section: "PF"
     l0: 0
     l1: 1
     l2: 5
     l3: 0
     l4: 0
-  - section: "CIP"
+  - section: "WT"
+    l0: 0
+    l1: 1
+    l2: 5
+    l3: 0
+    l4: 0
+  - section: "CP"
     l0: 0
     l1: 0
     l2: 5
     l3: 2
     l4: 0
-  - section: "过滤"
+  - section: "FL"
     l0: 0
     l1: 1
     l2: 3
     l3: 0
     l4: 0
+  - section: "BF"
+    l0: 1
+    l1: 2
+    l2: 2
+    l3: 0
+    l4: 0
+  - section: "CG"
+    l0: 0
+    l1: 3
+    l2: 2
+    l3: 0
+    l4: 0
+  - section: "LI"
+    l0: 0
+    l1: 1
+    l2: 2
+    l3: 1
+    l4: 0
+  - section: "CI"
+    l0: 0
+    l1: 1
+    l2: 3
+    l3: 0
+    l4: 0
+  - section: "LB"
+    l0: 0
+    l1: 1
+    l2: 3
+    l3: 0
+    l4: 0
+  - section: "CA"
+    l0: 0
+    l1: 0
+    l2: 5
+    l3: 0
+    l4: 0
+  - section: "PK"
+    l0: 0
+    l1: 1
+    l2: 4
+    l3: 1
+    l4: 0
+  - section: "TH"
+    l0: 0
+    l1: 1
+    l2: 3
+    l3: 1
+    l4: 0
+
+# ============================================================================
+# 新增工段联锁模板 (v2.0新增)
+# ============================================================================
+new_section_interlocks:
+
+  # --------------------------------------------------------------------------
+  # 制瓶系统联锁 (从灌装中拆分)
+  # --------------------------------------------------------------------------
+  BF:
+    name: "制瓶系统"
+    interlock_prefix: "BF"
+    section_index: 7
+
+    critical_points_desc: "吹瓶压力和速度是瓶身质量的关键参数。"
+
+    interlocks:
+      - id: "BF-01"
+        trigger_desc: "吹瓶压力PT < 2.0MPa"
+        trigger_tag: "BF-101-PT"
+        condition: "< 2.0"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止吹瓶机"
+          - "2.报警提示"
+          - "3.通知维修"
+        reset_condition: "压力恢复后手动"
+
+      - id: "BF-02"
+        trigger_desc: "吹瓶压力PT > 2.8MPa"
+        trigger_tag: "BF-101-PT"
+        condition: "> 2.8"
+        level: "L0"
+        alarm_level: "HH"
+        actions:
+          - "1.紧急停止吹瓶机"
+          - "2.报警提示"
+          - "3.检查压力阀"
+        reset_condition: "压力<2.5MPa后手动"
+
+      - id: "BF-03"
+        trigger_desc: "吹瓶速度ST < 50000瓶/h"
+        trigger_tag: "BF-101-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.通知工艺"
+        reset_condition: "速度恢复后确认"
+
+      - id: "BF-04"
+        trigger_desc: "吹瓶速度ST > 58000瓶/h"
+        trigger_tag: "BF-101-ST"
+        condition: "> 58000"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低速度"
+        reset_condition: "速度恢复后自动"
+
+      - id: "BF-05"
+        trigger_desc: "电机温度MT > 130℃"
+        trigger_tag: "BF-101-MT"
+        condition: "> 130"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止吹瓶机"
+          - "2.报警提示"
+        reset_condition: "温度<100℃后手动"
+
+  # --------------------------------------------------------------------------
+  # 旋盖系统联锁 (从灌装中拆分)
+  # --------------------------------------------------------------------------
+  CG:
+    name: "旋盖系统"
+    interlock_prefix: "CG"
+    section_index: 8
+
+    critical_points_desc: "旋盖扭矩是密封性的关键参数，过高或过低都会导致产品质量问题。"
+
+    interlocks:
+      - id: "CG-01"
+        trigger_desc: "旋盖扭矩TT < 0.3Nm"
+        trigger_tag: "CG-102-TT"
+        condition: "< 0.3"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止生产线"
+          - "2.报警提示"
+          - "3.不合格品追踪"
+        reset_condition: "扭矩调好后手动"
+
+      - id: "CG-02"
+        trigger_desc: "旋盖扭矩TT > 0.7Nm"
+        trigger_tag: "CG-102-TT"
+        condition: "> 0.7"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止生产线"
+          - "2.报警提示"
+          - "3.不合格品追踪"
+        reset_condition: "扭矩调好后手动"
+
+      - id: "CG-03"
+        trigger_desc: "旋盖机速度ST < 50000瓶/h"
+        trigger_tag: "CG-102-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查上游"
+        reset_condition: "速度恢复后自动"
+
+      - id: "CG-04"
+        trigger_desc: "金属检测报警DT=1"
+        trigger_tag: "CG-103-DT"
+        condition: "=1"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.剔除不合格瓶"
+          - "2.计数CG-103-CNT+1"
+          - "3.报警提示"
+        reset_condition: "自动"
+
+      - id: "CG-05"
+        trigger_desc: "瓶盖消毒温度TT < 60℃"
+        trigger_tag: "CG-101-TT"
+        condition: "< 60"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查UV灯"
+        reset_condition: "温度恢复后确认"
+
+  # --------------------------------------------------------------------------
+  # 灯检系统联锁 (从包装中拆分)
+  # --------------------------------------------------------------------------
+  LI:
+    name: "灯检系统"
+    interlock_prefix: "LI"
+    section_index: 9
+
+    interlocks:
+      - id: "LI-01"
+        trigger_desc: "灯检速度ST < 50000瓶/h"
+        trigger_tag: "LI-101-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查上游"
+        reset_condition: "速度恢复后自动"
+
+      - id: "LI-02"
+        trigger_desc: "漏堵检测报警DT=1"
+        trigger_tag: "LI-105-DT"
+        condition: "=1"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.剔除不合格瓶"
+          - "2.计数LI-105-CNT+1"
+          - "3.报警提示"
+        reset_condition: "自动"
+
+      - id: "LI-03"
+        trigger_desc: "视觉检测系统故障"
+        trigger_tag: "LI-106-DT"
+        condition: "=1"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.切换到人工目检"
+        reset_condition: "故障排除后确认"
+
+      - id: "LI-04"
+        trigger_desc: "检测计数异常"
+        trigger_tag: "LI-106-CT"
+        condition: "计数偏差>1%"
+        level: "L3"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查传感器"
+        reset_condition: "人工确认"
+
+  # --------------------------------------------------------------------------
+  # 喷码系统联锁 (从包装中拆分)
+  # --------------------------------------------------------------------------
+  CI:
+    name: "喷码系统"
+    interlock_prefix: "CI"
+    section_index: 10
+
+    interlocks:
+      - id: "CI-01"
+        trigger_desc: "喷码机1故障"
+        trigger_tag: "CI-101-DT"
+        condition: "=1"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.切换到喷码机2"
+        reset_condition: "故障恢复后确认"
+
+      - id: "CI-02"
+        trigger_desc: "喷码机2故障"
+        trigger_tag: "CI-102-DT"
+        condition: "=1"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.切换到激光喷码机"
+        reset_condition: "故障恢复后确认"
+
+      - id: "CI-03"
+        trigger_desc: "激光喷码机故障"
+        trigger_tag: "CI-103-DT"
+        condition: "=1"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止生产线"
+          - "2.报警提示"
+        reset_condition: "故障恢复后手动"
+
+      - id: "CI-04"
+        trigger_desc: "喷码计数与灌装计数偏差>2%"
+        trigger_tag: "CI-101-CT"
+        condition: "计数偏差>2%"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.检查传输"
+        reset_condition: "人工确认"
+
+  # --------------------------------------------------------------------------
+  # 贴标系统联锁 (从包装中拆分)
+  # --------------------------------------------------------------------------
+  LB:
+    name: "贴标系统"
+    interlock_prefix: "LB"
+    section_index: 11
+
+    interlocks:
+      - id: "LB-01"
+        trigger_desc: "贴标速度ST < 50000瓶/h"
+        trigger_tag: "LB-101-ST"
+        condition: "< 50000"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查上游"
+        reset_condition: "速度恢复后自动"
+
+      - id: "LB-02"
+        trigger_desc: "标签纸剩余量PT < 10%"
+        trigger_tag: "LB-101-PT"
+        condition: "< 10"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.准备更换标签"
+        reset_condition: "更换后自动"
+
+      - id: "LB-03"
+        trigger_desc: "标签检测报警DT=1"
+        trigger_tag: "LB-102-DT"
+        condition: "=1"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.剔除不合格瓶"
+          - "2.计数LB-102-CNT+1"
+          - "3.报警提示"
+        reset_condition: "自动"
+
+      - id: "LB-04"
+        trigger_desc: "贴标机温度MT > 100℃"
+        trigger_tag: "LB-101-MT"
+        condition: "> 100"
+        level: "L1"
+        alarm_level: "HH"
+        actions:
+          - "1.停止贴标机"
+          - "2.报警提示"
+        reset_condition: "温度<80℃后手动"
+
+  # --------------------------------------------------------------------------
+  # 装箱系统联锁 (从包装中拆分)
+  # --------------------------------------------------------------------------
+  CA:
+    name: "装箱系统"
+    interlock_prefix: "CA"
+    section_index: 12
+
+    interlocks:
+      - id: "CA-01"
+        trigger_desc: "装箱速度FT < 25箱/min"
+        trigger_tag: "CA-102-FT"
+        condition: "< 25"
+        level: "L2"
+        alarm_level: "L"
+        actions:
+          - "1.报警提示"
+          - "2.检查上游"
+        reset_condition: "速度恢复后确认"
+
+      - id: "CA-02"
+        trigger_desc: "装箱速度FT > 40箱/min"
+        trigger_tag: "CA-102-FT"
+        condition: "> 40"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.降低速度"
+        reset_condition: "速度恢复后自动"
+
+      - id: "CA-03"
+        trigger_desc: "重量检测超差"
+        trigger_tag: "CA-103-DT"
+        condition: "=1"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.剔除超差箱"
+          - "2.计数CA-103-CNT+1"
+          - "3.报警提示"
+        reset_condition: "自动"
+
+      - id: "CA-04"
+        trigger_desc: "纸箱供应不足"
+        trigger_tag: "CA-101-FT"
+        condition: "计数中断"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.报警提示"
+          - "2.停止装箱机"
+        reset_condition: "人工确认"
+
+      - id: "CA-05"
+        trigger_desc: "实际重量WT超出范围"
+        trigger_tag: "CA-103-WT"
+        condition: "超出±5g"
+        level: "L2"
+        alarm_level: "H"
+        actions:
+          - "1.剔除产品"
+          - "2.报警提示"
+        reset_condition: "人工确认"

@@ -1,0 +1,225 @@
+# 调配系统 (BL) 设备清单
+# 工段: BL, PLC: PLC-5, IP: 192.168.1.15
+
+devices_bl:
+  - id: "BL-101"
+    name: "调配罐1"
+    type: tank
+    section: BL
+    model: "MT-5000"
+    spec: "5m³, 高速搅拌(80rpm)"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "AT"
+        name: "pH值"
+        type: "pH计"
+        range: [0, 14]
+        alarm: {L: 5.0, H: 6.5}
+        is_key_point: true
+      - code: "BT"
+        name: "Brix值"
+        type: "糖度计"
+        range: [0, 20]
+        unit: "°Brix"
+        alarm: {L: 8, H: 12}
+        is_key_point: true
+      - code: "MT"
+        name: "搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    valves:
+      - id: "BV-101"
+        name: "调配罐1进茶阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-102"
+        name: "调配罐1进糖浆阀"
+        type: "计量阀"
+        control: "Brix控制"
+      - id: "BV-103"
+        name: "调配罐1进酸阀"
+        type: "计量阀"
+        control: "pH控制"
+      - id: "BV-104"
+        name: "调配罐1进香料阀"
+        type: "计量阀"
+        control: "配方控制"
+      - id: "BV-105"
+        name: "调配罐1搅拌阀"
+        type: "气动阀"
+        control: "批次控制"
+      - id: "BV-106"
+        name: "调配液出口阀"
+        type: "气动阀"
+        control: "批次结束"
+    motors:
+      - id: "M-BL01"
+        name: "调配罐1搅拌"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "BL-102"
+    name: "调配罐2"
+    type: tank
+    section: BL
+    model: "MT-5000"
+    spec: "5m³, 高速搅拌(80rpm)"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {H: 95}
+      - code: "TT"
+        name: "温度"
+        type: "温度计"
+        range: [0, 50]
+        unit: "℃"
+        alarm: {H: 35}
+      - code: "AT"
+        name: "pH值"
+        type: "pH计"
+        range: [0, 14]
+        alarm: {L: 5.0, H: 6.5}
+        is_key_point: true
+      - code: "BT"
+        name: "Brix值"
+        type: "糖度计"
+        range: [0, 20]
+        unit: "°Brix"
+        alarm: {L: 8, H: 12}
+        is_key_point: true
+      - code: "MT"
+        name: "搅拌电机温度"
+        type: "温度计"
+        range: [0, 150]
+        unit: "℃"
+        alarm: {H: 120}
+    motors:
+      - id: "M-BL02"
+        name: "调配罐2搅拌"
+        power_kw: 5.5
+        is_inverter: true
+
+  - id: "BL-103"
+    name: "糖浆溶解罐"
+    type: tank
+    section: BL
+    model: "ST-2000"
+    spec: "2m³, 夹套加热溶解"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 20, H: 90}
+      - code: "TT"
+        name: "糖浆罐温度"
+        type: "温度计"
+        range: [0, 80]
+        unit: "℃"
+        alarm: {L: 55, H: 70}
+        note: "保温"
+      - code: "BT"
+        name: "糖浆Brix值"
+        type: "糖度计"
+        range: [0, 50]
+        unit: "°Brix"
+        alarm: {L: 60, H: 65}
+        note: "糖浆浓度"
+
+  - id: "BL-104"
+    name: "糖浆储罐"
+    type: tank
+    section: BL
+    model: "SS304, 2m³"
+    spec: "带搅拌, 保温60℃"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30}
+
+  - id: "BL-105"
+    name: "酸液罐"
+    type: tank
+    section: BL
+    model: "SS316, 0.5m³"
+    spec: "柠檬酸/乳酸, 搅拌"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "LT"
+        name: "液位"
+        type: "液位计"
+        range: [0, 100]
+        unit: "%"
+        alarm: {L: 30}
+      - code: "AT"
+        name: "pH值"
+        type: "pH计"
+        range: [0, 14]
+        note: "2%浓度"
+
+  - id: "BL-106"
+    name: "香料/辅料罐"
+    type: tank
+    section: BL
+    model: "SS304, 0.2m³"
+    spec: "小型搅拌罐"
+    quantity: 2
+    supplier: "国产"
+    sensors: []
+
+  - id: "BL-107"
+    name: "电子秤"
+    type: sensor
+    section: BL
+    model: "ICS-500"
+    spec: "精度0.1kg, 称量500kg"
+    quantity: 1
+    supplier: "国产"
+    sensors:
+      - code: "WT"
+        name: "实际重量"
+        type: "重量计"
+        range: [0, 500]
+        unit: "kg"
+        alarm: {H: 500}
+
+  - id: "BL-108"
+    name: "调配液输送泵"
+    type: pump
+    section: BL
+    model: "卫生级离心泵"
+    spec: "3m³/h, SS316"
+    quantity: 2
+    supplier: "国产"
+    power_kw: 3.0
+    is_inverter: false
+    control: "均质连锁"

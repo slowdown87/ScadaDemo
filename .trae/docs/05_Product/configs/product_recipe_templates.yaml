@@ -1,0 +1,397 @@
+# SCADA 产品配方模板定义
+# 文档版本: v1.0
+# 创建日期: 2026-04-28
+# 更新日期: 2026-04-29
+# 说明: 定义产品配方模板，用于自动生成产品配方参数文件
+
+meta:
+  version: "v1.0"
+  created: "2026-04-28"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  source_docs:
+    - "茶饮料生产线工艺流程设计.md"
+  project_name: "茶饮料生产线SCADA系统"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+
+product_recipes:
+  green_tea:
+    name: "绿茶"
+    code: "GT"
+    description: "清淡爽口的绿茶饮料"
+    status: "active"
+
+    tea_spec:
+      type: "绿茶"
+      grade: "一级以上"
+      origin: "浙江/安徽/江苏"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    extraction:
+      water_temp_setpoint: 82
+      water_temp_range: [80, 85]
+      tea_ratio_min: 15
+      tea_ratio_max: 20
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 10
+      extraction_time_range: [8, 12]
+      extraction_time_unit: "min"
+      agitation_speed: 50
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    blending:
+      incoming_tea_conc:
+        value: 2.5
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 10
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 5.5
+        tolerance: "±0.5"
+        range: [5.0, 6.0]
+      citric_acid_percent: 0.1
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    quality:
+      tea_polyphenol_min: 300
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 1.5
+      turbidity_unit: "NTU"
+      color: "黄绿色"
+      flavor: "清香"
+
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+  red_tea:
+    name: "红茶"
+    code: "RT"
+    description: "浓郁醇厚的红茶饮料"
+    status: "active"
+
+    tea_spec:
+      type: "红茶"
+      grade: "一级以上"
+      origin: "云南/福建/四川"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    extraction:
+      water_temp_setpoint: 92
+      water_temp_range: [90, 95]
+      tea_ratio_min: 20
+      tea_ratio_max: 25
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 7
+      extraction_time_range: [5, 10]
+      extraction_time_unit: "min"
+      agitation_speed: 60
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    blending:
+      incoming_tea_conc:
+        value: 3.0
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 11
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 6.0
+        tolerance: "±0.5"
+        range: [5.5, 6.5]
+      citric_acid_percent: 0.08
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    quality:
+      tea_polyphenol_min: 150
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 2.0
+      turbidity_unit: "NTU"
+      color: "红褐色"
+      flavor: "醇厚"
+
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+  oolong_tea:
+    name: "乌龙茶"
+    code: "OT"
+    description: "清香甘醇的乌龙茶饮料"
+    status: "active"
+
+    tea_spec:
+      type: "乌龙茶"
+      grade: "一级以上"
+      origin: "福建/台湾"
+      particle_size: "60目粉碎"
+      storage_temp: "≤25℃"
+      storage_humidity: "≤65%"
+
+    extraction:
+      water_temp_setpoint: 87
+      water_temp_range: [85, 90]
+      tea_ratio_min: 15
+      tea_ratio_max: 20
+      tea_ratio_unit: "倍"
+      extraction_time_setpoint: 9
+      extraction_time_range: [8, 10]
+      extraction_time_unit: "min"
+      agitation_speed: 55
+      agitation_speed_unit: "rpm"
+      stages: 3
+      counter_current: true
+
+    blending:
+      incoming_tea_conc:
+        value: 2.8
+        unit: "°Brix"
+        tolerance: "±0.2"
+      sugar_syrup_conc:
+        value: 65
+        unit: "°Brix"
+      target_brix:
+        value: 10.5
+        unit: "°Brix"
+        tolerance: "±1.0"
+        range: [8, 12]
+      target_ph:
+        value: 5.8
+        tolerance: "±0.5"
+        range: [5.0, 6.5]
+      citric_acid_percent: 0.09
+      blending_temp:
+        value: 25
+        unit: "℃"
+        range: [20, 30]
+      blending_time: 15
+      blending_time_unit: "min"
+      agitation_speed: 80
+      agitation_speed_unit: "rpm"
+
+    homogenization:
+      pressure_setpoint: 22
+      pressure_range: [20, 25]
+      pressure_unit: "MPa"
+      inlet_temp: 65
+      inlet_temp_range: [60, 70]
+      outlet_temp_max: 75
+      passes: 1
+
+    uht:
+      preheat_temp: 80
+      sterilization_temp: 135
+      sterilization_temp_range: [133, 137]
+      sterilization_time: 15
+      sterilization_time_unit: "s"
+      holding_temp_min: 130
+      cooling_temp_outlet: 25
+      cooling_temp_outlet_max: 35
+      flow_rate: 3000
+      flow_rate_unit: "L/h"
+      back_pressure: 0.35
+      back_pressure_unit: "MPa"
+
+    filling:
+      temp: 87
+      temp_range: [85, 88]
+      temp_unit: "℃"
+      speed: 54000
+      speed_unit: "瓶/h"
+      bottle_volume: 500
+      bottle_volume_unit: "ml"
+      headspace: 15
+      headspace_unit: "mm"
+      cap_torque_min: 0.3
+      cap_torque_max: 0.7
+      cap_torque_unit: "Nm"
+
+    quality:
+      tea_polyphenol_min: 200
+      tea_polyphenol_unit: "mg/kg"
+      turbidity_max: 1.8
+      turbidity_unit: "NTU"
+      color: "金黄色"
+      flavor: "清香甘醇"
+
+    cleaning_recipe: "CIP-BL-EX"
+    cleaning_time_estimate: 4
+    cleaning_time_unit: "h"
+
+acceptance_standards:
+  sensory:
+    - parameter: "外观"
+      standard: "清澈透明，无悬浮物"
+      method: "目视"
+    - parameter: "色泽"
+      standard: "符合各产品特征色"
+      method: "目视"
+    - parameter: "气味"
+      standard: "无异味，具有茶香"
+      method: "感官评定"
+
+  physical:
+    - parameter: "Brix"
+      standard: "10±1.0"
+      unit: "°Brix"
+      method: "在线糖度计"
+    - parameter: "pH"
+      standard: "5.5±0.5"
+      unit: "-"
+      method: "在线pH计"
+    - parameter: "温度"
+      standard: "25±5"
+      unit: "℃"
+      method: "温度传感器"
+
+  chemical:
+    - parameter: "茶多酚"
+      standard: "≥300(绿茶)/≥150(红茶)/≥200(乌龙茶)"
+      unit: "mg/kg"
+      method: "GB/T 8313"
+    - parameter: "电导率"
+      standard: "<50"
+      unit: "μS/cm"
+      method: "在线电导率仪"
+
+  microbiological:
+    - parameter: "菌落总数"
+      standard: "<100"
+      unit: "CFU/mL"
+      method: "GB 4789.2"
+    - parameter: "大肠菌群"
+      standard: "<3"
+      unit: "CFU/mL"
+      method: "GB 4789.3"
+    - parameter: "商业无菌"
+      standard: "阴性"
+      unit: "-"
+      method: "GB/T 4789.26"
+
+version_management:
+  current_version: "v1.1"
+  effective_date: "2026-04-29"
+  author: "SCADA系统"
+  approver: "待确认"
+
+  history:
+    - version: "v1.0"
+      date: "2026-04-28"
+      author: "SCADA系统"
+      changes: "初始版本"
+      status: "approved"
+    - version: "v1.1"
+      date: "2026-04-29"
+      author: "SCADA系统"
+      changes: "完善验收标准，添加微生物检测"
+      status: "draft"

@@ -3,9 +3,9 @@
 > 文档版本: v1.0
 > 创建日期: 2026-04-29
 > 更新日期: 2026-04-29
-> 数据来源: scada_data/recipe_templates.yaml (自动生成)
+> 数据来源: cip_recipe_templates.yaml (自动生成)
 > 项目名称: 茶饮料生产线SCADA系统
-> 产能: 54000瓶/小时（500ml PET瓶）
+> 产能: 50000B/H (额定) / 54000B/H (最大)
 
 ---
 
