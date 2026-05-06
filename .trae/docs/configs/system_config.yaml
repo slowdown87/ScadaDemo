@@ -1,0 +1,641 @@
+# ============================================================================
+# 茶饮料生产线SCADA系统 - 核心配置文件
+# ============================================================================
+# 版本: v1.0
+# 创建日期: 2026-04-30
+# 更新日期: 2026-04-30
+# 用途: 单一真相源，所有依赖此数据的文档必须从本文件生成
+#
+# 文档依赖关系:
+#   - PLC_Architecture.md (自动生成) ← 本文件
+#   - 位号编码规则.md (自动生成) ← 本文件
+#   - 设备参数表.md (自动生成) ← 本文件
+#   - 通讯接口规格书_auto.md (自动生成) ← comm_templates.yaml + 本文件
+# ============================================================================
+
+meta:
+  version: "v1.0"
+  created: "2026-04-30"
+  updated: "2026-04-30"
+  project_name: "茶饮料生产线SCADA系统"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+  status: "active"
+  author: "SCADA系统"
+  base_ip_subnet: "192.168.2.x"
+  subnet_mask: "255.255.255.0"
+  gateway: "192.168.2.1"
+
+# ============================================================================
+# PLC定义 - 16个独立PLC
+# ============================================================================
+plcs:
+  PLC-1:
+    name: "WT水处理"
+    name_en: "Water Treatment"
+    section: "WT"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~200点"
+    io_actual: 0
+    ip: "192.168.2.11"
+    role: "公用工程"
+    process_order: 1
+  PLC-2:
+    name: "TH茶叶前处理"
+    name_en: "Tea Handling"
+    section: "TH"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~100点"
+    io_actual: 0
+    ip: "192.168.2.12"
+    role: "防爆区域"
+    process_order: 2
+  PLC-3:
+    name: "EX萃取"
+    name_en: "Extraction"
+    section: "EX"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~180点"
+    io_actual: 0
+    ip: "192.168.2.13"
+    role: "批次控制"
+    process_order: 3
+  PLC-4:
+    name: "FL过滤"
+    name_en: "Filtration"
+    section: "FL"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~120点"
+    io_actual: 0
+    ip: "192.168.2.14"
+    role: "连续流程"
+    process_order: 4
+  PLC-5:
+    name: "BL调配"
+    name_en: "Blending"
+    section: "BL"
+    cpu: "CPU 1517-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~200点"
+    io_actual: 0
+    ip: "192.168.2.15"
+    role: "核心批次"
+    process_order: 5
+  PLC-6:
+    name: "HM均质"
+    name_en: "Homogenization"
+    section: "HM"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~80点"
+    io_actual: 0
+    ip: "192.168.2.16"
+    role: "均质处理"
+    process_order: 6
+  PLC-7:
+    name: "UH UHT杀菌"
+    name_en: "UHT Processing"
+    section: "UH"
+    cpu: "CPU 1517-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~220点"
+    io_actual: 0
+    ip: "192.168.2.17"
+    role: "CCP关键"
+    is_ccp: true
+    process_order: 7
+  PLC-8:
+    name: "BF制瓶"
+    name_en: "Bottle Forming"
+    section: "BF"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~150点"
+    io_actual: 0
+    ip: "192.168.2.18"
+    role: "高速同步"
+    process_order: 8
+  PLC-9:
+    name: "PF灌装"
+    name_en: "Packaging Fill"
+    section: "PF"
+    cpu: "CPU 1517-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~180点"
+    io_actual: 0
+    ip: "192.168.2.19"
+    role: "超高速"
+    is_high_speed: true
+    process_order: 9
+  PLC-10:
+    name: "CG旋盖"
+    name_en: "Capping"
+    section: "CG"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~80点"
+    io_actual: 0
+    ip: "192.168.2.20"
+    role: "跟随灌装"
+    process_order: 10
+  PLC-11:
+    name: "LI灯检"
+    name_en: "Light Inspection"
+    section: "LI"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~60点"
+    io_actual: 0
+    ip: "192.168.2.21"
+    role: "检测设备"
+    process_order: 11
+  PLC-12:
+    name: "CI喷码"
+    name_en: "Coding"
+    section: "CI"
+    cpu: "CPU 1215C"
+    "通讯接口": "1×PN"
+    "冗余方式": "无"
+    io_estimate: "~40点"
+    io_actual: 0
+    ip: "192.168.2.22"
+    role: "产品追溯"
+    process_order: 12
+  PLC-13:
+    name: "LB贴标"
+    name_en: "Labeling"
+    section: "LB"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~60点"
+    io_actual: 0
+    ip: "192.168.2.23"
+    role: "中等速度"
+    process_order: 13
+  PLC-14:
+    name: "CA装箱"
+    name_en: "Cartoning"
+    section: "CA"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~80点"
+    io_actual: 0
+    ip: "192.168.2.24"
+    role: "批量控制"
+    process_order: 14
+  PLC-15:
+    name: "PK膜包码垛"
+    name_en: "Packing"
+    section: "PK"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~120点"
+    io_actual: 0
+    ip: "192.168.2.25"
+    role: "末端设备"
+    process_order: 15
+  PLC-16:
+    name: "CP CIP清洗"
+    name_en: "Cleaning In Place"
+    section: "CP"
+    cpu: "CPU 1515-2 PN"
+    "通讯接口": "2×PN"
+    "冗余方式": "H-Sync光纤环网"
+    io_estimate: "~140点"
+    io_actual: 0
+    ip: "192.168.2.26"
+    role: "独立系统"
+    is_independent: true
+    process_order: 16
+
+# ============================================================================
+# 工段定义
+# ============================================================================
+sections:
+  WT:
+    name: "水处理系统"
+    name_en: "Water Treatment"
+    prefix: "WT"
+    number_range: [101, 199]
+    plc: "PLC-1"
+    process_flow: "液料线-起点"
+    upstream: []
+    downstream: ["TH", "EX"]
+  TH:
+    name: "茶叶前处理系统"
+    name_en: "Tea Handling"
+    prefix: "TH"
+    number_range: [201, 299]
+    plc: "PLC-2"
+    process_flow: "液料线"
+    upstream: ["WT"]
+    downstream: ["EX"]
+  EX:
+    name: "萃取系统"
+    name_en: "Extraction"
+    prefix: "EX"
+    number_range: [301, 399]
+    plc: "PLC-3"
+    process_flow: "液料线"
+    upstream: ["WT", "TH"]
+    downstream: ["FL"]
+  FL:
+    name: "过滤净化系统"
+    name_en: "Filtration"
+    prefix: "FL"
+    number_range: [401, 499]
+    plc: "PLC-4"
+    process_flow: "液料线"
+    upstream: ["EX"]
+    downstream: ["BL"]
+  BL:
+    name: "调配系统"
+    name_en: "Blending"
+    prefix: "BL"
+    number_range: [501, 599]
+    plc: "PLC-5"
+    process_flow: "液料线"
+    upstream: ["FL"]
+    downstream: ["HM"]
+  HM:
+    name: "均质系统"
+    name_en: "Homogenization"
+    prefix: "HM"
+    number_range: [601, 699]
+    plc: "PLC-6"
+    process_flow: "液料线"
+    upstream: ["BL"]
+    downstream: ["UH"]
+  UH:
+    name: "UHT杀菌系统"
+    name_en: "UHT Processing"
+    prefix: "UH"
+    number_range: [701, 799]
+    plc: "PLC-7"
+    process_flow: "液料线-CCP"
+    upstream: ["HM"]
+    downstream: ["BF", "PF"]
+    is_ccp: true
+  BF:
+    name: "制瓶系统"
+    name_en: "Bottle Forming"
+    prefix: "BF"
+    number_range: [801, 899]
+    plc: "PLC-8"
+    process_flow: "包装线"
+    upstream: ["UH"]
+    downstream: ["PF"]
+  PF:
+    name: "灌装系统"
+    name_en: "Packaging Fill"
+    prefix: "PF"
+    number_range: [901, 999]
+    plc: "PLC-9"
+    process_flow: "包装线"
+    upstream: ["UH", "BF"]
+    downstream: ["CG"]
+    is_high_speed: true
+  CG:
+    name: "旋盖系统"
+    name_en: "Capping"
+    prefix: "CG"
+    number_range: [1001, 1099]
+    plc: "PLC-10"
+    process_flow: "包装线"
+    upstream: ["PF"]
+    downstream: ["LI"]
+  LI:
+    name: "灯检系统"
+    name_en: "Light Inspection"
+    prefix: "LI"
+    number_range: [1101, 1199]
+    plc: "PLC-11"
+    process_flow: "包装线"
+    upstream: ["CG"]
+    downstream: ["CI"]
+  CI:
+    name: "喷码系统"
+    name_en: "Coding"
+    prefix: "CI"
+    number_range: [1201, 1299]
+    plc: "PLC-12"
+    process_flow: "包装线"
+    upstream: ["LI"]
+    downstream: ["LB"]
+  LB:
+    name: "贴标系统"
+    name_en: "Labeling"
+    prefix: "LB"
+    number_range: [1301, 1399]
+    plc: "PLC-13"
+    process_flow: "包装线"
+    upstream: ["CI"]
+    downstream: ["CA"]
+  CA:
+    name: "装箱系统"
+    name_en: "Cartoning"
+    prefix: "CA"
+    number_range: [1401, 1499]
+    plc: "PLC-14"
+    process_flow: "包装线"
+    upstream: ["LB"]
+    downstream: ["PK"]
+  PK:
+    name: "膜包码垛系统"
+    name_en: "Packing"
+    prefix: "PK"
+    number_range: [1501, 1599]
+    plc: "PLC-15"
+    process_flow: "包装线-终点"
+    upstream: ["CA"]
+    downstream: []
+  CP:
+    name: "CIP清洗系统"
+    name_en: "Cleaning In Place"
+    prefix: "CP"
+    number_range: [1601, 1699]
+    plc: "PLC-16"
+    process_flow: "独立系统"
+    upstream: []
+    downstream: ["WT", "TH", "EX", "FL", "BL", "HM", "UH", "BF", "PF"]
+    is_independent: true
+
+# ============================================================================
+# 工艺流程定义
+# ============================================================================
+process_flow:
+  liquid_line:
+    name: "液料生产线"
+    sections: ["WT", "TH", "EX", "FL", "BL", "HM", "UH"]
+  packaging_line:
+    name: "包装生产线"
+    sections: ["BF", "PF", "CG", "LI", "CI", "LB", "CA", "PK"]
+  independent_systems:
+    name: "独立系统"
+    sections: ["CP"]
+
+# ============================================================================
+# 高速同步定义
+# ============================================================================
+high_speed_sync:
+  - from: "PLC-8"
+    from_section: "BF"
+    to: "PLC-9"
+    to_section: "PF"
+    period_ms: 10
+    content: "瓶速、瓶位"
+    precision_ms: 1
+  - from: "PLC-9"
+    from_section: "PF"
+    to: "PLC-10"
+    to_section: "CG"
+    period_ms: 10
+    content: "灌装完成、旋盖触发"
+    precision_ms: 1
+  - from: "PLC-10"
+    from_section: "CG"
+    to: "PLC-11"
+    to_section: "LI"
+    period_ms: 50
+    content: "产品计数"
+    precision_ms: 5
+  - from: "PLC-11"
+    from_section: "LI"
+    to: "PLC-12"
+    to_section: "CI"
+    period_ms: 50
+    content: "剔除信号"
+    precision_ms: 5
+  - from: "PLC-7"
+    from_section: "UH"
+    to: "PLC-9"
+    to_section: "PF"
+    period_ms: 20
+    content: "无菌料信号、速度主令"
+    precision_ms: 2
+
+# ============================================================================
+# PLC间通讯矩阵
+# ============================================================================
+plc_comm_matrix:
+  - from: "PLC-1"
+    to: "PLC-3"
+    method: "PROFINET I-Device"
+    data: "纯水产水量"
+    period_ms: 100
+    desc: "调配用水"
+  - from: "PLC-2"
+    to: "PLC-3"
+    method: "PROFINET I-Device"
+    data: "茶叶原料量"
+    period_ms: 100
+    desc: "批次计量"
+  - from: "PLC-3"
+    to: "PLC-4"
+    method: "PROFINET I-Device"
+    data: "茶汁流量、温度、批次完成"
+    period_ms: 50
+    desc: "批次信号"
+  - from: "PLC-4"
+    to: "PLC-5"
+    method: "PROFINET I-Device"
+    data: "过滤后流量、批次完成"
+    period_ms: 50
+    desc: "批次信号"
+  - from: "PLC-5"
+    to: "PLC-6"
+    method: "PROFINET I-Device"
+    data: "调配液流量、批次完成"
+    period_ms: 50
+    desc: "批次信号"
+  - from: "PLC-6"
+    to: "PLC-7"
+    method: "PROFINET I-Device"
+    data: "流量、压力、温度"
+    period_ms: 20
+    desc: "连续信号"
+  - from: "PLC-7"
+    to: "PLC-9"
+    method: "PROFINET I-Device"
+    data: "无菌料信号、速度主令"
+    period_ms: 10
+    desc: "超高速"
+  - from: "PLC-8"
+    to: "PLC-9"
+    method: "PROFINET I-Device"
+    data: "瓶速、瓶位"
+    period_ms: 10
+    desc: "高速同步"
+  - from: "PLC-9"
+    to: "PLC-10"
+    method: "PROFINET I-Device"
+    data: "旋盖速度、扭矩设定"
+    period_ms: 10
+    desc: "同步控制"
+  - from: "PLC-10"
+    to: "PLC-11"
+    method: "PROFINET I-Device"
+    data: "产品计数、合格信号"
+    period_ms: 50
+    desc: "检测触发"
+  - from: "PLC-11"
+    to: "PLC-12"
+    method: "PROFINET I-Device"
+    data: "剔除信号"
+    period_ms: 50
+    desc: "不合格跳过"
+  - from: "PLC-12"
+    to: "PLC-13"
+    method: "PROFINET I-Device"
+    data: "喷码内容、打印完成"
+    period_ms: 50
+    desc: "标签信息"
+  - from: "PLC-13"
+    to: "PLC-14"
+    method: "PROFINET I-Device"
+    data: "产品计数"
+    period_ms: 100
+    desc: "装箱触发"
+  - from: "PLC-14"
+    to: "PLC-15"
+    method: "PROFINET I-Device"
+    data: "纸箱计数"
+    period_ms: 100
+    desc: "码垛触发"
+  - from: "PLC-9"
+    to: ["PLC-1", "PLC-2", "PLC-3", "PLC-4", "PLC-5", "PLC-6", "PLC-7"]
+    method: "PROFINET I-Device"
+    data: "急停/清洗请求"
+    period_ms: 10
+    desc: "安全联锁"
+  - from: "PLC-16"
+    to: "ALL"
+    method: "PROFINET I-Device"
+    data: "CIP程序启动/完成"
+    period_ms: 200
+    desc: "清洗信号"
+
+# ============================================================================
+# 其他SCADA组件IP
+# ============================================================================
+scada_components:
+  scada_primary:
+    name: "SCADA主服务器"
+    ip: "192.168.2.100"
+  scada_backup:
+    name: "SCADA备服务器"
+    ip: "192.168.2.101"
+  engineer_station:
+    name: "工程师站"
+    ip: "192.168.2.110"
+  core_switch_1:
+    name: "核心交换机1"
+    ip: "192.168.2.1"
+    role: "网关"
+  core_switch_2:
+    name: "核心交换机2"
+    ip: "192.168.2.2"
+    role: "冗余"
+
+# ============================================================================
+# 中断组织块配置模板
+# ============================================================================
+ob_config:
+  OB1:
+    type: "Free Cycle"
+    cycle_ms: 100
+    applies_to: "ALL"
+    desc: "主程序循环"
+  OB30:
+    type: "Cyclic Interrupt"
+    cycle_ms: 50
+    applies_to: ["PLC-5", "PLC-7", "PLC-9"]
+    desc: "快速液位/温度控制"
+  OB32:
+    type: "Cyclic Interrupt"
+    cycle_ms: 50
+    applies_to: ["PLC-3", "PLC-4", "PLC-6", "PLC-15"]
+    desc: "快速液位/温度控制"
+  OB34:
+    type: "Cyclic Interrupt"
+    cycle_ms: 10
+    applies_to: ["PLC-8", "PLC-9", "PLC-10"]
+    desc: "高速同步控制"
+  OB35:
+    type: "Cyclic Interrupt"
+    cycle_ms: 100
+    applies_to: ["PLC-1", "PLC-2", "PLC-11", "PLC-12", "PLC-13", "PLC-14"]
+    desc: "标准控制"
+  OB80:
+    type: "Time Error"
+    applies_to: ["PLC-7", "PLC-9"]
+    desc: "同步超时处理"
+  OB82:
+    type: "Diagnostic Interrupt"
+    applies_to: "ALL"
+    desc: "诊断中断"
+  OB100:
+    type: "Startup"
+    applies_to: "ALL"
+    desc: "启动组织块"
+
+# ============================================================================
+# 关键控制点定义 (CCP)
+# ============================================================================
+critical_control_points:
+  - section: "UH"
+    plc: "PLC-7"
+    name: "UHT杀菌温度"
+    requirement: "135℃/15s"
+    f0_target: 15.0
+    time_requirement_ms: 10
+    desc: "食品安全关键控制点"
+
+# ============================================================================
+# 控制级别定义
+# ============================================================================
+control_levels:
+  P1:
+    name: "基础控制"
+    desc: "常规生产控制"
+  P2:
+    name: "过程控制"
+    desc: "工艺参数控制"
+  CCP:
+    name: "关键控制点"
+    desc: "食品安全关键控制"
+
+# ============================================================================
+# I/O总计
+# ============================================================================
+io_summary:
+  total_estimated: 2050
+  liquid_line: 1180
+  packaging_line: 730
+  independent: 140
+
+# ============================================================================
+# 版本历史
+# ============================================================================
+version_history:
+  - version: "v1.0"
+    date: "2026-04-30"
+    desc: "初始版本，从devices_meta.yaml和PLC_Architecture.md合并"

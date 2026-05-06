@@ -1,5 +1,5 @@
 # 水处理系统 (WT) 设备清单
-# 工段: WT, PLC: PLC-1, IP: 192.168.1.11
+# 工段: WT, PLC: PLC-1, IP: 192.168.2.11
 
 devices_wt:
   - id: "WT-101"

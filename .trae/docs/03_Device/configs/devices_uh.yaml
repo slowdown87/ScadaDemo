@@ -1,5 +1,5 @@
 # UHT杀菌系统 (UH) 设备清单
-# 工段: UH, PLC: PLC-6, IP: 192.168.1.16
+# 工段: UH, PLC: PLC-6, IP: 192.168.2.16
 
 devices_uh:
   - id: "UH-101"

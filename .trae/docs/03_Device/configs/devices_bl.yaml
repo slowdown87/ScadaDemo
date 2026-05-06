@@ -1,5 +1,5 @@
 # 调配系统 (BL) 设备清单
-# 工段: BL, PLC: PLC-5, IP: 192.168.1.15
+# 工段: BL, PLC: PLC-5, IP: 192.168.2.15
 
 devices_bl:
   - id: "BL-101"

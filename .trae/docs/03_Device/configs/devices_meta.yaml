@@ -1,13 +1,14 @@
 # 茶饮料生产线设备主数据 - 元数据与工段定义
 # 文档版本: v1.0
 # 创建日期: 2026-04-28
-# 更新日期: 2026-04-29
+# 更新日期: 2026-04-30
 # 说明: 拆分后的元数据与工段定义文件
+# 注意: FL与HM分开控制，共16个独立PLC
 
 meta:
   version: "v1.0"
   created: "2026-04-28"
-  updated: "2026-04-29"
+  updated: "2026-04-30"
   author: "SCADA系统"
   status: "active"
   source_docs:
@@ -20,7 +21,8 @@ meta:
 
 # ============================================================================
 # 工段定义
-# 说明: 共15个工段，分配到15个独立PLC
+# 说明: 共16个工段，分配到16个独立PLC
+# 流程顺序: WT→TH→EX→FL→BL→HM→UH→BF→PF→CG→LI→CI→LB→CA→PK→CP
 # ============================================================================
 sections:
   WT:
@@ -29,112 +31,112 @@ sections:
     prefix: "WT"
     number_range: [101, 199]
     plc: "PLC-1"
-    plc_ip: "192.168.1.11"
+    plc_ip: "192.168.2.11"
   TH:
     name: "茶叶前处理系统"
     name_en: "Tea Handling"
     prefix: "TH"
     number_range: [201, 299]
     plc: "PLC-2"
-    plc_ip: "192.168.1.12"
+    plc_ip: "192.168.2.12"
   EX:
     name: "萃取系统"
     name_en: "Extraction"
     prefix: "EX"
     number_range: [301, 399]
     plc: "PLC-3"
-    plc_ip: "192.168.1.13"
+    plc_ip: "192.168.2.13"
   FL:
     name: "过滤净化系统"
     name_en: "Filtration"
     prefix: "FL"
     number_range: [401, 499]
     plc: "PLC-4"
-    plc_ip: "192.168.1.14"
+    plc_ip: "192.168.2.14"
   BL:
     name: "调配系统"
     name_en: "Blending"
     prefix: "BL"
     number_range: [501, 599]
     plc: "PLC-5"
-    plc_ip: "192.168.1.15"
+    plc_ip: "192.168.2.15"
   HM:
     name: "均质系统"
     name_en: "Homogenization"
     prefix: "HM"
     number_range: [601, 699]
-    plc: "PLC-4"
-    plc_ip: "192.168.1.14"
+    plc: "PLC-6"
+    plc_ip: "192.168.2.16"
   UH:
     name: "UHT杀菌系统"
     name_en: "UHT Processing"
     prefix: "UH"
     number_range: [701, 799]
-    plc: "PLC-6"
-    plc_ip: "192.168.1.16"
+    plc: "PLC-7"
+    plc_ip: "192.168.2.17"
   BF:
     name: "制瓶系统"
     name_en: "Bottle Forming"
     prefix: "BF"
     number_range: [801, 899]
-    plc: "PLC-7"
-    plc_ip: "192.168.1.17"
+    plc: "PLC-8"
+    plc_ip: "192.168.2.18"
   PF:
     name: "灌装系统"
     name_en: "Packaging Fill"
     prefix: "PF"
     number_range: [901, 999]
-    plc: "PLC-8"
-    plc_ip: "192.168.1.18"
+    plc: "PLC-9"
+    plc_ip: "192.168.2.19"
   CG:
     name: "旋盖系统"
     name_en: "Capping"
     prefix: "CG"
     number_range: [1001, 1099]
-    plc: "PLC-9"
-    plc_ip: "192.168.1.19"
+    plc: "PLC-10"
+    plc_ip: "192.168.2.20"
   LI:
     name: "灯检系统"
     name_en: "Light Inspection"
     prefix: "LI"
     number_range: [1101, 1199]
-    plc: "PLC-10"
-    plc_ip: "192.168.1.20"
+    plc: "PLC-11"
+    plc_ip: "192.168.2.21"
   CI:
     name: "喷码系统"
     name_en: "Coding"
     prefix: "CI"
     number_range: [1201, 1299]
-    plc: "PLC-11"
-    plc_ip: "192.168.1.21"
+    plc: "PLC-12"
+    plc_ip: "192.168.2.22"
   LB:
     name: "贴标系统"
     name_en: "Labeling"
     prefix: "LB"
     number_range: [1301, 1399]
-    plc: "PLC-12"
-    plc_ip: "192.168.1.22"
+    plc: "PLC-13"
+    plc_ip: "192.168.2.23"
   CA:
     name: "装箱系统"
     name_en: "Cartoning"
     prefix: "CA"
     number_range: [1401, 1499]
-    plc: "PLC-13"
-    plc_ip: "192.168.1.23"
+    plc: "PLC-14"
+    plc_ip: "192.168.2.24"
   PK:
     name: "膜包码垛系统"
     name_en: "Packing"
     prefix: "PK"
     number_range: [1501, 1599]
-    plc: "PLC-14"
-    plc_ip: "192.168.1.24"
+    plc: "PLC-15"
+    plc_ip: "192.168.2.25"
   CP:
     name: "CIP清洗系统"
     name_en: "Cleaning In Place"
     prefix: "CP"
     number_range: [1601, 1699]
-    plc: "PLC-15"
-    plc_ip: "192.168.1.25"
+    plc: "PLC-16"
+    plc_ip: "192.168.2.26"
 
 # ============================================================================
 # 设备分类模板

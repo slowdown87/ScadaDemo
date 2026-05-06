@@ -1,5 +1,5 @@
 # 萃取系统 (EX) 设备清单
-# 工段: EX, PLC: PLC-3, IP: 192.168.1.13
+# 工段: EX, PLC: PLC-3, IP: 192.168.2.13
 
 devices_ex:
   - id: "EX-101"

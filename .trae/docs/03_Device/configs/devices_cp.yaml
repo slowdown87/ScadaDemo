@@ -1,5 +1,5 @@
 # CIP清洗系统 (CP) 设备清单
-# 工段: CP, PLC: PLC-15, IP: 192.168.1.25
+# 工段: CP, PLC: PLC-15, IP: 192.168.2.25
 
 devices_cp:
   - id: "CP-101"
