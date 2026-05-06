@@ -13,7 +13,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 CONFIG_COMM = SCRIPT_DIR.parent / "configs" / "comm_templates.yaml"
-OUTPUT_COMM = SCRIPT_DIR.parent / "通讯接口规格书_auto.md"
+OUTPUT_COMM = SCRIPT_DIR.parent / "auto" / "通讯接口规格书_auto.md"
 
 
 def load_yaml(file_path):
@@ -40,14 +40,30 @@ def generate_header(version="v2.0"):
 > 产品类型: {meta.get('product_type', '纯茶饮料')}
 > 产能: {meta.get('capacity', '50000B/H')}
 > IP段: {ip_segment}
+>
+> ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**
 
 ---
 
 ## ⚠️ 重要声明
 
-本文档已基于 **{meta.get('ip_segment', '192.168.2.x')}** IP段自动生成。
+### 生成信息
 
-**基准架构文档**: PLC_Architecture.md v2.0
+| 项目 | 内容 |
+| ---- | ---- |
+| **数据来源** | `04_Process/configs/comm_templates.yaml` |
+| **生成器脚本** | `04_Process/_generators/comm_spec_generator.py` |
+| **重新生成命令** | `python 04_Process/_generators/comm_spec_generator.py` |
+
+### 修改流程
+
+1. 编辑 `04_Process/configs/comm_templates.yaml`
+2. 运行 `python 04_Process/_generators/comm_spec_generator.py`
+3. 检查生成的 `04_Process/auto/通讯接口规格书_auto.md`
+
+---
+
+**基准架构文档**: PLC_Architecture_auto.md v1.0
 
 ---
 

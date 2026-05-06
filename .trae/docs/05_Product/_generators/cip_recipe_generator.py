@@ -37,6 +37,26 @@ def generate_header(doc_type, config_file, version="v1.0"):
 > 数据来源: {config_file.name} (自动生成)
 > 项目名称: {meta.get('project_name', '茶饮料生产线SCADA系统')}
 > 产能: {meta.get('capacity', '50000B/H')}
+>
+> ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**
+
+---
+
+## ⚠️ 重要声明
+
+### 生成信息
+
+| 项目 | 内容 |
+| ---- | ---- |
+| **数据来源** | `05_Product/configs/cip_recipe_templates.yaml` |
+| **生成器脚本** | `05_Product/_generators/cip_recipe_generator.py` |
+| **重新生成命令** | `python 05_Product/_generators/cip_recipe_generator.py` |
+
+### 修改流程
+
+1. 编辑 `05_Product/configs/cip_recipe_templates.yaml`
+2. 运行 `python 05_Product/_generators/cip_recipe_generator.py`
+3. 检查生成的 `05_Product/auto/CIP配方_auto.md`
 
 ---
 

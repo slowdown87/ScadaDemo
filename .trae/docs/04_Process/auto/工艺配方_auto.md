@@ -1,11 +1,31 @@
 # 茶饮料生产线工艺配方
 
 > 文档版本: v1.0
-> 创建日期: 2026-04-30
-> 更新日期: 2026-04-30
+> 创建日期: 2026-05-06
+> 更新日期: 2026-05-06
 > 数据来源: process_recipe_templates.yaml (自动生成)
 > 项目名称: 茶饮料生产线SCADA系统
 > 产能: 50000B/H (额定) / 54000B/H (最大)
+>
+> ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**
+
+---
+
+## ⚠️ 重要声明
+
+### 生成信息
+
+| 项目 | 内容 |
+| ---- | ---- |
+| **数据来源** | `04_Process/configs/process_recipe_templates.yaml` |
+| **生成器脚本** | `04_Process/_generators/process_recipe_generator.py` |
+| **重新生成命令** | `python 04_Process/_generators/process_recipe_generator.py` |
+
+### 修改流程
+
+1. 编辑 `04_Process/configs/process_recipe_templates.yaml`
+2. 运行 `python 04_Process/_generators/process_recipe_generator.py`
+3. 检查生成的 `04_Process/auto/工艺配方_auto.md`
 
 ---
 
@@ -324,4 +344,4 @@
 
 **版本历史**:
 
-- v1.0 (2026-04-30): 自动生成版本
+- v1.0 (2026-05-06): 自动生成版本

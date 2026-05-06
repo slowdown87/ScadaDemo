@@ -1,0 +1,548 @@
+# HMI画面配置
+# 茶饮料生产线SCADA监控系统
+#
+# 用途: SCADA画面规格说明书的配置驱动数据源
+# 生成器: HMI_Screens_generator.py
+# 输出: HMI_Screens_auto.md
+
+meta:
+  version: "v2.0"
+  created: "2026-04-29"
+  updated: "2026-05-06"
+  project_name: "茶饮料生产线SCADA监控系统"
+  product_type: "纯茶饮料（绿茶/红茶/乌龙茶）- 共线生产"
+  capacity: "50000B/H (额定) / 54000B/H (最大)"
+  author: "SCADA系统"
+
+# ============================================================================
+# 1. 画面导航
+# ============================================================================
+screens:
+  - id: WS-001
+    name: "茶饮料生产线总貌"
+    priority: P0
+    section: overview
+    description: "生产线工艺流程总览、关键参数、报警概览"
+    functions:
+      - MF-001  # 总貌监控
+      - AF-001  # 报警概览
+
+  - id: WS-002
+    name: "水处理系统"
+    priority: P1
+    section: WT
+    description: "原水、多介质过滤、活性炭、RO、离子交换、UV、纯水储罐"
+    functions:
+      - MF-002  # 水处理监控
+
+  - id: WS-003
+    name: "茶叶萃取系统"
+    priority: P1
+    section: EX
+    description: "茶叶前处理、三级逆流萃取、茶渣分离、冷却"
+    functions:
+      - MF-003  # 茶叶萃取监控
+
+  - id: WS-004
+    name: "过滤净化系统"
+    priority: P1
+    section: FL
+    description: "碟式离心、超滤膜"
+    functions:
+      - MF-004  # 过滤调配监控
+
+  - id: WS-005
+    name: "调配系统"
+    priority: P1
+    section: BL
+    description: "调配罐、糖浆制备"
+    functions:
+      - MF-004
+      - LC-004  # 调配Brix控制
+      - LC-005  # 调配pH控制
+
+  - id: WS-006
+    name: "均质系统"
+    priority: P1
+    section: HM
+    description: "均质机、阀门组"
+    functions:
+      - MF-005  # 均质监控
+      - LC-006  # 均质压力控制
+
+  - id: WS-007
+    name: "UHT杀菌系统"
+    priority: P0
+    section: UH
+    is_ccp: true
+    description: "预热、杀菌、保温、冷却、无菌储罐"
+    functions:
+      - MF-006  # UHT杀菌监控
+      - LC-007  # UHT预热温度
+      - LC-008  # UHT杀菌温度
+      - LC-009  # UHT冷却温度
+
+  - id: WS-008
+    name: "灌装系统"
+    priority: P0
+    section: PF
+    description: "灌装机、旋盖机"
+    functions:
+      - MF-007  # 灌装监控
+
+  - id: WS-009
+    name: "冷却包装系统"
+    priority: P1
+    section: PK
+    description: "冷却隧道、输送链、贴标机、装箱机"
+    functions:
+      - MF-007  # 冷却监控
+
+  - id: WS-010
+    name: "CIP清洗系统"
+    priority: P1
+    section: CP
+    description: "清洗配方选择、步骤显示、执行控制"
+    functions:
+      - MF-008  # CIP清洗监控
+      - SC-003  # CIP清洗顺序
+
+  - id: WS-011
+    name: "趋势曲线"
+    priority: P1
+    section: trend
+    description: "历史趋势、实时趋势、多参数对比"
+    trend_groups:
+      - TG-01  # 温度趋势
+      - TG-02  # 压力/流量趋势
+      - TG-03  # 液位趋势
+      - TG-04  # 品质参数趋势
+      - TG-05  # 产量趋势
+
+  - id: WS-012
+    name: "报警汇总"
+    priority: P0
+    section: alarm
+    description: "报警列表、历史报警、报警统计"
+    functions:
+      - AF-001  # 报警列表
+      - AF-002  # 报警确认
+      - AF-003  # 报警历史
+      - AF-004  # 报警统计
+
+  - id: WS-013
+    name: "产量报表"
+    priority: P1
+    section: report
+    description: "日报、周报、月报、自定义报表"
+    functions:
+      - RP-001  # 日报表
+      - RP-002  # 周报表
+      - RP-003  # 月报表
+      - RP-004  # 年报表
+
+  - id: WS-014
+    name: "用户管理"
+    priority: P2
+    section: admin
+    description: "用户列表、权限配置、操作日志"
+
+  - id: WS-015
+    name: "系统设置"
+    priority: P2
+    section: config
+    description: "系统参数、通讯配置、备份还原"
+
+# ============================================================================
+# 2. 控件库规格
+# ============================================================================
+control_library:
+  # 2.1 基础控件
+  numeric_display:
+    type: NumericDisplay
+    font: Consolas
+    font_size: 16
+    decimal_places: 1-2
+    unit_position: subscript
+    colors:
+      normal: "#FFFFFF"
+      warning: "#FFFF00"
+      alarm: "#FF0000"
+    refresh: 1s
+
+  level_indicator:
+    type: LevelIndicator
+    direction: vertical
+    height: 100
+    width: 30
+    fill_color: "#0066FF"
+    bg_color: "#2a3a5a"
+    high_alarm: "#FF6600"
+    low_alarm: "#00CCFF"
+    over_limit: "#FF0000"
+
+  valve_symbol:
+    type: ValveSymbol
+    shape: diamond
+    size: "16×16px"
+    open_color: "#00FF00"
+    closed_color: "#808080"
+    fault_color: "#FF0000"
+    transitioning_color: "#FFFF00"
+    animation: pulse_when_transitioning
+
+  pump_symbol:
+    type: PumpSymbol
+    shape: circle_with_triangle
+    size: "24×24px"
+    running_color: "#00FF00"
+    stopped_color: "#808080"
+    fault_color: "#FF0000"
+    overload_color: "#FFFF00"
+    animation:
+      type: rotation
+      fps: 25
+
+  pipeline_flow:
+    type: PipelineFlow
+    pipe_width: 8
+    liquid_color: "#0066FF"
+    gas_color: "#FFCC00"
+    animation: dashed_line_moving
+    speed_proportional_to_flow: true
+    static_when_stopped: true
+
+  # 2.2 报警控件
+  alarm_banner:
+    type: AlarmBanner
+    height: 40
+    width: "100%"
+    styles:
+      HH: {bg: "#FF0000", text: "#FFFFFF", flash: true}
+      H: {bg: "#FFFF00", text: "#000000", flash: false}
+      L: {bg: "#FFFF00", text: "#000000", flash: false}
+      LL: {bg: "#FF0000", text: "#FFFFFF", flash: true}
+      D: {bg: "#0066FF", text: "#FFFFFF", flash: false}
+      F: {bg: "#FF0000", text: "#FFFFFF", flash: false}
+    font: "微软雅黑 14pt"
+    sound:
+      HH: continuous
+      LL: continuous
+      H: intermittent
+      L: intermittent
+    flash_frequency: 1Hz
+
+  alarm_ack_button:
+    type: AlarmAckButton
+    size: "80×32px"
+    default_bg: "#808080"
+    default_text: "#FFFFFF"
+    default_text_content: "确认"
+    has_unack_alarm_bg: "#FFFF00"
+    permission: operator
+
+  # 2.3 操作控件
+  button:
+    type: Button
+    size: "80×32px"
+    font: "微软雅黑 14pt"
+    states:
+      default: {bg: "#2a3a5a", text: "#FFFFFF"}
+      hover: {bg: "#3a4a6a", text: "#FFFFFF"}
+      pressed: {bg: "#1a2a4a", text: "#FFFFFF"}
+      disabled: {bg: "#1a1a1a", text: "#808080"}
+    types:
+      start: {bg: "#006600", text: "#FFFFFF"}
+      stop: {bg: "#660000", text: "#FFFFFF"}
+      reset: {bg: "#665500", text: "#FFFFFF"}
+      ack: {bg: "#005566", text: "#FFFFFF"}
+      operate: {bg: "#2a3a5a", text: "#FFFFFF"}
+      emergency: {bg: "#CC0000", text: "#FFFFFF"}
+
+  setpoint_input:
+    type: SetpointInput
+    size: "80x28"
+    font: "Consolas 14pt"
+    bg_normal: "#1a2235"
+    bg_focused: "#2a3a5a"
+    validation: range_check
+    permission_required: true
+
+  # 2.4 图表控件
+  trend_chart:
+    type: TrendChart
+    canvas_height: 300
+    time_axis: horizontal
+    value_axis: vertical
+    grid: optional_gray_dashed
+    line_width: 2
+    max_colors: 8
+    sample_period: 10s
+    display_duration: ["1h", "4h", "8h", "24h"]
+    display_mode: connected_line
+
+  bar_chart:
+    type: BarChart
+    direction: vertical
+    bar_width: 20
+    bar_spacing: 8
+    value_display: top_of_bar
+
+# ============================================================================
+# 3. 报警样式
+# ============================================================================
+alarm_styles:
+  HH:
+    name: "高高报警"
+    color: "#FF0000"
+    bg_color: "#FF0000"
+    flash: true
+    sound: continuous
+    response: immediate
+    interlock: true
+  H:
+    name: "高报警"
+    color: "#FFFF00"
+    bg_color: "#FFFF00"
+    flash: false
+    sound: intermittent
+    response: "30分钟内"
+    interlock: false
+  L:
+    name: "低报警"
+    color: "#FFFF00"
+    bg_color: "#FFFF00"
+    flash: false
+    sound: intermittent
+    response: "30分钟内"
+    interlock: false
+  LL:
+    name: "低低报警"
+    color: "#FF0000"
+    bg_color: "#FF0000"
+    flash: true
+    sound: continuous
+    response: immediate
+    interlock: true
+  D:
+    name: "偏差报警"
+    color: "#0066FF"
+    bg_color: "#0066FF"
+    flash: false
+    sound: none
+    response: 提示
+    interlock: false
+  F:
+    name: "故障报警"
+    color: "#FF0000"
+    bg_color: "#FF0000"
+    flash: false
+    sound: intermittent
+    response: 故障排除后
+    interlock: false
+
+# ============================================================================
+# 4. 画面优先级定义
+# ============================================================================
+priority_definitions:
+  P0:
+    count: 4
+    response_time: "≤0.5s"
+    description: "总貌、UHT、灌装、报警"
+    refresh_mode: realtime_push
+  P1:
+    count: 9
+    response_time: "≤1s"
+    description: "各工段、趋势、报表"
+    refresh_mode: polling
+  P2:
+    count: 2
+    response_time: 按需
+    description: "用户管理、系统设置"
+    refresh_mode: on_demand
+
+# ============================================================================
+# 5. 通用模板
+# ============================================================================
+standard_layout:
+  header:
+    logo:
+      size: "32x32"
+      position: top_left
+    title:
+      font: "微软雅黑 24pt"
+      color: "#FFFFFF"
+      position: center
+    time_format: "YYYY-MM-DD HH:mm:ss"
+    user_format: "角色:用户名"
+    logout_button: top_right
+
+  status_bar:
+    height: 24
+    bg_color: "#1a2235"
+    elements:
+      - connection_status: {normal: "#00FF00", disconnected: "#FF0000"}
+      - plc_status: {running: "#00FF00", warning: "#FFFF00", fault: "#FF0000"}
+      - current_batch: "当前批次"
+    font: "微软雅黑 11pt"
+    font_color: "#FFFFFF"
+
+  navigation_bar:
+    sections:
+      - 总貌
+      - WT
+      - EX
+      - FL
+      - BL
+      - HM
+      - UH
+      - PF
+      - PK
+      - CIP
+    right_items:
+      - 趋势
+      - 报警
+      - 报表
+      - 用户
+
+  content_regions:
+    - name: "工艺流程区"
+      height_percent: 60
+    - name: "设备状态面板"
+      width_percent: 30
+    - name: "参数监控面板"
+      width_percent: 70
+    - name: "操作面板"
+      height_percent: 15
+
+# ============================================================================
+# 6. CCP点定义
+# ============================================================================
+ccp_points:
+  - tag: "UH-101-TT2"
+    description: "UHT杀菌温度"
+    section: UH
+    alarm_levels:
+      HH:
+        threshold: "<130℃"
+        duration: "持续10s"
+        interlock_action: "关闭进料阀UV-101"
+      H:
+        threshold: ">142℃"
+        interlock_action: "紧急关闭+泄压"
+
+  - tag: "UH-101-PT2"
+    description: "UHT杀菌压力"
+    section: UH
+    alarm_levels:
+      HH:
+        threshold: "<0.2MPa"
+        interlock_action: "关闭进料"
+      H:
+        threshold: ">0.5MPa"
+        interlock_action: "打开泄压阀UV-106"
+
+  - tag: "HM-101-PT2"
+    description: "均质压力"
+    section: HM
+    alarm_levels:
+      HH:
+        threshold: "<18MPa"
+        interlock_action: "停均质机"
+      H:
+        threshold: ">27MPa"
+        interlock_action: "报警"
+
+  - tag: "EX-101-TT"
+    description: "萃取温度"
+    section: EX
+    alarm_levels:
+      HH:
+        threshold: "<75℃或>100℃"
+        interlock_action: "停批次"
+
+# ============================================================================
+# 7. 交互规格
+# ============================================================================
+interaction_specs:
+  mouse:
+    - action: "单击"
+      target: "工艺设备符号"
+      response: "跳转对应工段画面"
+    - action: "单击"
+      target: "参数数值"
+      response: "弹出趋势小窗口"
+    - action: "双击"
+      target: "参数数值"
+      response: "跳转趋势画面(该参数)"
+    - action: "单击"
+      target: "报警条"
+      response: "跳转报警详情"
+    - action: "右键"
+      target: "设备符号"
+      response: "弹出操作菜单"
+    - action: "悬停"
+      target: "设备符号"
+      response: "显示设备详情tooltip"
+
+  keyboard:
+    - key: "Esc"
+      function: "取消当前操作/关闭弹窗"
+    - key: "Enter"
+      function: "确认当前操作"
+    - key: "F1"
+      function: "帮助"
+    - key: "F5"
+      function: "刷新当前画面"
+    - key: "Ctrl+F"
+      function: "搜索"
+    - key: "Ctrl+P"
+      function: "打印"
+    - key: "Ctrl+A"
+      function: "全选(列表)"
+    - key: "1-9"
+      function: "快速跳转画面 WS-00X"
+
+# ============================================================================
+# 8. 权限验证
+# ============================================================================
+permission_checks:
+  device_start:
+    required_level: 1
+    denied_response: "按钮禁用+提示'需要操作员权限'"
+  parameter_modify:
+    required_level: 4
+    denied_response: "输入框禁用"
+  recipe_adjust:
+    required_level: 3
+    denied_response: "按钮禁用"
+  user_management:
+    required_level: 5
+    denied_response: "菜单隐藏"
+
+# ============================================================================
+# 9. 性能规格
+# ============================================================================
+performance_specs:
+  response_times:
+    screen_switch: "≤1s"
+    data_refresh: "≤1s"
+    alarm_response: "≤0.5s"
+    operation_feedback: "≤0.3s"
+    trend_load: "≤2s"
+
+  refresh_strategies:
+    P0:
+      mode: "实时推送"
+      period: "0.5s"
+    P1:
+      mode: "轮询"
+      period: "1s"
+    P2:
+      mode: "按需"
+      trigger: "操作时"
+    alarm:
+      mode: "事件触发"
+    trend:
+      mode: "后台采集"
+      period: "10s"

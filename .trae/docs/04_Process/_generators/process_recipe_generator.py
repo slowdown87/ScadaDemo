@@ -13,7 +13,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
 CONFIG_PROCESS = SCRIPT_DIR.parent / "configs" / "process_recipe_templates.yaml"
-OUTPUT_PROCESS = SCRIPT_DIR.parent / "工艺配方_auto.md"
+OUTPUT_PROCESS = SCRIPT_DIR.parent / "auto" / "工艺配方_auto.md"
 
 
 def load_yaml(file_path):
@@ -37,6 +37,26 @@ def generate_header(doc_type, config_file, version="v1.0"):
 > 数据来源: {config_file.name} (自动生成)
 > 项目名称: {meta.get('project_name', '茶饮料生产线SCADA系统')}
 > 产能: {meta.get('capacity', '50000B/H')}
+>
+> ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**
+
+---
+
+## ⚠️ 重要声明
+
+### 生成信息
+
+| 项目 | 内容 |
+| ---- | ---- |
+| **数据来源** | `04_Process/configs/process_recipe_templates.yaml` |
+| **生成器脚本** | `04_Process/_generators/process_recipe_generator.py` |
+| **重新生成命令** | `python 04_Process/_generators/process_recipe_generator.py` |
+
+### 修改流程
+
+1. 编辑 `04_Process/configs/process_recipe_templates.yaml`
+2. 运行 `python 04_Process/_generators/process_recipe_generator.py`
+3. 检查生成的 `04_Process/auto/工艺配方_auto.md`
 
 ---
 
