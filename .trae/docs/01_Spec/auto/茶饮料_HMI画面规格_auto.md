@@ -654,13 +654,13 @@ SCADA监控系统
 | SCADA系统功能规格说明书.md 第4.2节 | 报警功能需求 |
 | SCADA系统功能规格说明书.md 第4.3节 | 控制功能需求 |
 | PLC_Architecture.md | 设备控制逻辑 |
-| FB_Spec_Template.yaml | 功能块接口定义 |
+| fb_spec_config.yaml | 功能块接口定义 |
 
 ---
 
 **文档状态**: 自动生成
-**生成时间**: 2026-05-06 14:07:09
-**数据来源**: `01_Spec/configs/hmi_screens_config.yaml`
+**生成时间**: 2026-05-06 16:23:57
+**数据来源**: `01_Spec/configs/hmi_config.yaml`
 **生成器脚本**: `docs/_generators/HMI_Screens_generator.py`
 
 **版本历史**:

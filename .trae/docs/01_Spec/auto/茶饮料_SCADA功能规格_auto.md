@@ -511,7 +511,7 @@
 ---
 
 **文档状态**: 自动生成
-**生成时间**: 2026-05-06 14:07:09
+**生成时间**: 2026-05-06 16:23:56
 **审核状态**: 待审核
 **数据来源**: `01_Spec/configs/system_config.yaml`
 **生成器脚本**: `docs/_generators/SCADA_Spec_generator.py`

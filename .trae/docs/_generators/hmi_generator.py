@@ -4,13 +4,13 @@
 HMI_Screens_generator.py
 茶饮料生产线SCADA系统 - HMI画面规格说明书生成器
 
-功能: 从 hmi_screens_config.yaml 读取配置，自动生成完整的HMI画面规格说明书
+功能: 从 hmi_config.yaml 读取配置，自动生成完整的HMI画面规格说明书
 
 使用方法:
     python HMI_Screens_generator.py
 
 输入:
-    01_Spec/configs/hmi_screens_config.yaml - HMI画面配置
+    01_Spec/configs/hmi_config.yaml - HMI画面配置
 
 输出:
     01_Spec/auto/HMI_Screens_auto.md - HMI画面规格说明书
@@ -30,7 +30,7 @@ from pathlib import Path
 # ============================================================================
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-CONFIG_FILE = PROJECT_ROOT / "01_Spec" / "configs" / "hmi_screens_config.yaml"
+CONFIG_FILE = PROJECT_ROOT / "01_Spec" / "configs" / "hmi_config.yaml"
 OUTPUT_FILE = PROJECT_ROOT / "01_Spec" / "auto" / "茶饮料_HMI画面规格_auto.md"
 
 # ============================================================================
@@ -542,13 +542,13 @@ def generate_interaction_spec(config):
 | SCADA系统功能规格说明书.md 第4.2节 | 报警功能需求 |
 | SCADA系统功能规格说明书.md 第4.3节 | 控制功能需求 |
 | PLC_Architecture.md | 设备控制逻辑 |
-| FB_Spec_Template.yaml | 功能块接口定义 |
+| fb_spec_config.yaml | 功能块接口定义 |
 
 ---
 
 **文档状态**: 自动生成
 **生成时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-**数据来源**: `01_Spec/configs/hmi_screens_config.yaml`
+**数据来源**: `01_Spec/configs/hmi_config.yaml`
 **生成器脚本**: `docs/_generators/HMI_Screens_generator.py`
 
 **版本历史**:

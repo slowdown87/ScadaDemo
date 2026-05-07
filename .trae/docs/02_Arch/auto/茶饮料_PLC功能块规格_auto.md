@@ -3,7 +3,7 @@
 > 文档版本: v1.0
 > 创建日期: 2026-05-06
 > 更新日期: 2026-05-06
-> 数据来源: 02_Arch/configs/FB_Spec_Template.yaml (自动生成)
+> 数据来源: 02_Arch/configs/fb_spec_config.yaml (自动生成)
 
 > ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**
 
@@ -15,13 +15,13 @@
 
 | 项目 | 内容 |
 | ---- | ---- |
-| **数据来源** | `02_Arch/configs/FB_Spec_Template.yaml` |
+| **数据来源** | `02_Arch/configs/fb_spec_config.yaml` |
 | **生成器脚本** | `02_Arch/_generators/fb_spec_generator.py` |
 | **重新生成命令** | `python 02_Arch/_generators/fb_spec_generator.py` |
 
 ### 修改流程
 
-1. 编辑 `02_Arch/configs/FB_Spec_Template.yaml`
+1. 编辑 `02_Arch/configs/fb_spec_config.yaml`
 2. 运行 `python 02_Arch/_generators/fb_spec_generator.py`
 3. 检查生成的 `02_Arch/auto/PLC功能块规格说明书_auto.md`
 

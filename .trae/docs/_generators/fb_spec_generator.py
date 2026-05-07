@@ -1,6 +1,6 @@
 """
 FB功能块规格说明书生成器
-茶饮料生产线 - 从FB_Spec_Template.yaml生成规格文档
+茶饮料生产线 - 从fb_spec_config.yaml生成规格文档
 
 使用方法:
     python fb_spec_generator.py
@@ -193,7 +193,7 @@ def generate_document(config):
     lines.append("> 文档版本: v1.0")
     lines.append(f"> 创建日期: {created}")
     lines.append(f"> 更新日期: {datetime.now().strftime('%Y-%m-%d')}")
-    lines.append("> 数据来源: 02_Arch/configs/FB_Spec_Template.yaml (自动生成)")
+    lines.append("> 数据来源: 02_Arch/configs/fb_spec_config.yaml (自动生成)")
     lines.append("")
     lines.append("> ⚠️ **本文件由系统配置自动生成 - 请勿手动修改**")
     lines.append("")
@@ -205,13 +205,13 @@ def generate_document(config):
     lines.append("")
     lines.append("| 项目 | 内容 |")
     lines.append("| ---- | ---- |")
-    lines.append("| **数据来源** | `02_Arch/configs/FB_Spec_Template.yaml` |")
+    lines.append("| **数据来源** | `02_Arch/configs/fb_spec_config.yaml` |")
     lines.append("| **生成器脚本** | `02_Arch/_generators/fb_spec_generator.py` |")
     lines.append("| **重新生成命令** | `python 02_Arch/_generators/fb_spec_generator.py` |")
     lines.append("")
     lines.append("### 修改流程")
     lines.append("")
-    lines.append("1. 编辑 `02_Arch/configs/FB_Spec_Template.yaml`")
+    lines.append("1. 编辑 `02_Arch/configs/fb_spec_config.yaml`")
     lines.append("2. 运行 `python 02_Arch/_generators/fb_spec_generator.py`")
     lines.append("3. 检查生成的 `02_Arch/auto/PLC功能块规格说明书_auto.md`")
     lines.append("")
@@ -302,7 +302,7 @@ def main():
     print("FB功能块规格说明书生成器")
     print("-" * 40)
 
-    config_file = CONFIG_DIR / "FB_Spec_Template.yaml"
+    config_file = CONFIG_DIR / "fb_spec_config.yaml"
     print(f"读取配置: {config_file}")
 
     if not config_file.exists():

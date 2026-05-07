@@ -1,9 +1,9 @@
 # ============================================================================
 # 茶饮料生产线SCADA系统 - 核心配置文件
 # ============================================================================
-# 版本: v1.0
+# 版本: v1.1
 # 创建日期: 2026-04-30
-# 更新日期: 2026-04-30
+# 更新日期: 2026-05-07
 # 用途: 单一真相源，所有依赖此数据的文档必须从本文件生成
 #
 # 文档依赖关系:
@@ -11,6 +11,7 @@
 #   - 位号编码规则.md (自动生成) ← 本文件
 #   - 设备参数表.md (自动生成) ← 本文件
 #   - 通讯接口规格书_auto.md (自动生成) ← comm_templates.yaml + 本文件
+#   - CIP清洗程序规格书_auto.md (自动生成) ← 本文件(已合并cip_templates.yaml)
 # ============================================================================
 
 meta:
@@ -1013,6 +1014,529 @@ cip_program:
       cleanliness: "普通"
       temp: "20-28℃"
       humidity: "≤75%"
+  system:
+    stations:
+      - id: "CP-101"
+        name: "CIP碱液罐"
+        volume_m3: 2
+        tank_type: "SS304"
+        chemical: "NaOH"
+        concentration_default: 2
+        concentration_range: [1.5, 2.5]
+        temp_default: 85
+        temp_range: [80, 90]
+      - id: "CP-102"
+        name: "CIP酸液罐"
+        volume_m3: 1
+        tank_type: "SS304"
+        chemical: "HNO₃"
+        concentration_default: 1
+        concentration_range: [0.8, 1.5]
+        temp_default: 60
+        temp_range: [55, 65]
+      - id: "CP-103"
+        name: "CIP热水罐"
+        volume_m3: 3
+        tank_type: "SS304"
+        temp_default: 85
+        temp_range: [80, 90]
+    pumps:
+      - id: "P-CP01"
+        name: "CIP清洗泵1"
+        flow_m3_h: 5
+        is_inverter: true
+      - id: "P-CP02"
+        name: "CIP清洗泵2"
+        flow_m3_h: 5
+        is_inverter: true
+  cleaning_agents:
+    NaOH:
+      name: "氢氧化钠(碱)"
+      concentration_default: 2
+      concentration_unit: "%"
+      temp_default: 85
+      time_default: 30
+      unit: "min"
+      applicable: "所有不锈钢设备"
+    HNO3:
+      name: "硝酸(酸)"
+      concentration_default: 1
+      concentration_unit: "%"
+      temp_default: 60
+      time_default: 20
+      unit: "min"
+      applicable: "所有不锈钢设备"
+    热水:
+      name: "热水"
+      temp_default: 85
+      time_default: 15
+      unit: "min"
+      applicable: "最终冲洗"
+    纯水:
+      name: "纯水"
+      temp_default: "常温"
+      time_default: 10
+      unit: "min"
+      applicable: "最终冲洗"
+    H2O2:
+      name: "过氧化氢(消毒)"
+      concentration_default: 0.5
+      concentration_unit: "%"
+      temp_default: "常温"
+      time_default: 10
+      unit: "min"
+      applicable: "消毒处理"
+  zones:
+    A:
+      name: "A区"
+      description: "水处理系统"
+      section_codes: ["WT"]
+      target_devices: ["原水箱、管道、过滤器(不含RO膜)、纯水储罐"]
+      cip_program: "CIP-WT"
+      frequency: "每日生产前"
+    B:
+      name: "B区"
+      description: "茶叶前处理+萃取"
+      section_codes: ["TH", "EX"]
+      target_devices: ["茶叶储罐、粉碎机、萃取罐、茶渣分离器、冷却器、萃取液储罐"]
+      cip_program: "CIP-EX"
+      frequency: "每批次后"
+    C:
+      name: "C区"
+      description: "过滤系统"
+      section_codes: ["FL"]
+      target_devices: ["碟式离心机、超滤膜组件、超滤循环泵、膜清洗罐"]
+      cip_program: "CIP-FL"
+      frequency: "每批次过滤完成后"
+    D:
+      name: "D区"
+      description: "调配系统"
+      section_codes: ["BL"]
+      target_devices: ["调配罐、糖浆罐、酸液罐、香料罐、计量罐、管道"]
+      cip_program: "CIP-BL"
+      frequency: "每批次调配完成后"
+    E:
+      name: "E区"
+      description: "UHT系统"
+      section_codes: ["UH"]
+      target_devices: ["UHT杀菌锅、预热器、保温管、冷却器、无菌储罐"]
+      cip_program: "CIP-UH"
+      frequency: "每48小时"
+    F:
+      name: "F区"
+      description: "灌装系统"
+      section_codes: ["PF"]
+      target_devices: ["吹灌一体机、旋盖机、管道"]
+      cip_program: "CIP-PF"
+      frequency: "每12小时"
+  programs:
+    CIP-WT:
+      name: "水处理系统清洗"
+      zone: "A"
+      description: "原水箱、管道、过滤器(不含RO膜)、纯水储罐"
+      trigger_conditions:
+        - "每日生产前"
+        - "停产超过48小时"
+        - "水质检测不合格"
+      steps:
+        - step: 1
+          name: "预冲洗"
+          medium: "原水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 3
+          drain: true
+          standard: "冲水清澈"
+        - step: 2
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 85
+          time_min: 20
+          flow_m3_h: 3
+          drain: false
+          circulation: true
+          standard: "回水电导率稳定"
+        - step: 3
+          name: "中间冲洗"
+          medium: "原水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 3
+          drain: true
+          standard: "pH<8.5"
+        - step: 4
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 60
+          time_min: 15
+          flow_m3_h: 3
+          drain: false
+          circulation: true
+          standard: "回水电导率稳定"
+        - step: 5
+          name: "最终冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 3
+          drain: true
+          standard: "电导率<50μS/cm"
+      notes:
+        - "RO膜组件不参与清洗，需单独处理"
+        - "UV灯管需拆下后才能清洗"
+    CIP-EX:
+      name: "茶叶前处理+萃取系统清洗"
+      zone: "B"
+      description: "茶叶储罐、粉碎机、萃取罐、茶渣分离器、冷却器、萃取液储罐"
+      trigger_conditions:
+        - "每批次茶叶用完"
+        - "停产超过24小时"
+        - "产品切换（绿茶↔红茶↔乌龙茶）"
+      steps:
+        - step: 1
+          name: "预冲洗"
+          medium: "纯水"
+          temp: 50
+          time_min: 15
+          flow_m3_h: 2
+          drain: true
+          standard: "冲水无茶渣"
+        - step: 2
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 85
+          time_min: 30
+          flow_m3_h: 2
+          drain: false
+          circulation: true
+          standard: "回水电导率稳定"
+        - step: 3
+          name: "中间冲洗"
+          medium: "纯水"
+          temp: 60
+          time_min: 15
+          flow_m3_h: 2
+          drain: true
+          standard: "pH<8.5"
+        - step: 4
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 60
+          time_min: 20
+          flow_m3_h: 2
+          drain: false
+          circulation: true
+          standard: "回水电导率稳定"
+        - step: 5
+          name: "最终冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 2
+          drain: true
+          standard: "电导率<50μS/cm"
+      notes:
+        - "茶叶储罐需人工清理残余茶叶后再启动CIP"
+        - "萃取罐内部冲洗球必须全部动作"
+        - "清洗完成后打开EX-106检查内部清洁度"
+    CIP-FL:
+      name: "膜过滤系统清洗"
+      zone: "C"
+      description: "碟式离心机、超滤膜组件、超滤循环泵、膜清洗罐"
+      trigger_conditions:
+        - "每批次过滤完成后"
+        - "膜压差超过0.15MPa"
+        - "停产超过24小时"
+        - "每日待机前"
+      steps:
+        - step: 1
+          name: "顶料"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "产品完全顶出"
+        - step: 2
+          name: "反冲洗"
+          medium: "纯水"
+          temp: 50
+          time_min: 15
+          flow_m3_h: 3
+          pressure_max: 0.3
+          standard: "出水清澈"
+        - step: 3
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 45
+          time_min: 30
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "回水电导稳定"
+        - step: 4
+          name: "冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 10
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "pH<8.5"
+        - step: 5
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 35
+          time_min: 20
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "回水电导稳定"
+        - step: 6
+          name: "冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 15
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "电导率<50μS/cm"
+        - step: 7
+          name: "膜完整性测试"
+          medium: "纯水"
+          temp: "常温"
+          pressure_test: 0.2
+          standard: "压降<10%"
+      enhanced_cleaning:
+        frequency: "每72小时"
+        steps:
+          - step: "CIP-1"
+            medium: "NaOH 1%"
+            temp: 45
+            time_min: 30
+            note: "去除有机物"
+          - step: "CIP-2"
+            medium: "纯水"
+            temp: "常温"
+            time_min: 10
+            note: "冲洗"
+          - step: "CIP-3"
+            medium: "HNO₃ 0.5%"
+            temp: 35
+            time_min: 30
+            note: "去除无机物"
+          - step: "CIP-4"
+            medium: "纯水"
+            temp: "常温"
+            time_min: 15
+            note: "冲洗至中性"
+    CIP-BL:
+      name: "调配系统清洗"
+      zone: "D"
+      description: "调配罐、糖浆罐、酸液罐、香料罐、计量罐、管道"
+      trigger_conditions:
+        - "每批次调配完成后"
+        - "产品切换"
+        - "停产超过24小时"
+      steps:
+        - step: 1
+          name: "预冲洗"
+          medium: "纯水"
+          temp: 40
+          time_min: 10
+          flow_m3_h: 2
+          agitation: "低速"
+          standard: "无残留糖液"
+        - step: 2
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 85
+          time_min: 30
+          flow_m3_h: 2
+          agitation: "低速"
+          standard: "回水电导稳定"
+        - step: 3
+          name: "冲洗"
+          medium: "纯水"
+          temp: 50
+          time_min: 15
+          flow_m3_h: 2
+          agitation: "低速"
+          standard: "pH<8.5"
+        - step: 4
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 60
+          time_min: 20
+          flow_m3_h: 2
+          agitation: "低速"
+          standard: "回水电导稳定"
+        - step: 5
+          name: "最终冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 15
+          flow_m3_h: 2
+          standard: "电导率<50μS/cm"
+        - step: 6
+          name: "消毒"
+          medium: "0.5% H₂O₂"
+          temp: "常温"
+          time_min: 10
+          standard: "无残留"
+      notes:
+        - "糖浆罐BL-103使用前需用85℃热水溶解残留糖"
+        - "酸液罐BL-104需单独酸洗，避免与碱液混合"
+    CIP-UH:
+      name: "UHT杀菌系统清洗"
+      zone: "E"
+      description: "UHT杀菌锅、预热器、保温管、冷却器、无菌储罐"
+      trigger_conditions:
+        - "每48小时"
+        - "停产超过12小时"
+        - "产品切换"
+        - "微生物检测不合格"
+      steps:
+        - step: 1
+          name: "纯水顶料"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 5
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "产品完全顶出"
+        - step: 2
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 85
+          time_min: 45
+          flow_m3_h: 2
+          pressure_range: [0.3, 0.5]
+          standard: "回流温度>80℃"
+        - step: 3
+          name: "纯水冲洗"
+          medium: "纯水"
+          temp: 70
+          time_min: 15
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "pH<8.5"
+        - step: 4
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 60
+          time_min: 30
+          flow_m3_h: 2
+          pressure_range: [0.3, 0.5]
+          standard: "回流温度>55℃"
+        - step: 5
+          name: "纯水冲洗"
+          medium: "纯水"
+          temp: "常温"
+          time_min: 15
+          flow_m3_h: 2
+          pressure_max: 0.3
+          standard: "电导率<50μS/cm"
+        - step: 6
+          name: "无菌验证"
+          medium: "-"
+          standard: "无菌培养48h"
+      notes:
+        - "清洗过程中保温管必须保持满管状态"
+        - "无菌储罐清洗后需充无菌空气保持正压"
+        - "清洗完成后需进行无菌验证"
+    CIP-PF:
+      name: "灌装系统清洗"
+      zone: "F"
+      description: "吹灌一体机、旋盖机、管道"
+      trigger_conditions:
+        - "每12小时"
+        - "停产超过8小时"
+        - "产品切换"
+      steps:
+        - step: 1
+          name: "预冲洗"
+          medium: "RO水"
+          temp: 50
+          time_min: 10
+          standard: "冲洗管道残留"
+        - step: 2
+          name: "碱洗"
+          medium: "2% NaOH"
+          temp: 85
+          time_min: 40
+          standard: "CIP球阀切换冲刷"
+        - step: 3
+          name: "冲洗"
+          medium: "RO水"
+          temp: 60
+          time_min: 15
+          standard: "冲洗至中性"
+        - step: 4
+          name: "酸洗"
+          medium: "1% HNO₃"
+          temp: 60
+          time_min: 30
+          standard: "CIP球阀切换冲刷"
+        - step: 5
+          name: "最终冲洗"
+          medium: "RO水"
+          temp: "常温"
+          time_min: 15
+          standard: "电导率<50μS/cm"
+        - step: 6
+          name: "消毒"
+          medium: "0.5% H₂O₂"
+          temp: "常温"
+          time_min: 10
+          standard: "无残留"
+      notes:
+        - "吹灌一体机内部阀需全部打开清洗"
+        - "料缸内部需全面冲刷"
+        - "清洗完成后检查灌装阀无残留水渍"
+  product_switch_matrix:
+    - current_product: "绿茶"
+      target_product: "红茶"
+      programs: ["CIP-BL", "CIP-EX"]
+      estimated_time_h: 4
+    - current_product: "绿茶"
+      target_product: "乌龙茶"
+      programs: ["CIP-BL", "CIP-EX"]
+      estimated_time_h: 4
+    - current_product: "红茶"
+      target_product: "绿茶"
+      programs: ["CIP-BL", "CIP-EX"]
+      estimated_time_h: 4
+    - current_product: "任一产品"
+      target_product: "停产"
+      programs: ["CIP-ALL"]
+      estimated_time_h: 6
+    - current_product: "-"
+      target_product: "每日启动"
+      programs: ["CIP-WT", "CIP-PF"]
+      estimated_time_h: 2
+  acceptance_standards:
+    visual:
+      method: "目视检查"
+      standard: "无残留、无变色"
+    pH:
+      method: "在线pH计"
+      standard: "6.5-7.5"
+    conductivity:
+      method: "在线电导率仪"
+      standard: "<50μS/cm"
+    microbiology:
+      method: "棉签法"
+      standard: "平板计数<10CFU/cm²"
+    ATP:
+      method: "拭子检测仪"
+      standard: "<100RLU"
+  water_specifications:
+    预冲洗:
+      type: "RO水"
+      conductivity_max: "100μS/cm"
+    最终冲洗:
+      type: "纯水"
+      conductivity_max: "10μS/cm"
+    无菌冲洗:
+      type: "无菌水"
+      microbiology_max: "10CFU/ml"
 
 # ============================================================================
 # 物料平衡基础数据
@@ -1102,6 +1626,11 @@ devices:
       spec: "Φ1200×2400mm, 滤速10m/h"
       quantity: 1
       sensors:
+        - code: "FT"
+          name: "过滤流量"
+          range: [0, 15]
+          unit: "m³/h"
+          alarm: {L: 5}
         - code: "PT"
           name: "RO前压力"
           range: [0, 1]
@@ -1113,12 +1642,28 @@ devices:
       supplier: "国产"
       spec: "Φ1000×2000mm, 活性炭填充量1.5m³"
       quantity: 1
+      sensors:
+        - code: "FT"
+          name: "活性炭过滤流量"
+          range: [0, 15]
+          unit: "m³/h"
+          alarm: {L: 5}
+        - code: "PT"
+          name: "高压泵压力"
+          range: [0, 2]
+          unit: "MPa"
+          alarm: {H: 1.6}
     - id: "WT-104"
       name: "RO反渗透系统"
       type: "filter"
       supplier: "进口"
       spec: "产水5m³/h, 脱盐率≥97%"
       sensors:
+        - code: "PT"
+          name: "RO段压力"
+          range: [0, 1.5]
+          unit: "MPa"
+          alarm: {H: 1.2}
         - code: "FT"
           name: "RO产水流量"
           range: [0, 10]
@@ -1136,12 +1681,30 @@ devices:
       supplier: "国产"
       spec: "Φ800×2000mm, 阳离子+阴离子树脂"
       quantity: 2
+      sensors:
+        - code: "PT"
+          name: "离子交换后压力"
+          range: [0, 0.5]
+          unit: "MPa"
+          alarm: {H: 0.4}
+        - code: "CtT"
+          name: "离子交换水电导率"
+          range: [0, 50]
+          unit: "μS/cm"
+          alarm: {H: 10}
+          is_key_point: true
     - id: "WT-106"
       name: "UV紫外线杀菌器"
       type: "heat_exchanger"
       supplier: "进口"
       spec: "40W, 杀菌率99.9%"
       quantity: 1
+      sensors:
+        - code: "TT"
+          name: "UV前温度"
+          range: [0, 50]
+          unit: "℃"
+          alarm: {H: 40}
     - id: "WT-107"
       name: "纯水储罐"
       type: "tank"
@@ -1154,6 +1717,11 @@ devices:
           range: [0, 100]
           unit: "%"
           alarm: {LL: 20, L: 30, H: 85, HH: 95}
+        - code: "TT"
+          name: "温度"
+          range: [0, 50]
+          unit: "℃"
+          alarm: {H: 35}
 
   TH:
     - id: "TH-101"
@@ -1217,11 +1785,29 @@ devices:
           unit: "℃"
           alarm: {L: 75, H: 100}
           is_key_point: true
+        - code: "FT"
+          name: "萃取罐1进水量"
+          range: [0, 5]
+          unit: "m³/h"
         - code: "MT"
           name: "搅拌电机温度"
           range: [0, 150]
           unit: "℃"
           alarm: {H: 120}
+      motors:
+        - id: "M-EX01"
+          name: "萃取罐1搅拌"
+          power_kw: 3.0
+          is_inverter: true
+      valves:
+        - id: "EV-101"
+          name: "萃取罐1进水阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "EV-103"
+          name: "萃取罐1进茶阀"
+          type: "气动阀"
+          control: "自动"
     - id: "EX-102"
       name: "萃取罐2"
       type: "tank"
@@ -1229,12 +1815,36 @@ devices:
       spec: "2m³, 夹套加热, 温度90℃"
       quantity: 1
       sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {H: 95}
         - code: "TT"
           name: "萃取罐2温度"
           range: [0, 120]
           unit: "℃"
           alarm: {L: 75, H: 100}
           is_key_point: true
+        - code: "MT"
+          name: "搅拌电机温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {H: 120}
+      motors:
+        - id: "M-EX02"
+          name: "萃取罐2搅拌"
+          power_kw: 3.0
+          is_inverter: true
+      valves:
+        - id: "EV-102"
+          name: "萃取罐2进水阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "EV-104"
+          name: "萃取罐2进茶阀"
+          type: "气动阀"
+          control: "自动"
     - id: "EX-103"
       name: "萃取罐3"
       type: "tank"
@@ -1242,24 +1852,74 @@ devices:
       spec: "2m³, 夹套加热, 温度85℃"
       quantity: 1
       sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {H: 95}
         - code: "TT"
           name: "萃取罐3温度"
           range: [0, 120]
           unit: "℃"
           alarm: {L: 75, H: 100}
           is_key_point: true
+        - code: "MT"
+          name: "搅拌电机温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {H: 120}
+      motors:
+        - id: "M-EX03"
+          name: "萃取罐3搅拌"
+          power_kw: 3.0
+          is_inverter: true
+      valves:
+        - id: "EV-105"
+          name: "萃取罐3进水阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "EV-106"
+          name: "萃取罐3进茶阀"
+          type: "气动阀"
+          control: "自动"
+        - id: "EV-107"
+          name: "茶渣分离排放阀"
+          type: "气动阀"
+          control: "手动"
     - id: "EX-104"
       name: "茶渣分离器"
       type: "filter"
       supplier: "国产"
       spec: "筛网60目, 离心式"
       quantity: 1
+      sensors:
+        - code: "FT"
+          name: "茶渣分离流量"
+          range: [0, 5]
+          unit: "m³/h"
+          alarm: {L: 2}
+        - code: "TT"
+          name: "茶汁出口温度"
+          range: [0, 100]
+          unit: "℃"
+          alarm: {H: 85}
     - id: "EX-105"
       name: "茶汁冷却器"
       type: "heat_exchanger"
       supplier: "国产"
       spec: "板式换热器, 冷却水冷却"
       quantity: 1
+      sensors:
+        - code: "PT"
+          name: "冷却器出口压力"
+          range: [0, 0.5]
+          unit: "MPa"
+          alarm: {H: 0.4}
+        - code: "TT"
+          name: "冷却器出口温度"
+          range: [0, 50]
+          unit: "℃"
+          alarm: {H: 40}
     - id: "EX-106"
       name: "萃取液储罐"
       type: "tank"
@@ -1294,6 +1954,11 @@ devices:
       power_kw: 15
       is_inverter: true
       sensors:
+        - code: "PT"
+          name: "碟式离心机进口压力"
+          range: [0, 0.3]
+          unit: "MPa"
+          alarm: {H: 0.25}
         - code: "ST"
           name: "碟式离心机转速"
           range: [0, 10000]
@@ -1304,6 +1969,11 @@ devices:
           range: [0, 120]
           unit: "℃"
           alarm: {H: 100}
+      motors:
+        - id: "M-FL01"
+          name: "碟式离心机电机"
+          power_kw: 15
+          is_inverter: true
     - id: "FL-102"
       name: "超滤膜组件"
       type: "filter"
@@ -1330,11 +2000,18 @@ devices:
           range: [0, 6]
           unit: "m³/h"
           alarm: {L: 4}
+        - code: "FT2"
+          name: "超滤浓水流量"
+          range: [0, 2]
+          unit: "m³/h"
+          alarm: {L: 0.5}
+          note: "反洗监控"
         - code: "TT"
           name: "超滤进口温度"
           range: [0, 80]
           unit: "℃"
           alarm: {L: 55, H: 75}
+          note: "膜工作温度"
     - id: "FL-103"
       name: "超滤循环泵"
       type: "pump"
@@ -1342,6 +2019,17 @@ devices:
       spec: "8m³/h, SS316"
       power_kw: 5.5
       is_inverter: true
+      sensors:
+        - code: "PT"
+          name: "超滤循环泵出口压力"
+          range: [0, 0.6]
+          unit: "MPa"
+          alarm: {H: 0.5}
+        - code: "FT"
+          name: "超滤循环流量"
+          range: [0, 8]
+          unit: "m³/h"
+          alarm: {L: 6}
     - id: "FL-104"
       name: "膜组件清洗罐"
       type: "tank"
@@ -1383,6 +2071,36 @@ devices:
           range: [0, 150]
           unit: "℃"
           alarm: {H: 120}
+      motors:
+        - id: "M-BL01"
+          name: "调配罐1搅拌"
+          power_kw: 5.5
+          is_inverter: true
+      valves:
+        - id: "BV-101"
+          name: "调配罐1进茶阀"
+          type: "气动阀"
+          control: "批次控制"
+        - id: "BV-102"
+          name: "调配罐1进糖浆阀"
+          type: "计量阀"
+          control: "Brix控制"
+        - id: "BV-103"
+          name: "调配罐1进酸阀"
+          type: "计量阀"
+          control: "pH控制"
+        - id: "BV-104"
+          name: "调配罐1进香料阀"
+          type: "计量阀"
+          control: "配方控制"
+        - id: "BV-105"
+          name: "调配罐1搅拌阀"
+          type: "气动阀"
+          control: "批次控制"
+        - id: "BV-106"
+          name: "调配液出口阀"
+          type: "气动阀"
+          control: "批次结束"
     - id: "BL-102"
       name: "调配罐2"
       type: "tank"
@@ -1390,6 +2108,16 @@ devices:
       spec: "5m³, 高速搅拌(80rpm)"
       quantity: 1
       sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {H: 95}
+        - code: "TT"
+          name: "温度"
+          range: [0, 50]
+          unit: "℃"
+          alarm: {H: 35}
         - code: "AT"
           name: "pH值"
           range: [0, 14]
@@ -1401,6 +2129,16 @@ devices:
           unit: "°Brix"
           alarm: {L: 8, H: 12}
           is_key_point: true
+        - code: "MT"
+          name: "搅拌电机温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {H: 120}
+      motors:
+        - id: "M-BL02"
+          name: "调配罐2搅拌"
+          power_kw: 5.5
+          is_inverter: true
     - id: "BL-103"
       name: "糖浆溶解罐"
       type: "tank"
@@ -1408,28 +2146,51 @@ devices:
       spec: "2m³, 夹套加热溶解"
       quantity: 1
       sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 20, H: 90}
         - code: "TT"
           name: "糖浆罐温度"
           range: [0, 80]
           unit: "℃"
           alarm: {L: 55, H: 70}
+          note: "保温"
         - code: "BT"
           name: "糖浆Brix值"
           range: [0, 50]
           unit: "°Brix"
           alarm: {L: 60, H: 65}
+          note: "糖浆浓度"
     - id: "BL-104"
       name: "糖浆储罐"
       type: "tank"
       supplier: "国产"
       spec: "SS304, 2m³, 带搅拌, 保温60℃"
       quantity: 1
+      sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 30}
     - id: "BL-105"
       name: "酸液罐"
       type: "tank"
       supplier: "国产"
       spec: "SS316, 0.5m³, 柠檬酸/乳酸, 搅拌"
       quantity: 1
+      sensors:
+        - code: "LT"
+          name: "液位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 30}
+        - code: "AT"
+          name: "pH值"
+          range: [0, 14]
+          note: "2%浓度"
     - id: "BL-106"
       name: "香料/辅料罐"
       type: "tank"
@@ -1442,6 +2203,12 @@ devices:
       supplier: "国产"
       spec: "精度0.1kg, 称量500kg"
       quantity: 1
+      sensors:
+        - code: "WT"
+          name: "实际重量"
+          range: [0, 500]
+          unit: "kg"
+          alarm: {H: 500}
     - id: "BL-108"
       name: "调配液输送泵"
       type: "pump"
@@ -1480,6 +2247,34 @@ devices:
           range: [0, 5]
           unit: "m³/h"
           alarm: {L: 2.5}
+        - code: "MT"
+          name: "均质机电机温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {H: 130}
+        - code: "ST"
+          name: "均质机转速"
+          range: [0, 5000]
+          unit: "rpm"
+        - code: "TT2"
+          name: "均质阀温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {H: 140}
+      motors:
+        - id: "M-HM01"
+          name: "均质机电机"
+          power_kw: 75
+          is_inverter: false
+      valves:
+        - id: "BV-107"
+          name: "均质机进口阀"
+          type: "气动阀"
+          control: "均质启动"
+        - id: "BV-108"
+          name: "均质机出口阀"
+          type: "气动阀"
+          control: "均质启动"
     - id: "HM-102"
       name: "均质阀组"
       type: "valve"
@@ -1492,6 +2287,11 @@ devices:
       supplier: "进口"
       spec: "0-40MPa, 精度0.5级"
       quantity: 1
+      sensors:
+        - code: "PT"
+          name: "均质压力"
+          range: [0, 40]
+          unit: "MPa"
 
   UH:
     - id: "UH-101"
@@ -1544,12 +2344,44 @@ devices:
           range: [0, 5]
           unit: "m³/h"
           alarm: {L: 2.5, H: 3.5}
+      valves:
+        - id: "UV-101"
+          name: "产品进料阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "UV-102"
+          name: "蒸汽进口阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "UV-103"
+          name: "冷却水进口阀"
+          type: "气动调节阀"
+          control: "自动/PID"
+        - id: "UV-106"
+          name: "清洗回流阀"
+          type: "气动阀"
+          control: "自动"
+        - id: "UV-107"
+          name: "排放阀"
+          type: "气动阀"
+          control: "手动"
     - id: "UH-102"
       name: "预热器"
       type: "heat_exchanger"
       supplier: "进口"
       spec: "板式换热器, 80℃预热段"
       quantity: 1
+      sensors:
+        - code: "TT"
+          name: "热水系统温度"
+          range: [0, 150]
+          unit: "℃"
+          alarm: {L: 130, H: 145}
+        - code: "PT"
+          name: "蒸汽压力"
+          range: [0, 1.5]
+          unit: "MPa"
+          alarm: {L: 0.6, H: 1.0}
     - id: "UH-103"
       name: "保温管"
       type: "tank"
@@ -1585,12 +2417,26 @@ devices:
           unit: "MPa"
           alarm: {H: 0.05}
           note: "微正压"
+      valves:
+        - id: "UV-104"
+          name: "无菌罐进口阀"
+          type: "气动阀"
+          control: "液位控制"
+        - id: "UV-105"
+          name: "无菌罐出口阀"
+          type: "气动阀"
+          control: "流量控制"
     - id: "UH-106"
       name: "温度传感器"
       type: "sensor"
       supplier: "进口"
       spec: "PT100, A级, 精度±0.5℃"
       quantity: 4
+      sensors:
+        - code: "TT"
+          name: "温度传感器"
+          range: [0, 150]
+          unit: "℃"
     - id: "P-UH01"
       name: "UHT产品泵"
       type: "pump"
@@ -1678,6 +2524,11 @@ devices:
           range: [0, 0.5]
           unit: "MPa"
           alarm: {H: 0.3}
+      motors:
+        - id: "M-PF01"
+          name: "灌装机主电机"
+          power_kw: 30
+          is_inverter: true
     - id: "PF-102"
       name: "瓶盖消毒器"
       type: "heat_exchanger"
@@ -1696,12 +2547,22 @@ devices:
       supplier: "进口"
       spec: "灵敏度φ0.8mm Fe"
       quantity: 1
+      sensors:
+        - code: "DT"
+          name: "金属检测机状态"
+          type: "状态"
+          range: [0, 100]
     - id: "PF-104"
       name: "漏堵检测器"
       type: "packaging"
       supplier: "国产"
       spec: "红外检测"
       quantity: 1
+      sensors:
+        - code: "DT"
+          name: "漏堵检测器状态"
+          type: "状态"
+          range: [0, 100]
 
   CG:
     - id: "CG-101"
@@ -1722,12 +2583,23 @@ devices:
           unit: "Nm"
           alarm: {L: 0.3, H: 0.7}
           is_key_point: true
+      motors:
+        - id: "M-CG01"
+          name: "旋盖机主电机"
+          power_kw: 15
+          is_inverter: true
     - id: "CG-102"
       name: "瓶盖料仓"
       type: "tank"
       supplier: "国产"
       spec: "500L容量"
       quantity: 1
+      sensors:
+        - code: "LT"
+          name: "瓶盖料位"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 20}
 
   LI:
     - id: "LI-101"
@@ -1742,12 +2614,33 @@ devices:
           range: [0, 60000]
           unit: "瓶/h"
           alarm: {L: 50000, H: 58000}
+        - code: "DT"
+          name: "工位1状态"
+          type: "状态"
+          range: [0, 100]
+        - code: "DT2"
+          name: "工位2状态"
+          type: "状态"
+          range: [0, 100]
+        - code: "DT3"
+          name: "工位3状态"
+          type: "状态"
+          range: [0, 100]
+        - code: "DT4"
+          name: "工位4状态"
+          type: "状态"
+          range: [0, 100]
         - code: "FT"
           name: "正品计数"
           unit: "瓶"
         - code: "FT2"
           name: "次品计数"
           unit: "瓶"
+      motors:
+        - id: "M-LI01"
+          name: "输送电机"
+          power_kw: 2.2
+          is_inverter: true
     - id: "LI-102"
       name: "剔除阀"
       type: "valve"
@@ -1763,6 +2656,10 @@ devices:
       spec: "CO2激光, 54000B/H"
       quantity: 1
       sensors:
+        - code: "DT"
+          name: "设备状态"
+          type: "状态"
+          range: [0, 100]
         - code: "ST"
           name: "喷印速度"
           range: [0, 60000]
@@ -1778,6 +2675,14 @@ devices:
       supplier: "进口"
       spec: "字符识别"
       quantity: 1
+      sensors:
+        - code: "DT"
+          name: "相机状态"
+          type: "状态"
+          range: [0, 100]
+        - code: "FT"
+          name: "检测计数"
+          unit: "瓶"
     - id: "CI-103"
       name: "不合格品剔除阀"
       type: "valve"
@@ -1804,12 +2709,35 @@ devices:
           range: [0, 120]
           unit: "℃"
           alarm: {H: 100}
+        - code: "PT"
+          name: "标签纸剩余量"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 10}
     - id: "LB-102"
       name: "标签检测系统"
       type: "packaging"
       supplier: "进口"
       spec: "标签位置检测"
       quantity: 1
+      sensors:
+        - code: "DT"
+          name: "标签检测状态"
+          type: "状态"
+          range: [0, 100]
+    - id: "LB-103"
+      name: "贴标机"
+      type: "packaging"
+      supplier: "进口"
+      spec: "54000B/H, 定位精度±1mm"
+      power_kw: 5.5
+      is_inverter: true
+      quantity: 1
+      motors:
+        - id: "M-LB01"
+          name: "贴标机"
+          power_kw: 5.5
+          is_inverter: true
 
   CA:
     - id: "CA-101"
@@ -1820,6 +2748,19 @@ devices:
       power_kw: 4
       is_inverter: true
       quantity: 1
+      sensors:
+        - code: "FT"
+          name: "纸箱供应计数"
+          unit: "个"
+        - code: "DT"
+          name: "纸箱成型状态"
+          type: "状态"
+          range: [0, 100]
+      motors:
+        - id: "M-CA01"
+          name: "纸箱成型机"
+          power_kw: 4
+          is_inverter: true
     - id: "CA-102"
       name: "装箱机"
       type: "packaging"
@@ -1834,6 +2775,14 @@ devices:
           range: [0, 60]
           unit: "箱/min"
           alarm: {L: 25, H: 40}
+        - code: "CT"
+          name: "装箱计数"
+          unit: "箱"
+      motors:
+        - id: "M-CA02"
+          name: "装箱机"
+          power_kw: 5.5
+          is_inverter: true
     - id: "CA-103"
       name: "重量检测机"
       type: "packaging"
@@ -1841,6 +2790,11 @@ devices:
       spec: "精度±5g, 速度30箱/分钟"
       quantity: 1
       sensors:
+        - code: "DT"
+          name: "重量检测机状态"
+          type: "状态"
+          range: [0, 100]
+          note: "±5g"
         - code: "WT"
           name: "实际重量"
           range: [0, 30]
@@ -1859,12 +2813,21 @@ devices:
           range: [0, 100]
           unit: "℃"
           alarm: {H: 70}
+        - code: "PT"
+          name: "冷却隧道气压"
+          range: [0, 1]
+          unit: "kPa"
     - id: "PK-102"
       name: "灯检台"
       type: "packaging"
       supplier: "国产"
       spec: "4工位, 人工目检"
       quantity: 2
+      sensors:
+        - code: "ST"
+          name: "输送速度"
+          range: [0, 60000]
+          unit: "瓶/h"
     - id: "PK-103"
       name: "贴标机"
       type: "packaging"
@@ -1873,12 +2836,32 @@ devices:
       power_kw: 5.5
       is_inverter: true
       quantity: 1
+      sensors:
+        - code: "ST"
+          name: "贴标机速度"
+          range: [0, 60000]
+          unit: "瓶/h"
+        - code: "PT"
+          name: "标签纸剩余量"
+          range: [0, 100]
+          unit: "%"
+          alarm: {L: 10}
+      motors:
+        - id: "M-PK01"
+          name: "贴标机"
+          power_kw: 5.5
+          is_inverter: true
     - id: "PK-104"
       name: "喷码机"
       type: "packaging"
       supplier: "进口"
       spec: "速度54000B/H, 小字符"
       quantity: 2
+      sensors:
+        - code: "DT"
+          name: "喷码机状态"
+          type: "状态"
+          range: [0, 100]
     - id: "PK-105"
       name: "纸箱成型机"
       type: "packaging"
@@ -1887,6 +2870,19 @@ devices:
       power_kw: 4
       is_inverter: true
       quantity: 1
+      sensors:
+        - code: "FT"
+          name: "纸箱供应计数"
+          unit: "个"
+        - code: "DT"
+          name: "纸箱成型状态"
+          type: "状态"
+          range: [0, 100]
+      motors:
+        - id: "M-PK02"
+          name: "纸箱成型机"
+          power_kw: 4
+          is_inverter: true
     - id: "PK-106"
       name: "装箱机"
       type: "packaging"
@@ -1895,12 +2891,35 @@ devices:
       power_kw: 5.5
       is_inverter: true
       quantity: 1
+      sensors:
+        - code: "FT"
+          name: "装箱速度"
+          range: [0, 60]
+          unit: "箱/min"
+          alarm: {L: 25, H: 40}
+        - code: "CT"
+          name: "装箱计数"
+          unit: "箱"
+      motors:
+        - id: "M-PK03"
+          name: "装箱机"
+          power_kw: 5.5
+          is_inverter: true
     - id: "PK-107"
       name: "重量检测机"
       type: "packaging"
       supplier: "国产"
       spec: "精度±5g"
       quantity: 1
+      sensors:
+        - code: "DT"
+          name: "重量检测机状态"
+          type: "状态"
+          range: [0, 100]
+        - code: "WT"
+          name: "实际重量"
+          range: [0, 30]
+          unit: "kg"
     - id: "PK-108"
       name: "码垛机"
       type: "packaging"
@@ -1915,6 +2934,11 @@ devices:
           range: [0, 100]
           unit: "箱/min"
           alarm: {L: 70, H: 90}
+      motors:
+        - id: "M-PK04"
+          name: "码垛机"
+          power_kw: 15
+          is_inverter: true
     - id: "PK-109"
       name: "托盘库"
       type: "tank"
@@ -2051,35 +3075,6 @@ control_templates:
     Td: 8
     cycle_ms: 100
     note: "非线性控制"
-
-# ============================================================================
-# 联锁模板
-# ============================================================================
-interlock_templates:
-  temperature_ll:
-    action: "关闭进料阀/停止加热"
-    delay_ms: 0
-  temperature_hh:
-    action: "关闭进料阀/停止加热"
-    delay_ms: 0
-  pressure_ll:
-    action: "报警提示"
-    delay_ms: 0
-  pressure_hh:
-    action: "停机保护"
-    delay_ms: 0
-  level_ll:
-    action: "停止泵/关闭进料"
-    delay_ms: 0
-  level_hh:
-    action: "关闭进料阀"
-    delay_ms: 0
-  flow_ll:
-    action: "报警提示"
-    delay_ms: 1000
-  conductivity_hh:
-    action: "产品隔离/报警"
-    delay_ms: 0
 
 # ============================================================================
 # CCP联锁详细配置

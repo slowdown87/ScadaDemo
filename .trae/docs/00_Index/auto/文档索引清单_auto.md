@@ -23,48 +23,28 @@ docs/
 │       └── index_config.yaml
 ├── 01_Spec/                          ← 规格文档
 │   └── auto/
-│       ├── HMI_Screens_auto.md
-│       ├── SCADA系统功能规格说明书_auto.md
+│       ├── 茶饮料_HMI画面规格_auto.md
+│       ├── 茶饮料_SCADA功能规格_auto.md
 │   └── configs/
-│       ├── hmi_screens_config.yaml
+│       ├── hmi_config.yaml
 │       └── system_config.yaml
 ├── 02_Arch/                          ← 架构文档
 │   └── auto/
-│       ├── PLC_Architecture_auto.md
-│       ├── PLC功能块规格说明书_auto.md
-│       ├── 生产线工艺配置_auto.md
+│       ├── 茶饮料_PLC功能块规格_auto.md
+│       ├── 茶饮料_PLC架构_auto.md
+│       ├── 茶饮料_生产线工艺配置_auto.md
 │   └── manual/
-│       ├── 工艺设计说明.md
-│       ├── 茶饮料生产线工艺流程设计.md
+│       ├── 茶饮料_工艺设计说明.md
 │   └── configs/
-│       └── FB_Spec_Template.yaml
+│       └── fb_spec_config.yaml
 ├── 03_Device/                          ← 设备文档
 │   └── auto/
-│       ├── 位号编码规则_auto.md
-│       ├── 茶饮料生产线监控点表_auto.md
-│       ├── 设备参数表_auto.md
+│       ├── 茶饮料_位号编码规则_auto.md
+│       ├── 茶饮料_监控点表_auto.md
+│       ├── 茶饮料_设备参数表_auto.md
 │   └── manual/
-│       ├── 位号编码规则.md
-│       ├── 茶饮料生产线设备清单.md
-│       ├── 设备控制参数表.md
-│   └── configs/
-│       ├── devices_bf.yaml
-│       ├── devices_bl.yaml
-│       ├── devices_ci.yaml
-│       ├── devices_cp.yaml
-│       ├── devices_ex.yaml
-│       ├── devices_fl.yaml
-│       ├── devices_hm.yaml
-│       ├── devices_index.yaml
-│       ├── devices_lb_ca.yaml
-│       ├── devices_li.yaml
-│       ├── devices_meta.yaml
-│       ├── devices_pf_cg.yaml
-│       ├── devices_pk.yaml
-│       ├── devices_th.yaml
-│       ├── devices_uh.yaml
-│       ├── devices_wt.yaml
-│       └── sensor_templates.yaml
+│       ├── 茶饮料_设备清单.md
+│       └── 茶饮料_设备控制参数表.md
 ├── 04_Process/                          ← 工艺文档
 │   └── BF_制瓶控制规格.md
 │   └── BL_调配工段工艺说明.md
@@ -172,8 +152,8 @@ docs/
 
 | 文档 | 版本 | 更新日期 | 说明 |
 | ---- | ---- | -------- | ---- |
-| HMI_Screens_auto.md | v2.0 | 2026-05-06 |  |
-| SCADA系统功能规格说明书_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_HMI画面规格_auto.md | v2.0 | 2026-05-06 |  |
+| 茶饮料_SCADA功能规格_auto.md | v1.0 | 2026-05-06 |  |
 
 ---
 
@@ -183,16 +163,15 @@ docs/
 
 | 文档 | 版本 | 更新日期 | 说明 |
 | ---- | ---- | -------- | ---- |
-| PLC_Architecture_auto.md | v1.0 | 2026-05-06 |  |
-| PLC功能块规格说明书_auto.md | v1.0 | 2026-05-06 |  |
-| 生产线工艺配置_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_PLC功能块规格_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_PLC架构_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_生产线工艺配置_auto.md | v1.0 | 2026-05-06 |  |
 
 #### ✏️ 手动编辑文档 (manual/)
 
 | 文档 | 版本 | 更新日期 | 说明 |
 | ---- | ---- | -------- | ---- |
-| 工艺设计说明.md | v2.0 | 2026-04-30 |  |
-| 茶饮料生产线工艺流程设计.md | v2.0 | 2026-04-30 |  |
+| 茶饮料_工艺设计说明.md | v2.0 | 2026-04-30 |  |
 
 ---
 
@@ -202,17 +181,16 @@ docs/
 
 | 文档 | 版本 | 更新日期 | 说明 |
 | ---- | ---- | -------- | ---- |
-| 位号编码规则_auto.md | v3.0 | 2026-05-06 |  |
-| 茶饮料生产线监控点表_auto.md | v1.0 | 2026-05-06 |  |
-| 设备参数表_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_位号编码规则_auto.md | v3.0 | 2026-05-06 |  |
+| 茶饮料_监控点表_auto.md | v1.0 | 2026-05-06 |  |
+| 茶饮料_设备参数表_auto.md | v1.0 | 2026-05-06 |  |
 
 #### ✏️ 手动编辑文档 (manual/)
 
 | 文档 | 版本 | 更新日期 | 说明 |
 | ---- | ---- | -------- | ---- |
-| 位号编码规则.md | v1.1 | 2026-04-30 |  |
-| 茶饮料生产线设备清单.md | v2.0 | 2026-04-28 |  |
-| 设备控制参数表.md | v1.0 | - |  |
+| 茶饮料_设备清单.md | v3.0 | 2026-05-06 |  |
+| 茶饮料_设备控制参数表.md | v1.0 | - |  |
 
 ---
 
