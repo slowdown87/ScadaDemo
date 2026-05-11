@@ -1,0 +1,122 @@
+# Terminal_Assignments 端子定义表 配置
+
+meta:
+  version: "v1.0"
+  created: "2026-04-29"
+  updated: "2026-04-29"
+  author: "SCADA系统"
+  status: "active"
+  description: "端子定义表配置 - PLC I/O端子与现场设备对应关系"
+  data_source: "../_templates/devices.yaml"
+  source_docs:
+    - "devices.yaml"
+  project_name: "茶饮料生产线SCADA系统"
+
+template:
+  type: "excel"
+  engine: "openpyxl"
+  sheets:
+    - name: "端子定义总表"
+      header:
+        - "PLC柜"
+        - "端子排号"
+        - "端子号"
+        - "信号类型"
+        - "位号"
+        - "设备名称"
+        - "信号描述"
+        - "公共端"
+        - "备注"
+
+    - name: "DI数字量输入"
+      header:
+        - "PLC柜"
+        - "模块槽位"
+        - "端子"
+        - "位号"
+        - "设备"
+        - "信号"
+        - "公共端"
+        - "备注"
+
+    - name: "DO数字量输出"
+      header:
+        - "PLC柜"
+        - "模块槽位"
+        - "端子"
+        - "位号"
+        - "设备"
+        - "信号"
+        - "公共端"
+        - "备注"
+
+    - name: "AI模拟量输入"
+      header:
+        - "PLC柜"
+        - "模块槽位"
+        - "通道"
+        - "位号"
+        - "设备"
+        - "信号"
+        - "量程"
+        - "备注"
+
+    - name: "AO模拟量输出"
+      header:
+        - "PLC柜"
+        - "模块槽位"
+        - "通道"
+        - "位号"
+        - "设备"
+        - "信号"
+        - "量程"
+        - "备注"
+
+    - name: "通讯端口定义"
+      header:
+        - "PLC柜"
+        - "端口"
+        - "协议"
+        - "波特率"
+        - "设备"
+        - "IP地址"
+        - "功能"
+        - "备注"
+
+data_sources:
+  plc_config:
+    source: "comm_templates"
+    path: "plc_config"
+    fields:
+      - plc_id: "{{ item.id }}"
+        plc_name: "{{ item.name }}"
+        plc_ip: "{{ item.ip }}"
+
+  devices:
+    source: "devices"
+    path: "devices"
+    transform:
+      di_signals: "{{ sensors[?code.startsWith('DT')] }}"
+      ai_signals: "{{ sensors[?code.startsWith('TT') or code.startsWith('PT') or code.startsWith('LT') or code.startsWith('FT') or code.startsWith('AT')] }}"
+
+terminal_rules:
+  di_group:
+    start_address: "I0.0"
+    points_per_module: 16
+    common_terminal: "1M (0V)"
+  do_group:
+    start_address: "Q0.0"
+    points_per_module: 16
+    common_terminal: "1L+ (24V)"
+  ai_group:
+    start_address: "IW0"
+    channels_per_module: 8
+    signal_type: "4-20mA / PT100"
+  ao_group:
+    start_address: "QW0"
+    channels_per_module: 4
+    signal_type: "4-20mA"
+
+output:
+  path: "../../07_Engineering/auto/茶饮料_端子定义表_auto.xlsx"
+  overwrite: true
