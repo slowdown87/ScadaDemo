@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-CONFIG_FILE = SCRIPT_DIR.parent / "01_Spec" / "configs" / "system_config.yaml"
+CONFIG_RECIPE = SCRIPT_DIR.parent / "01_Spec" / "configs" / "process_recipe_templates.yaml"
 OUTPUT_FILE = SCRIPT_DIR.parent / "04_Process" / "auto" / "茶饮料_CIP清洗程序规格书_auto.md"
 
 
@@ -23,7 +23,7 @@ def load_yaml(file_path):
 
 
 def get_meta_data():
-    data = load_yaml(CONFIG_FILE)
+    data = load_yaml(CONFIG_RECIPE)
     return data.get('meta', {})
 
 
@@ -35,7 +35,7 @@ def generate_header():
 > 文档版本: v1.0
 > 创建日期: {now}
 > 更新日期: {now}
-> 数据来源: 01_Spec/configs/system_config.yaml (自动生成)
+> 数据来源: 01_Spec/configs/process_recipe_templates.yaml (自动生成)
 > 项目名称: {meta.get('project_name', '茶饮料生产线SCADA系统')}
 > 产能: {meta.get('capacity', '50000B/H')}
 
@@ -49,13 +49,13 @@ def generate_header():
 
 | 项目 | 内容 |
 | ---- | ---- |
-| **数据来源** | `01_Spec/configs/system_config.yaml` |
+| **数据来源** | `01_Spec/configs/process_recipe_templates.yaml` |
 | **生成器脚本** | `_generators/cip_spec_generator.py` |
 | **重新生成命令** | `python _generators/run_all_generators.py --gen=CIP_Spec` |
 
 ### 修改流程
 
-1. 编辑 `01_Spec/configs/system_config.yaml` 中的 `cip_program` 部分
+1. 编辑 `01_Spec/configs/process_recipe_templates.yaml` 中的 `cip_program` 部分
 2. 运行 `python _generators/run_all_generators.py --gen=CIP_Spec`
 3. 检查生成的 `04_Process/auto/茶饮料_CIP清洗程序规格书_auto.md`
 
@@ -273,7 +273,7 @@ def generate_water_specifications(cip_program):
 
 
 def generate_cip_spec():
-    data = load_yaml(CONFIG_FILE)
+    data = load_yaml(CONFIG_RECIPE)
     cip_program = data.get('cip_program', {})
 
     output = []
@@ -301,8 +301,8 @@ def main():
     print("CIP清洗程序规格书生成器")
     print("-" * 40)
 
-    if not CONFIG_FILE.exists():
-        print(f"错误: 配置文件不存在: {CONFIG_FILE}")
+    if not CONFIG_RECIPE.exists():
+        print(f"错误: 配置文件不存在: {CONFIG_RECIPE}")
         return
 
     document = generate_cip_spec()

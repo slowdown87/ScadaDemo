@@ -1,8 +1,8 @@
 # 茶饮料生产线产品配方
 
 > 文档版本: v1.0
-> 创建日期: 2026-05-06
-> 更新日期: 2026-05-06
+> 创建日期: 2026-05-11
+> 更新日期: 2026-05-11
 > 数据来源: product_recipe_templates.yaml (自动生成)
 > 项目名称: 茶饮料生产线SCADA系统
 > 产能: 50000B/H (额定) / 54000B/H (最大)
@@ -18,13 +18,13 @@
 | 项目 | 内容 |
 | ---- | ---- |
 | **数据来源** | `05_Product/configs/product_recipe_templates.yaml` |
-| **生成器脚本** | `05_Product/_generators/product_recipe_generator.py` |
-| **重新生成命令** | `python 05_Product/_generators/product_recipe_generator.py` |
+| **生成器脚本** | `docs/_generators/product_recipe_generator.py` |
+| **重新生成命令** | `python docs/_generators/product_recipe_generator.py` |
 
 ### 修改流程
 
 1. 编辑 `05_Product/configs/product_recipe_templates.yaml`
-2. 运行 `python 05_Product/_generators/product_recipe_generator.py`
+2. 运行 `python docs/_generators/product_recipe_generator.py`
 3. 检查生成的 `05_Product/auto/产品配方_auto.md`
 
 ---

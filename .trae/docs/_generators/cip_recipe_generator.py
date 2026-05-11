@@ -12,8 +12,8 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-CONFIG_CIP = SCRIPT_DIR.parent / "configs" / "cip_recipe_templates.yaml"
-OUTPUT_CIP = SCRIPT_DIR.parent / "CIP配方_auto.md"
+CONFIG_CIP = SCRIPT_DIR.parent / "05_Product" / "configs" / "cip_recipe_templates.yaml"
+OUTPUT_CIP = SCRIPT_DIR.parent / "05_Product" / "auto" / "CIP配方_auto.md"
 
 
 def load_yaml(file_path):
@@ -49,13 +49,13 @@ def generate_header(doc_type, config_file, version="v1.0"):
 | 项目 | 内容 |
 | ---- | ---- |
 | **数据来源** | `05_Product/configs/cip_recipe_templates.yaml` |
-| **生成器脚本** | `05_Product/_generators/cip_recipe_generator.py` |
-| **重新生成命令** | `python 05_Product/_generators/cip_recipe_generator.py` |
+| **生成器脚本** | `docs/_generators/cip_recipe_generator.py` |
+| **重新生成命令** | `python docs/_generators/cip_recipe_generator.py` |
 
 ### 修改流程
 
 1. 编辑 `05_Product/configs/cip_recipe_templates.yaml`
-2. 运行 `python 05_Product/_generators/cip_recipe_generator.py`
+2. 运行 `python docs/_generators/cip_recipe_generator.py`
 3. 检查生成的 `05_Product/auto/CIP配方_auto.md`
 
 ---

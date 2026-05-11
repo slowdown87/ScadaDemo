@@ -12,8 +12,8 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-CONFIG_COMM = SCRIPT_DIR.parent / "configs" / "comm_templates.yaml"
-OUTPUT_COMM = SCRIPT_DIR.parent / "auto" / "通讯接口规格书_auto.md"
+CONFIG_COMM = SCRIPT_DIR.parent / "01_Spec" / "configs" / "comm_templates.yaml"
+OUTPUT_COMM = SCRIPT_DIR.parent / "04_Process" / "auto" / "茶饮料_通讯接口规格书_auto.md"
 
 
 def load_yaml(file_path):
@@ -51,15 +51,15 @@ def generate_header(version="v2.0"):
 
 | 项目 | 内容 |
 | ---- | ---- |
-| **数据来源** | `04_Process/configs/comm_templates.yaml` |
-| **生成器脚本** | `04_Process/_generators/comm_spec_generator.py` |
-| **重新生成命令** | `python 04_Process/_generators/comm_spec_generator.py` |
+| **数据来源** | `01_Spec/configs/comm_templates.yaml` |
+| **生成器脚本** | `_generators/comm_spec_generator.py` |
+| **重新生成命令** | `python _generators/run_all_generators.py --gen=Comm_Spec` |
 
 ### 修改流程
 
-1. 编辑 `04_Process/configs/comm_templates.yaml`
-2. 运行 `python 04_Process/_generators/comm_spec_generator.py`
-3. 检查生成的 `04_Process/auto/通讯接口规格书_auto.md`
+1. 编辑 `01_Spec/configs/comm_templates.yaml`
+2. 运行 `python _generators/run_all_generators.py --gen=Comm_Spec`
+3. 检查生成的 `04_Process/auto/茶饮料_通讯接口规格书_auto.md`
 
 ---
 

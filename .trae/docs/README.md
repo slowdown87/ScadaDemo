@@ -80,7 +80,7 @@ docs/
 |----------|------|----------|
 | `01_Spec/configs/system_config.yaml` | 核心配置（单一真相源） | **手动编辑** |
 | `01_Spec/_generators/*.py` | 文档生成器脚本 | 自动维护 |
-| `00_Index/configs/index_config.yaml` | 索引配置 | 手动编辑 |
+| `01_Spec/configs/index_config.yaml` | 索引配置 | 手动编辑 |
 
 ---
 

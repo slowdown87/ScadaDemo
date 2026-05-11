@@ -1,9 +1,9 @@
 # 茶饮料生产线CIP清洗程序规格书
 
 > 文档版本: v1.0
-> 创建日期: 2026-05-07
-> 更新日期: 2026-05-07
-> 数据来源: 01_Spec/configs/system_config.yaml (自动生成)
+> 创建日期: 2026-05-08
+> 更新日期: 2026-05-08
+> 数据来源: 01_Spec/configs/process_recipe_templates.yaml (自动生成)
 > 项目名称: 茶饮料生产线SCADA系统
 > 产能: 50000B/H (额定) / 54000B/H (最大)
 
@@ -17,15 +17,15 @@
 
 | 项目 | 内容 |
 | ---- | ---- |
-| **数据来源** | `01_Spec/configs/system_config.yaml` |
-| **生成器脚本** | `04_Process/_generators/cip_spec_generator.py` |
+| **数据来源** | `01_Spec/configs/process_recipe_templates.yaml` |
+| **生成器脚本** | `_generators/cip_spec_generator.py` |
 | **重新生成命令** | `python _generators/run_all_generators.py --gen=CIP_Spec` |
 
 ### 修改流程
 
-1. 编辑 `01_Spec/configs/system_config.yaml` 中的 `cip_program` 部分
+1. 编辑 `01_Spec/configs/process_recipe_templates.yaml` 中的 `cip_program` 部分
 2. 运行 `python _generators/run_all_generators.py --gen=CIP_Spec`
-3. 检查生成的 `04_Process/auto/CIP清洗程序规格书_auto.md`
+3. 检查生成的 `04_Process/auto/茶饮料_CIP清洗程序规格书_auto.md`
 
 ---
 
@@ -41,42 +41,6 @@
 | 5 | 最终冲洗 | 纯水 | 常温 | 10min | pH 6.5-7.0 | 中和+检测 |
 
 ## 2. 生产环境要求
-
-### 2.1 无菌区
-
-| 项目 | 要求 |
-|------|------|
-| 洁净度 | 10万级正压 |
-| 温度 | 20-25℃ |
-| 湿度 | ≤60% |
-| 压力 | ≥10Pa正压 |
-
-### 2.2 调配区
-
-| 项目 | 要求 |
-|------|------|
-| 洁净度 | 30万级 |
-| 温度 | 20-25℃ |
-| 湿度 | ≤65% |
-| 压力 | 正压 |
-
-### 2.3 萃取区
-
-| 项目 | 要求 |
-|------|------|
-| 洁净度 | 30万级 |
-| 温度 | 20-25℃ |
-| 湿度 | ≤65% |
-| 压力 | 正压 |
-
-### 2.4 一般区
-
-| 项目 | 要求 |
-|------|------|
-| 洁净度 | 普通 |
-| 温度 | 20-28℃ |
-| 湿度 | ≤75% |
-| 压力 |  |
 
 ## 3. CIP系统配置
 
@@ -391,8 +355,8 @@
 
 **文档状态**: 自动生成
 
-**最后更新**: 2026-05-07 15:04:24
+**最后更新**: 2026-05-08 09:33:20
 
 **版本历史**:
 
-- v1.0 (2026-05-07): 自动生成版本
+- v1.0 (2026-05-08): 自动生成版本

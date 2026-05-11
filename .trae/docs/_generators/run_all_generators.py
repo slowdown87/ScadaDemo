@@ -38,14 +38,20 @@ GENERATORS = {
     "FB_Spec": {
         "script": "fb_spec_generator.py",
         "desc": "PLC功能块规格说明书",
-        "output": "02_Arch/茶饮料_PLC功能块规格_auto.md",
-        "input": "02_Arch/configs/fb_spec_config.yaml"
+        "output": "02_Arch/auto/茶饮料_PLC功能块规格_auto.md",
+        "input": "01_Spec/configs/fb_spec_config.yaml"
     },
     "Process_Flow": {
         "script": "process_flow_generator.py",
         "desc": "生产线工艺配置",
-        "output": "02_Arch/茶饮料_生产线工艺配置_auto.md",
+        "output": "02_Arch/auto/茶饮料_生产线工艺配置_auto.md",
         "input": "01_Spec/configs/system_config.yaml"
+    },
+    "Process_Recipe": {
+        "script": "process_recipe_generator.py",
+        "desc": "工艺配方",
+        "output": "04_Process/auto/茶饮料_工艺配方_auto.md",
+        "input": "01_Spec/configs/process_recipe_templates.yaml"
     },
     "Index": {
         "script": "index_generator.py",
@@ -63,6 +69,24 @@ GENERATORS = {
         "script": "cip_spec_generator.py",
         "desc": "CIP清洗程序规格书",
         "output": "04_Process/auto/茶饮料_CIP清洗程序规格书_auto.md",
-        "input": "01_Spec/configs/system_config.yaml"
+        "input": "01_Spec/configs/process_recipe_templates.yaml"
+    },
+    "Comm_Spec": {
+        "script": "comm_spec_generator.py",
+        "desc": "通讯接口规格书",
+        "output": "04_Process/auto/茶饮料_通讯接口规格书_auto.md",
+        "input": "01_Spec/configs/comm_templates.yaml"
+    },
+    "CIP_Recipe": {
+        "script": "cip_recipe_generator.py",
+        "desc": "CIP清洗配方",
+        "output": "05_Product/auto/CIP配方_auto.md",
+        "input": "05_Product/configs/cip_recipe_templates.yaml"
+    },
+    "Product_Recipe": {
+        "script": "product_recipe_generator.py",
+        "desc": "产品配方",
+        "output": "05_Product/auto/产品配方_auto.md",
+        "input": "05_Product/configs/product_recipe_templates.yaml"
     },
 }

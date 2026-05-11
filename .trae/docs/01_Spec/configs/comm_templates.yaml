@@ -20,7 +20,7 @@ meta:
 
 # ============================================================================
 # PLC配置
-# 说明: 共15个独立PLC，每个工段独立控制
+# 说明: 共16个独立PLC，与system_config.yaml保持一致
 # ============================================================================
 plc_config:
   - id: "PLC-1"
@@ -62,8 +62,8 @@ plc_config:
   - id: "PLC-4"
     name: "S7-1500 R/H"
     ip: "192.168.2.14"
-    sections: ["FL", "HM"]
-    section_names: ["过滤净化", "均质"]
+    sections: ["FL"]
+    section_names: ["过滤净化"]
     redundant: true
     data_area:
       di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
@@ -86,6 +86,18 @@ plc_config:
   - id: "PLC-6"
     name: "S7-1500 R/H"
     ip: "192.168.2.16"
+    sections: ["HM"]
+    section_names: ["均质"]
+    redundant: true
+    data_area:
+      di: {start: "I0.0", end: "I63.7", points: 512, desc: "设备状态、阀门反馈"}
+      do: {start: "Q0.0", end: "Q31.7", points: 256, desc: "阀门控制、泵控制"}
+      ai: {start: "IW0", end: "IW126", points: 64, desc: "压力、流量、温度"}
+      ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
+
+  - id: "PLC-7"
+    name: "S7-1500 R/H"
+    ip: "192.168.2.17"
     sections: ["UH"]
     section_names: ["UHT杀菌"]
     redundant: true
@@ -95,9 +107,9 @@ plc_config:
       ai: {start: "IW0", end: "IW254", points: 128, desc: "多段温度、压力、流量"}
       ao: {start: "QW0", end: "QW31", points: 32, desc: "调节阀输出"}
 
-  - id: "PLC-7"
+  - id: "PLC-8"
     name: "S7-1500 R/H"
-    ip: "192.168.1.17"
+    ip: "192.168.2.18"
     sections: ["BF"]
     section_names: ["制瓶"]
     redundant: true
@@ -107,9 +119,9 @@ plc_config:
       ai: {start: "IW0", end: "IW94", points: 48, desc: "压力、速度、温度"}
       ao: {start: "QW0", end: "QW23", points: 24, desc: "比例阀输出"}
 
-  - id: "PLC-8"
+  - id: "PLC-9"
     name: "S7-1500 R/H"
-    ip: "192.168.2.18"
+    ip: "192.168.2.19"
     sections: ["PF"]
     section_names: ["灌装"]
     redundant: true
@@ -119,9 +131,9 @@ plc_config:
       ai: {start: "IW0", end: "IW126", points: 64, desc: "速度、温度、压力、液位"}
       ao: {start: "QW0", end: "QW63", points: 64, desc: "高速阀岛控制"}
 
-  - id: "PLC-9"
+  - id: "PLC-10"
     name: "S7-1500 R/H"
-    ip: "192.168.2.19"
+    ip: "192.168.2.20"
     sections: ["CG"]
     section_names: ["旋盖"]
     redundant: true
@@ -131,9 +143,9 @@ plc_config:
       ai: {start: "IW0", end: "IW62", points: 32, desc: "扭矩、温度、速度"}
       ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
 
-  - id: "PLC-10"
+  - id: "PLC-11"
     name: "S7-1500 R/H"
-    ip: "192.168.2.20"
+    ip: "192.168.2.21"
     sections: ["LI"]
     section_names: ["灯检"]
     redundant: true
@@ -143,9 +155,9 @@ plc_config:
       ai: {start: "IW0", end: "IW62", points: 32, desc: "速度"}
       ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
 
-  - id: "PLC-11"
+  - id: "PLC-12"
     name: "CPU 1215C"
-    ip: "192.168.2.21"
+    ip: "192.168.2.22"
     sections: ["CI"]
     section_names: ["喷码"]
     redundant: false
@@ -155,9 +167,9 @@ plc_config:
       ai: {start: "IW0", end: "IW30", points: 16, desc: "计数器"}
       ao: {start: "QW0", end: "QW7", points: 8, desc: "预留"}
 
-  - id: "PLC-12"
+  - id: "PLC-13"
     name: "S7-1500 R/H"
-    ip: "192.168.2.22"
+    ip: "192.168.2.23"
     sections: ["LB"]
     section_names: ["贴标"]
     redundant: true
@@ -167,9 +179,9 @@ plc_config:
       ai: {start: "IW0", end: "IW62", points: 32, desc: "速度、温度"}
       ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
 
-  - id: "PLC-13"
+  - id: "PLC-14"
     name: "S7-1500 R/H"
-    ip: "192.168.2.23"
+    ip: "192.168.2.24"
     sections: ["CA"]
     section_names: ["装箱"]
     redundant: true
@@ -179,9 +191,9 @@ plc_config:
       ai: {start: "IW0", end: "IW62", points: 32, desc: "速度、重量"}
       ao: {start: "QW0", end: "QW15", points: 16, desc: "变频器速度"}
 
-  - id: "PLC-14"
+  - id: "PLC-15"
     name: "S7-1500 R/H"
-    ip: "192.168.2.24"
+    ip: "192.168.2.25"
     sections: ["PK"]
     section_names: ["膜包码垛"]
     redundant: true
@@ -191,9 +203,9 @@ plc_config:
       ai: {start: "IW0", end: "IW94", points: 48, desc: "速度、温度"}
       ao: {start: "QW0", end: "QW23", points: 24, desc: "变频器速度"}
 
-  - id: "PLC-15"
+  - id: "PLC-16"
     name: "S7-1500 R/H"
-    ip: "192.168.2.25"
+    ip: "192.168.2.26"
     sections: ["CP"]
     section_names: ["CIP清洗"]
     redundant: true
@@ -555,6 +567,10 @@ ip_planning:
       gateway: "192.168.2.1"
     - device: "PLC-15"
       ip: "192.168.2.25"
+      mask: "255.255.255.0"
+      gateway: "192.168.2.1"
+    - device: "PLC-16"
+      ip: "192.168.2.26"
       mask: "255.255.255.0"
       gateway: "192.168.2.1"
 

@@ -1,13 +1,13 @@
-# 文档索引清单配置 v4.0
+# 文档索引清单配置 v4.1
 # 用于自动生成文档索引清单
-# 版本: v4.0
-# 更新日期: 2026-05-06
-# 说明: 新增 auto/manual 子目录分类
+# 版本: v4.1
+# 更新日期: 2026-05-07
+# 说明: 更新配置文件路径，反映重构后的真相源分离
 
 meta:
-  version: "v4.0"
+  version: "v4.1"
   created: "2026-04-30"
-  updated: "2026-05-06"
+  updated: "2026-05-07"
   project_name: "茶饮料生产线文档体系"
   generator_script: "index_generator.py"
 
@@ -71,37 +71,39 @@ core_config:
   desc: "单一真相源，所有自动生成文档的数据来源"
 
 # ============================================================================
-# 生成器与输入输出关系 (更新路径)
+# 生成器与输入输出关系 (更新路径 v1.2)
 # ============================================================================
 generators:
-  # 核心配置系统生成器（configs/目录）
-  - generator: "configs/generators/PLC_Arch_generator.py"
+  # 核心配置系统生成器（01_Spec/configs/目录）
+  - generator: "01_Spec/configs/generators/PLC_Arch_generator.py"
     inputs:
-      - "configs/system_config.yaml"
+      - "01_Spec/configs/system_config.yaml"
     outputs:
       - "02_Arch/auto/PLC_Architecture_auto.md"
     desc: "PLC架构文档"
     module: "核心"
 
-  - generator: "configs/generators/TagCode_generator.py"
+  - generator: "01_Spec/configs/generators/TagCode_generator.py"
     inputs:
-      - "configs/system_config.yaml"
+      - "01_Spec/configs/system_config.yaml"
     outputs:
       - "03_Device/auto/位号编码规则_auto.md"
     desc: "位号编码规则"
     module: "核心"
 
-  - generator: "configs/generators/DeviceParam_generator.py"
+  - generator: "01_Spec/configs/generators/DeviceParam_generator.py"
     inputs:
-      - "configs/system_config.yaml"
+      - "01_Spec/configs/system_config.yaml"
     outputs:
       - "03_Device/auto/设备参数表_auto.md"
     desc: "设备参数表"
     module: "核心"
 
-  - generator: "configs/generators/run_all_generators.py"
+  - generator: "_generators/run_all_generators.py"
     inputs:
-      - "configs/system_config.yaml"
+      - "01_Spec/configs/system_config.yaml"
+      - "01_Spec/configs/comm_templates.yaml"
+      - "01_Spec/configs/process_recipe_templates.yaml"
     outputs:
       - "多个auto文档"
     desc: "一键运行所有核心生成器"
@@ -118,20 +120,28 @@ generators:
     module: "03_Device"
 
   # 工艺系统生成器（04_Process/目录）
-  - generator: "04_Process/_generators/comm_spec_generator.py"
+  - generator: "_generators/comm_spec_generator.py"
     inputs:
-      - "04_Process/configs/comm_templates.yaml"
+      - "01_Spec/configs/comm_templates.yaml"
     outputs:
-      - "04_Process/auto/通讯接口规格书_auto.md"
+      - "04_Process/auto/茶饮料_通讯接口规格书_auto.md"
     desc: "PLC通讯配置"
     module: "04_Process"
 
-  - generator: "04_Process/_generators/process_recipe_generator.py"
+  - generator: "_generators/process_recipe_generator.py"
     inputs:
-      - "04_Process/configs/process_recipe_templates.yaml"
+      - "01_Spec/configs/process_recipe_templates.yaml"
     outputs:
-      - "04_Process/auto/工艺配方_auto.md"
+      - "04_Process/auto/茶饮料_工艺配方_auto.md"
     desc: "工艺参数"
+    module: "04_Process"
+
+  - generator: "_generators/cip_spec_generator.py"
+    inputs:
+      - "01_Spec/configs/process_recipe_templates.yaml"
+    outputs:
+      - "04_Process/auto/茶饮料_CIP清洗程序规格书_auto.md"
+    desc: "CIP清洗程序规格"
     module: "04_Process"
 
   # 产品系统生成器（05_Product/目录）
@@ -166,7 +176,7 @@ generators:
   # 索引生成器
   - generator: "00_Index/_generators/index_generator.py"
     inputs:
-      - "00_Index/configs/index_config.yaml"
+      - "01_Spec/configs/index_config.yaml"
     outputs:
       - "00_Index/文档索引清单.md"
     desc: "文档索引"
@@ -178,40 +188,46 @@ generators:
 dependencies:
   - doc: "02_Arch/auto/PLC_Architecture_auto.md"
     dependencies:
-      - { name: "configs/system_config.yaml", desc: "单一真相源" }
+      - { name: "01_Spec/configs/system_config.yaml", desc: "设备基础数据真相源" }
 
   - doc: "03_Device/auto/位号编码规则_auto.md"
     dependencies:
-      - { name: "configs/system_config.yaml", desc: "单一真相源" }
+      - { name: "01_Spec/configs/system_config.yaml", desc: "设备基础数据真相源" }
 
   - doc: "03_Device/auto/设备参数表_auto.md"
     dependencies:
-      - { name: "configs/system_config.yaml", desc: "单一真相源" }
+      - { name: "01_Spec/configs/system_config.yaml", desc: "设备基础数据真相源" }
 
   - doc: "03_Device/auto/茶饮料生产线监控点表_auto.md"
     dependencies:
       - { name: "03_Device/configs/devices_*.yaml", desc: "设备清单" }
       - { name: "03_Device/configs/sensor_templates.yaml", desc: "传感器定义" }
 
-  - doc: "04_Process/auto/通讯接口规格书_auto.md"
+  - doc: "04_Process/auto/茶饮料_通讯接口规格书_auto.md"
     dependencies:
-      - { name: "04_Process/configs/comm_templates.yaml", desc: "通讯配置" }
-      - { name: "configs/system_config.yaml", desc: "PLC定义" }
+      - { name: "01_Spec/configs/comm_templates.yaml", desc: "通讯配置真相源" }
+      - { name: "01_Spec/configs/system_config.yaml", desc: "PLC定义" }
+
+  - doc: "04_Process/auto/茶饮料_CIP清洗程序规格书_auto.md"
+    dependencies:
+      - { name: "01_Spec/configs/process_recipe_templates.yaml", desc: "工艺详细数据真相源" }
 
   - doc: "工段控制规格 (各工段)"
     dependencies:
-      - { name: "configs/system_config.yaml", desc: "PLC/工段定义" }
+      - { name: "01_Spec/configs/system_config.yaml", desc: "PLC/工段定义" }
       - { name: "03_Device/configs/devices_*.yaml", desc: "设备定义" }
       - { name: "03_Device/auto/位号编码规则_auto.md", desc: "位号命名" }
 
 # ============================================================================
-# 配置目录结构
+# 配置目录结构 (更新路径 v1.2)
 # ============================================================================
 config_dirs:
-  - path: "configs/"
+  - path: "01_Spec/configs/"
     desc: "核心配置目录"
     files:
-      - "system_config.yaml ★单一真相源"
+      - "system_config.yaml ★设备基础数据真相源"
+      - "comm_templates.yaml ★通讯配置真相源"
+      - "process_recipe_templates.yaml ★工艺详细数据真相源"
       - "generators/*.py ★生成器"
       - "README.md ★使用说明"
 
@@ -224,9 +240,8 @@ config_dirs:
   - path: "04_Process/configs/"
     desc: "工艺配置目录"
     files:
-      - "comm_templates.yaml"
+      - "Section_Control_Template.md ★工段控制模板"
       - "interlock_templates.yaml"
-      - "process_recipe_templates.yaml"
 
   - path: "05_Product/configs/"
     desc: "产品配置目录"
@@ -243,16 +258,17 @@ config_dirs:
       - "cable_list.yaml"
 
 # ============================================================================
-# 维护规则
+# 维护规则 (更新路径 v1.2)
 # ============================================================================
 maintenance_rules:
   core_config_modification:
-    title: "核心配置修改流程 (system_config.yaml)"
+    title: "核心配置修改流程"
     steps:
-      - "1. 编辑 configs/system_config.yaml"
-      - "2. 运行 configs/generators/run_all_generators.py"
-      - "3. 检查生成的 02_Arch/auto/*.md 文档"
-      - "4. 提交 configs/ 目录"
+      - "1. 编辑 01_Spec/configs/system_config.yaml (设备基础数据)"
+      - "2. 编辑 01_Spec/configs/process_recipe_templates.yaml (工艺详细数据)"
+      - "3. 运行 _generators/run_all_generators.py"
+      - "4. 检查生成的 auto/ 目录文档"
+      - "5. 提交 configs/ 目录"
 
   device_config_modification:
     title: "设备配置修改流程"
@@ -271,7 +287,8 @@ maintenance_rules:
   version_rules:
     title: "版本更新规则"
     rules:
-      - { doc_type: "system_config.yaml", trigger: "修改后", rule: "v1.0 → v1.1" }
+      - { doc_type: "system_config.yaml", trigger: "修改后", rule: "v1.2 → v1.3" }
+      - { doc_type: "process_recipe_templates.yaml", trigger: "修改后", rule: "v1.1 → v1.2" }
       - { doc_type: "auto生成文档", trigger: "重新生成后", rule: "自动更新日期" }
       - { doc_type: "手动文档", trigger: "内容重大变更", rule: "v1.0 → v2.0" }
       - { doc_type: "工段控制规格", trigger: "控制逻辑变更", rule: "v1.0 → v1.1" }
@@ -301,3 +318,6 @@ version_history:
   - version: "v4.0"
     date: "2026-05-06"
     desc: "新增 auto/manual 子目录分类，区分自动生成和手动编辑文档"
+  - version: "v4.1"
+    date: "2026-05-07"
+    desc: "配置文件重构：分离设备基础数据(system_config.yaml)和工艺详细数据(process_recipe_templates.yaml)，修复BL pH/Brix数据冲突"

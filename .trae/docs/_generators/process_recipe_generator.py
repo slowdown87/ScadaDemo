@@ -4,6 +4,7 @@
 
 使用方法:
     python process_recipe_generator.py
+    或通过 run_all_generators.py 调用
 """
 
 import os
@@ -12,8 +13,8 @@ from datetime import datetime
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
-CONFIG_PROCESS = SCRIPT_DIR.parent / "configs" / "process_recipe_templates.yaml"
-OUTPUT_PROCESS = SCRIPT_DIR.parent / "auto" / "工艺配方_auto.md"
+CONFIG_PROCESS = SCRIPT_DIR.parent / "01_Spec" / "configs" / "process_recipe_templates.yaml"
+OUTPUT_PROCESS = SCRIPT_DIR.parent / "04_Process" / "auto" / "茶饮料_工艺配方_auto.md"
 
 
 def load_yaml(file_path):
@@ -48,15 +49,15 @@ def generate_header(doc_type, config_file, version="v1.0"):
 
 | 项目 | 内容 |
 | ---- | ---- |
-| **数据来源** | `04_Process/configs/process_recipe_templates.yaml` |
-| **生成器脚本** | `04_Process/_generators/process_recipe_generator.py` |
-| **重新生成命令** | `python 04_Process/_generators/process_recipe_generator.py` |
+| **数据来源** | `01_Spec/configs/process_recipe_templates.yaml` |
+| **生成器脚本** | `_generators/process_recipe_generator.py` |
+| **重新生成命令** | `python _generators/run_all_generators.py --gen=Process_Recipe` |
 
 ### 修改流程
 
-1. 编辑 `04_Process/configs/process_recipe_templates.yaml`
-2. 运行 `python 04_Process/_generators/process_recipe_generator.py`
-3. 检查生成的 `04_Process/auto/工艺配方_auto.md`
+1. 编辑 `01_Spec/configs/process_recipe_templates.yaml`
+2. 运行 `python _generators/run_all_generators.py --gen=Process_Recipe`
+3. 检查生成的 `04_Process/auto/茶饮料_工艺配方_auto.md`
 
 ---
 
