@@ -1,0 +1,156 @@
+digraph "flowsheet_p&id" {
+	bgcolor=transparent compound=true dpi=300 fontname=SimHei fontsize=12 newrank=true nodesep=0.8 pad=0.5 rankdir=LR ranksep=1.2 ratio=fill size="30,20" splines=ortho
+	node [color="#1565C0" fillcolor="#E3F2FD" fontname=SimHei fontsize=10 height=0.8 penwidth=2 shape=box style="rounded,filled" width=2.0]
+	edge [arrowsize=0.8 color="#5a9ab8" fontcolor="#333333" fontname=SimHei fontsize=9 penwidth=2]
+	subgraph cluster_wt {
+		color="#4fc3f7" fillcolor="#E3F2FD" fontname=SimHei fontsize=12 label="WT 水处理系统" margin=20 penwidth=2 style="rounded,filled"
+		WT101 [label="WT-101
+原水箱 10m³" color="#4fc3f7" fillcolor="#B3E5FC"]
+		WT102 [label="WT-102
+多介质过滤器" color="#4fc3f7" fillcolor="#B3E5FC"]
+		WT103 [label="WT-103
+活性炭过滤器" color="#4fc3f7" fillcolor="#B3E5FC"]
+		WT104 [label="WT-104
+RO反渗透" color="#4fc3f7" fillcolor="#B3E5FC"]
+		WT105 [label="WT-105
+离子交换柱" color="#4fc3f7" fillcolor="#B3E5FC"]
+		WT106 [label="WT-106
+UV杀菌器" color="#9370db" fillcolor="#E1BEE7"]
+		WT107 [label="WT-107
+纯水储罐 10m³" color="#4fc3f7" fillcolor="#B3E5FC"]
+	}
+	subgraph cluster_th {
+		color="#8D6E63" fillcolor="#EFEBE9" fontname=SimHei fontsize=12 label="TH 茶叶前处理" margin=20 penwidth=2 style="rounded,filled"
+		TH101 [label="TH-101
+茶叶储罐 2m³" color="#8D6E63" fillcolor="#D7CCC8"]
+		TH102 [label="TH-102
+茶叶粉碎机" color="#8D6E63" fillcolor="#D7CCC8"]
+	}
+	subgraph cluster_ex {
+		color="#66BB6A" fillcolor="#E8F5E9" fontname=SimHei fontsize=12 label="EX 萃取系统(三级逆流)" margin=20 penwidth=2 style="rounded,filled"
+		EX101 [label="EX-101
+萃取罐1 95°C" color="#66BB6A" fillcolor="#C8E6C9"]
+		EX102 [label="EX-102
+萃取罐2 90°C" color="#66BB6A" fillcolor="#C8E6C9"]
+		EX103 [label="EX-103
+萃取罐3 85°C" color="#66BB6A" fillcolor="#C8E6C9"]
+		EX104 [label="EX-104
+茶渣分离器" color="#66BB6A" fillcolor="#C8E6C9"]
+		EX105 [label="EX-105
+茶汁冷却器" color="#66BB6A" fillcolor="#C8E6C9"]
+		EX106 [label="EX-106
+萃取液储罐" color="#66BB6A" fillcolor="#C8E6C9"]
+	}
+	subgraph cluster_fl {
+		color="#26C6DA" fillcolor="#E0F7FA" fontname=SimHei fontsize=12 label="FL 过滤净化" margin=20 penwidth=2 style="rounded,filled"
+		FL101 [label="FL-101
+碟式离心机" color="#26C6DA" fillcolor="#B2EBF2"]
+		FL102 [label="FL-102
+超滤膜组件" color="#26C6DA" fillcolor="#B2EBF2"]
+	}
+	subgraph cluster_bl {
+		color="#AB47BC" fillcolor="#F3E5F5" fontname=SimHei fontsize=12 label="BL 调配系统" margin=20 penwidth=2 style="rounded,filled"
+		BL101 [label="BL-101
+调配罐1 5m³" color="#AB47BC" fillcolor="#E1BEE7"]
+		BL102 [label="BL-102
+调配罐2 5m³" color="#AB47BC" fillcolor="#E1BEE7"]
+		BL103 [label="BL-103
+糖浆溶解罐" color="#EC407A" fillcolor="#FCE4EC"]
+		BL104 [label="BL-104
+糖浆储罐" color="#EC407A" fillcolor="#FCE4EC"]
+		BL105 [label="BL-105
+酸液罐" color="#F9A825" fillcolor="#FFF9C4"]
+	}
+	subgraph cluster_hm {
+		color="#EC407A" fillcolor="#FCE4EC" fontname=SimHei fontsize=12 label="HM 均质系统" margin=20 penwidth=2 style="rounded,filled"
+		HM101 [label="HM-101
+高压均质机
+20-25MPa" color="#EC407A" fillcolor="#F8BBD9"]
+	}
+	subgraph cluster_uh {
+		color="#EF5350" fillcolor="#FFEBEE" fontname=SimHei fontsize=12 label="UH UHT杀菌系统" margin=20 penwidth=2 style="rounded,filled"
+		UH102 [label="UH-102
+预热器 80°C" color="#EF5350" fillcolor="#FFCDD2"]
+		UH101 [label="UH-101
+UHT杀菌锅
+135°C/15s" color="#EF5350" fillcolor="#FFCDD2"]
+		UH103 [label="UH-103
+保温管 30m" color="#EF5350" fillcolor="#FFCDD2"]
+		UH104 [label="UH-104
+冷却器 25°C" color="#26C6DA" fillcolor="#B2EBF2"]
+		UH105 [label="UH-105
+无菌储罐 3m³" color="#EF5350" fillcolor="#FFCDD2"]
+	}
+	subgraph cluster_pkg {
+		color="#FFA726" fillcolor="#FFF8E1" fontname=SimHei fontsize=12 label="PKG 包装系统" margin=20 penwidth=2 style="rounded,filled"
+		BF101 [label="BF-101
+吹瓶机" color="#FFA726" fillcolor="#FFE0B2"]
+		PF101 [label="PF-101
+吹灌一体机
+54000B/H" color="#FFA726" fillcolor="#FFE0B2"]
+		CG101 [label="CG-101
+旋盖机" color="#FFA726" fillcolor="#FFE0B2"]
+		LI101 [label="LI-101
+视觉灯检机" color="#26C6DA" fillcolor="#B2EBF2"]
+		CI101 [label="CI-101
+激光喷码机" color="#FFA726" fillcolor="#FFE0B2"]
+		LB101 [label="LB-101
+贴标机" color="#66BB6A" fillcolor="#C8E6C9"]
+		CA101 [label="CA-101
+装箱机" color="#AB47BC" fillcolor="#E1BEE7"]
+		PK101 [label="PK-101
+冷却隧道" color="#66BB6A" fillcolor="#C8E6C9"]
+		PK108 [label="PK-108
+码垛机" color="#66BB6A" fillcolor="#C8E6C9"]
+		PK110 [label="PK-110
+缠绕机" color="#66BB6A" fillcolor="#C8E6C9"]
+	}
+	subgraph cluster_cip {
+		color="#78909C" fillcolor="#ECEFF1" fontname=SimHei fontsize=12 label="CIP 清洗系统" margin=20 penwidth=2 style="rounded,filled"
+		CP101 [label="CP-101
+CIP碱液罐
+2m³ 85°C" color="#78909C" fillcolor="#CFD8DC"]
+		CP102 [label="CP-102
+CIP酸液罐
+1m³ 60°C" color="#78909C" fillcolor="#CFD8DC"]
+		CP103 [label="CP-103
+CIP热水罐
+3m³ 85°C" color="#78909C" fillcolor="#CFD8DC"]
+	}
+	WT101 -> WT102 [color="#4fc3f7"]
+	WT102 -> WT103 [color="#4fc3f7"]
+	WT103 -> WT104 [color="#4fc3f7"]
+	WT104 -> WT105 [color="#4fc3f7"]
+	WT105 -> WT106 [color="#4fc3f7"]
+	WT106 -> WT107 [color="#4fc3f7"]
+	TH101 -> TH102 [color="#8D6E63"]
+	EX101 -> EX102 [color="#66BB6A" style=dashed]
+	EX102 -> EX103 [color="#66BB6A" style=dashed]
+	EX103 -> EX104 [color="#66BB6A"]
+	EX104 -> EX105 [color="#66BB6A"]
+	EX105 -> EX106 [color="#66BB6A"]
+	FL101 -> FL102 [color="#26C6DA"]
+	BL101 -> BL102 [color="#AB47BC"]
+	BL103 -> BL104 [color="#EC407A"]
+	BL104 -> BL105 [color="#F9A825"]
+	UH102 -> UH101 [color="#EF5350"]
+	UH101 -> UH103 [color="#EF5350"]
+	UH103 -> UH104 [color="#26C6DA"]
+	UH104 -> UH105 [color="#EF5350"]
+	PF101 -> CG101 [color="#FFA726"]
+	CG101 -> LI101 [color="#26C6DA"]
+	LI101 -> CI101 [color="#FFA726"]
+	CI101 -> LB101 [color="#66BB6A"]
+	LB101 -> CA101 [color="#AB47BC"]
+	CA101 -> PK101 [color="#66BB6A"]
+	PK101 -> PK108 [color="#66BB6A"]
+	PK108 -> PK110 [color="#66BB6A"]
+	TH102 -> EX101 [label="茶叶粉" color="#8D6E63" style=dashed]
+	WT107 -> BL101 [label="纯水" color="#4fc3f7" style=dashed]
+	EX105 -> FL101 [color="#66BB6A"]
+	FL102 -> BL101 [label="净化茶汁" color="#66BB6A" style=dashed]
+	BL102 -> HM101 [color="#AB47BC"]
+	HM101 -> UH102 [color="#EC407A"]
+	UH105 -> PF101 [label="UHT产品" color="#EF5350" style=dashed]
+	BF101 -> PF101 [label="空瓶" color="#FFA726" style=dashed]
+}

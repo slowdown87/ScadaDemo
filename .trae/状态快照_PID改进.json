@@ -1,0 +1,108 @@
+{
+  "version": "1.3",
+  "lastUpdated": "2026-05-12T19:25:00Z",
+  "currentPhase": "全部完成",
+
+  "task": {
+    "id": "PID-IMPROVE-001",
+    "name": "茶饮料生产线P&ID流程图专业度提升",
+    "description": "根据ANSI/ISA-5.1标准，提升现有流程图的专业度",
+    "status": "已完成",
+    "priority": "P0",
+    "progress": "6/6"
+  },
+
+  "subTasks": [
+    {
+      "id": "Phase1",
+      "name": "仪表符号标准化",
+      "description": "添加ISA标准圆形仪表符号（TT/LT/FT/PT/CT/pH/BX等）",
+      "status": "completed",
+      "priority": "P0",
+      "output": "已添加ISA标准仪表符号库定义"
+    },
+    {
+      "id": "Phase2",
+      "name": "设备代码标准化",
+      "description": "采用标准设备代码（TK/V/P/E等）",
+      "status": "completed",
+      "priority": "P0",
+      "output": "已更新所有设备标注"
+    },
+    {
+      "id": "Phase3",
+      "name": "管道编号系统",
+      "description": "添加管道尺寸-流体代码-管线号标注",
+      "status": "completed",
+      "priority": "P1",
+      "output": "已为所有管道添加规范标签"
+    },
+    {
+      "id": "Phase4",
+      "name": "阀门详细标注",
+      "description": "添加阀门类型和功能代码",
+      "status": "completed",
+      "priority": "P1",
+      "output": "已添加阀门符号定义（FCV/CV/GV/BV/SV/PRV）"
+    },
+    {
+      "id": "ConnectionFix",
+      "name": "管道连接关系修复",
+      "description": "修复管道与设备的连接点：泵顶入底出、储罐底部出料",
+      "status": "completed",
+      "priority": "P0",
+      "output": "已完成WT/EX/FL/UH系统的泵连接修复"
+    },
+    {
+      "id": "ValveFix",
+      "name": "阀门位置修复",
+      "description": "在管道上添加阀门符号",
+      "status": "completed",
+      "priority": "P1",
+      "output": "已在WT系统和跨系统连接管道上添加阀门"
+    }
+  ],
+
+  "blockers": [],
+
+  "pendingConfirmations": [],
+
+  "已完成的工作": [
+    "1. 添加ISA标准仪表符号（TT/LT/FT/PT/CT/pH/BX共7种）",
+    "2. 添加阀门符号定义（FCV/CV/GV/BV/SV/PRV共6种）",
+    "3. 修复泵连接：入口在顶部，出口在底部",
+    "4. 修复储罐连接：进料口在顶部/侧面，出料口在底部",
+    "5. 优化管道走向：最短路径原则",
+    "6. 添加管道标签：Ø尺寸-流体代码-管线号格式",
+    "7. 在管道上添加阀门符号（FV-101至FV-701等）",
+    "8. 添加阀门标注格式图例"
+  ],
+
+  "修复的连接问题": {
+    "泵连接": "泵入口在顶部，出口在底部（专业标准）",
+    "储罐连接": "进料口在顶部/侧面，出料口在底部",
+    "管道走向": "遵循最短路径原则",
+    "阀门位置": "在管道上添加阀门符号"
+  },
+
+  "阀门编号说明": {
+    "FV": "流量控制阀",
+    "UV": "单元阀",
+    "示例": "FV-801表示纯水系统第1个流量控制阀"
+  },
+
+  "资源": {
+    "参考文档": [
+      "public/54000工艺流程图2.png (小料系统参考)",
+      "docs/01_Spec/manual/P&ID管道仪表流程图规范.md"
+    ],
+    "目标文件": "public/flowsheet.svg"
+  },
+
+  "当前状态": {
+    "任务": "P&ID流程图改进 - 全部完成",
+    "进度": "100%",
+    "阻塞": "无",
+    "待确认": "请查看flowsheet.svg验收"
+  }
+}

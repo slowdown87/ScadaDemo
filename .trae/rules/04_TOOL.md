@@ -9,7 +9,7 @@
 | 搜索代码 | Grep / SearchCodebase | Grep精确，Search模糊 |
 | 批量查找 | Glob + Grep | 先定位目录再搜索 |
 | 修改文件 | SearchReplace | 精准替换，不丢内容 |
-| 创建文件 | Write | 仅在必要时使用 |
+| 创建文件 | Write | 经常使用 |
 | 跟踪任务 | TodoWrite | 复杂任务必备 |
 
 ## 命令对照

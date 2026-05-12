@@ -41,13 +41,13 @@ GENERATORS = {
     "SCADA_Spec": {
         "script": "scada_spec_generator.py",
         "desc": "SCADA系统功能规格说明书",
-        "output": "01_Spec/茶饮料_SCADA功能规格_auto.md",
+        "output": "01_Spec/auto/茶饮料_SCADA功能规格_auto.md",
         "input": "01_Spec/configs/system_config.yaml"
     },
     "HMI_Spec": {
         "script": "hmi_generator.py",
         "desc": "HMI画面规格说明书",
-        "output": "01_Spec/茶饮料_HMI画面规格_auto.md",
+        "output": "01_Spec/auto/茶饮料_HMI画面规格_auto.md",
         "input": "01_Spec/configs/hmi_config.yaml"
     },
     "FB_Spec": {

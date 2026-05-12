@@ -48,112 +48,6 @@
     <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
       <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1a2535" stroke-width="0.3"/>
     </pattern>
-
-    <!-- ISA标准仪表符号定义 -->
-    <!-- 温度变送器 TT -->
-    <symbol id="TT" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">TT</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- 液位变送器 LT -->
-    <symbol id="LT" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">LT</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- 流量变送器 FT -->
-    <symbol id="FT" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">FT</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- 压力变送器 PT -->
-    <symbol id="PT" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">PT</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- 电导率变送器 CT -->
-    <symbol id="CT" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">CT</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- pH变送器 pH -->
-    <symbol id="PH" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">pH</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- Brix变送器 BX -->
-    <symbol id="BX" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#1a2535" stroke="#f0ad4e" stroke-width="2"/>
-      <line x1="20" y1="2" x2="20" y2="8" stroke="#f0ad4e" stroke-width="1.5"/>
-      <text x="20" y="17" text-anchor="middle" fill="#f0ad4e" font-size="9" font-weight="bold" font-family="Arial">BX</text>
-      <text x="20" y="28" text-anchor="middle" fill="#f0ad4e" font-size="7" font-family="Arial"></text>
-    </symbol>
-
-    <!-- 流量控制阀 FCV -->
-    <symbol id="FCV" viewBox="0 0 50 35">
-      <polygon points="10,8 25,17 10,26" fill="#1a2535" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="25" y1="17" x2="45" y2="17" stroke="#FFA726" stroke-width="2"/>
-      <rect x="18" y="5" width="14" height="10" fill="#1a2535" stroke="#FFA726" stroke-width="1"/>
-    </symbol>
-
-    <!-- 止回阀 CV -->
-    <symbol id="CV" viewBox="0 0 50 35">
-      <polygon points="10,8 25,17 10,26" fill="#1a2535" stroke="#FFA726" stroke-width="1.5"/>
-      <polygon points="20,12 25,17 20,22" fill="#FFA726"/>
-    </symbol>
-
-    <!-- 手阀/闸阀 GV -->
-    <symbol id="GV" viewBox="0 0 40 30">
-      <rect x="5" y="8" width="30" height="14" rx="2" fill="#1a2535" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="20" y1="8" x2="20" y2="22" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="8" y1="15" x2="32" y2="15" stroke="#FFA726" stroke-width="1"/>
-    </symbol>
-
-    <!-- 球阀 BV -->
-    <symbol id="BV" viewBox="0 0 40 30">
-      <circle cx="20" cy="15" r="10" fill="#1a2535" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="20" y1="5" x2="20" y2="25" stroke="#FFA726" stroke-width="1"/>
-      <line x1="10" y1="15" x2="30" y2="15" stroke="#FFA726" stroke-width="1"/>
-    </symbol>
-
-    <!-- 蝶阀 BDV -->
-    <symbol id="BDV" viewBox="0 0 40 30">
-      <ellipse cx="20" cy="15" rx="12" ry="8" fill="none" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="20" y1="7" x2="20" y2="23" stroke="#FFA726" stroke-width="1.5"/>
-      <line x1="8" y1="15" x2="32" y2="15" stroke="#FFA726" stroke-width="1"/>
-    </symbol>
-
-    <!-- 电磁阀 SV -->
-    <symbol id="SV" viewBox="0 0 40 30">
-      <rect x="8" y="5" width="24" height="20" rx="2" fill="#1a2535" stroke="#FFA726" stroke-width="1.5"/>
-      <rect x="12" y="9" width="16" height="6" fill="#FFA726" opacity="0.5"/>
-      <line x1="20" y1="15" x2="20" y2="25" stroke="#FFA726" stroke-width="1.5"/>
-    </symbol>
-
-    <!-- 安全阀/泄压阀 PRV -->
-    <symbol id="PRV" viewBox="0 0 50 35">
-      <polygon points="10,8 25,17 10,26" fill="#1a2535" stroke="#FF6B6B" stroke-width="1.5"/>
-      <line x1="25" y1="17" x2="45" y2="17" stroke="#FF6B6B" stroke-width="2"/>
-      <line x1="15" y1="12" x2="25" y2="8" stroke="#FF6B6B" stroke-width="1"/>
-      <line x1="15" y1="22" x2="25" y2="26" stroke="#FF6B6B" stroke-width="1"/>
-    </symbol>
   </defs>
 
   <style>
@@ -165,7 +59,6 @@
     .equipment-label { font-family: Arial, sans-serif; font-size: 12px; fill: #ffffff; text-anchor: middle; }
     .tag-label { font-family: Arial, sans-serif; font-size: 11px; fill: #ffd700; text-anchor: middle; font-weight: bold; }
     .param-label { font-family: Arial, sans-serif; font-size: 10px; fill: #00ff00; text-anchor: middle; }
-    .pipe-label { font-family: Arial, sans-serif; font-size: 8px; fill: #aaaaaa; text-anchor: middle; background-color: #1a2535; }
     .title-text { font-family: Arial, sans-serif; font-size: 24px; fill: #ffffff; text-anchor: middle; font-weight: bold; }
     .section-text { font-family: Arial, sans-serif; font-size: 13px; fill: #aaaaaa; text-anchor: middle; }
     .legend-text { font-family: Arial, sans-serif; font-size: 11px; fill: #cccccc; }
@@ -181,37 +74,6 @@
   <text x="1500" y="58" class="section-text">纯茶饮料 · PET瓶UHT无菌灌装 · 54000B/H(最大)</text>
   <text x="1500" y="75" class="section-text" style="font-size:11px;fill:#888">PLC-1~16 · Ethernet/IP环网 · SCADA监控</text>
 
-  <!-- ISA标准仪表图例 -->
-  <g id="instrument-legend" transform="translate(30, 95)">
-    <rect x="930" y="-25" width="280" height="55" rx="3" fill="#1a2535" stroke="#5a9ab8" stroke-width="1" opacity="0.9"/>
-    <text x="1070" y="-12" fill="#f0ad4e" font-size="10" font-family="Arial" font-weight="bold" text-anchor="middle">ISA仪表符号 (ANSI/ISA-5.1)</text>
-
-    <!-- TT -->
-    <use href="#TT" x="940" y="0" width="22" height="22"/>
-    <text x="952" y="15" fill="#aaaaaa" font-size="7" font-family="Arial" text-anchor="middle">TT</text>
-    <text x="952" y="25" fill="#888888" font-size="6" font-family="Arial" text-anchor="middle">温度变送器</text>
-
-    <!-- LT -->
-    <use href="#LT" x="985" y="0" width="22" height="22"/>
-    <text x="997" y="15" fill="#aaaaaa" font-size="7" font-family="Arial" text-anchor="middle">LT</text>
-    <text x="997" y="25" fill="#888888" font-size="6" font-family="Arial" text-anchor="middle">液位变送器</text>
-
-    <!-- FT -->
-    <use href="#FT" x="1030" y="0" width="22" height="22"/>
-    <text x="1042" y="15" fill="#aaaaaa" font-size="7" font-family="Arial" text-anchor="middle">FT</text>
-    <text x="1042" y="25" fill="#888888" font-size="6" font-family="Arial" text-anchor="middle">流量变送器</text>
-
-    <!-- PT -->
-    <use href="#PT" x="1075" y="0" width="22" height="22"/>
-    <text x="1087" y="15" fill="#aaaaaa" font-size="7" font-family="Arial" text-anchor="middle">PT</text>
-    <text x="1087" y="25" fill="#888888" font-size="6" font-family="Arial" text-anchor="middle">压力变送器</text>
-
-    <!-- pH -->
-    <use href="#PH" x="1120" y="0" width="22" height="22"/>
-    <text x="1132" y="15" fill="#aaaaaa" font-size="7" font-family="Arial" text-anchor="middle">pH</text>
-    <text x="1132" y="25" fill="#888888" font-size="6" font-family="Arial" text-anchor="middle">pH变送器</text>
-  </g>
-
   <!-- ====== 水处理系统 WT ====== -->
   <g id="water-treatment" transform="translate(30, 95)">
     <rect x="0" y="0" width="920" height="170" rx="5" fill="none" stroke="#4fc3f7" stroke-width="1" stroke-dasharray="4,2" opacity="0.4"/>
@@ -220,10 +82,9 @@
     <!-- 原水箱 WT-101 -->
     <rect x="10" y="10" width="70" height="100" rx="4" fill="url(#tankGrad)" stroke="#4fc3f7" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="10" y="60" width="70" height="50" rx="0" fill="url(#waterGrad)" opacity="0.5"/>
-    <use href="#LT" x="35" y="-15" width="30" height="30"/>
-    <text x="50" y="-5" fill="#f0ad4e" font-size="9" font-family="Arial" text-anchor="middle">LT-101 75%</text>
     <text x="45" y="130" class="tag-label">WT-101</text>
-    <text x="45" y="145" class="equipment-label" style="font-size:9px">原水箱 TK-101 10m³</text>
+    <text x="45" y="145" class="equipment-label" style="font-size:9px">原水箱 10m³</text>
+    <text x="45" y="35" class="param-label" style="font-size:9px">LT: 75%</text>
 
     <!-- 多介质过滤器 WT-102 -->
     <rect x="115" y="20" width="50" height="80" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="2"/>
@@ -246,10 +107,9 @@
     <rect x="275" y="15" width="60" height="90" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="2"/>
     <text x="305" y="50" class="equipment-label" style="font-size:9px;color:#4fc3f7">RO</text>
     <text x="305" y="63" class="equipment-label" style="font-size:9px;color:#4fc3f7">反渗透</text>
-    <use href="#FT" x="290" y="-10" width="30" height="30"/>
-    <text x="305" y="-5" fill="#f0ad4e" font-size="9" font-family="Arial" text-anchor="middle">FT-101 5m³/h</text>
     <text x="305" y="120" class="tag-label">WT-104</text>
     <text x="305" y="135" class="equipment-label" style="font-size:9px">脱盐率≥97%</text>
+    <text x="305" y="35" class="param-label" style="font-size:9px">5m³/h</text>
 
     <!-- 离子交换柱 WT-105 -->
     <rect x="365" y="20" width="50" height="80" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="2"/>
@@ -270,107 +130,44 @@
     <!-- 纯水储罐 WT-107 -->
     <rect x="515" y="10" width="70" height="100" rx="4" fill="url(#tankGrad)" stroke="#4fc3f7" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="515" y="50" width="70" height="60" rx="0" fill="url(#waterGrad)" opacity="0.7"/>
-    <!-- 液位计从顶部 -->
-    <use href="#LT" x="530" y="-20" width="30" height="30"/>
-    <text x="545" y="-10" fill="#f0ad4e" font-size="8" font-family="Arial" text-anchor="middle">LT-102 80%</text>
-    <!-- 电导率仪在侧面 -->
-    <use href="#CT" x="575" y="0" width="28" height="28"/>
-    <text x="590" y="12" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">CT-101</text>
-    <!-- 罐位号在底部 -->
     <text x="550" y="130" class="tag-label">WT-107</text>
-    <text x="550" y="145" class="equipment-label" style="font-size:9px">纯水储罐 TK-102 10m³</text>
-    <!-- 进料口在顶部左侧 -->
-    <path d="M 515 35 L 505 35 L 505 265 L 495 265" class="water-line"/>
-    <!-- 出料口在底部（通过泵P-WT02） -->
-    <path d="M 550 110 L 550 265 L 610 265 L 610 80" class="water-line" marker-end="url(#waterArrow)"/>
+    <text x="550" y="145" class="equipment-label" style="font-size:9px">纯水储罐 10m³</text>
+    <text x="550" y="35" class="param-label" style="font-size:9px">LT: 80%</text>
+    <text x="550" y="48" class="param-label" style="font-size:9px">CT: 8μS/cm</text>
 
-    <!-- 原水泵 P-WT01 - 泵入口在顶部，出料在底部 -->
+    <!-- 原水泵 P-WT01 -->
     <rect x="610" y="30" width="55" height="50" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="1.5"/>
-    <!-- 入口（从WT-106来） -->
-    <path d="M 665 55 L 695 55 L 695 80" class="water-line" marker-end="url(#waterArrow)"/>
-    <!-- 出口（到WT-101） -->
-    <path d="M 637 80 L 637 265 L 80 265 L 80 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="610" y="82" width="55" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="637" y="93" class="pipe-label" fill="#4fc3f7">Ø40-PW-102</text>
     <text x="637" y="52" class="equipment-label" style="font-size:8px;color:#4fc3f7">P-WT01</text>
     <text x="637" y="63" class="equipment-label" style="font-size:8px;color:#4fc3f7">原水泵</text>
     <text x="637" y="95" class="tag-label">P-WT01</text>
 
-    <!-- 纯水泵 P-WT02 - 泵入口在顶部，出料在底部 -->
+    <!-- 纯水泵 P-WT02 -->
     <rect x="690" y="30" width="55" height="50" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="1.5"/>
-    <!-- 入口（从WT-107来） -->
-    <path d="M 745 55 L 775 55 L 775 80" class="water-line" marker-end="url(#waterArrow)"/>
-    <!-- 出口（向调配系统） -->
-    <path d="M 717 80 L 717 265 L 980 265" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="742" y="82" width="55" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="770" y="93" class="pipe-label" fill="#4fc3f7">Ø50-PW-801</text>
     <text x="717" y="52" class="equipment-label" style="font-size:8px;color:#4fc3f7">P-WT02</text>
     <text x="717" y="63" class="equipment-label" style="font-size:8px;color:#4fc3f7">纯水泵</text>
     <text x="717" y="95" class="tag-label">P-WT02</text>
 
-    <!-- CIP酸罐 - 入口在顶部 -->
+    <!-- CIP酸罐 -->
     <rect x="770" y="15" width="55" height="65" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="1.5"/>
     <rect x="775" y="35" width="45" height="40" rx="0" fill="#FFFF00" opacity="0.3"/>
-    <!-- 进料口在顶部 -->
-    <path d="M 797 15 L 797 0 L 845 0 L 845 15" class="cip-line"/>
     <text x="797" y="100" class="tag-label">CP-102</text>
     <text x="797" y="113" class="equipment-label" style="font-size:8px">CIP酸液罐</text>
     <text x="797" y="30" class="param-label" style="font-size:9px">1%HNO₃</text>
 
-    <!-- CIP碱罐 - 入口在顶部 -->
+    <!-- CIP碱罐 -->
     <rect x="845" y="15" width="55" height="65" rx="3" fill="url(#vesselGrad)" stroke="#4fc3f7" stroke-width="1.5"/>
     <rect x="850" y="35" width="45" height="40" rx="0" fill="#4169E1" opacity="0.4"/>
-    <!-- 进料口在顶部 -->
-    <path d="M 872 15 L 872 0 L 920 0 L 920 15" class="cip-line"/>
     <text x="872" y="100" class="tag-label">CP-101</text>
     <text x="872" y="113" class="equipment-label" style="font-size:8px">CIP碱液罐</text>
     <text x="872" y="30" class="param-label" style="font-size:9px">2%NaOH</text>
 
-    <!-- WT内部连接 - 简化版，泵之间的连接已在上方定义 -->
-    <!-- WT-101入口阀门 -->
-    <path d="M 80 75 L 115 75" class="water-line"/>
-    <polygon points="115,68 130,75 115,82" fill="#FFA726" stroke="#FFA726" stroke-width="1"/>
-    <rect x="90" y="82" width="8" height="8" fill="#FFA726" rx="1"/>
-    <text x="97" y="100" class="pipe-label" fill="#FFA726" style="font-size:7px">UV-101</text>
-    <path d="M 115 75 L 135 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="123" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="148" y="76" class="pipe-label" fill="#4fc3f7">Ø40-PW-101</text>
-
-    <!-- WT-102入口阀门 -->
-    <path d="M 165 75 L 195 75" class="water-line"/>
-    <polygon points="195,68 210,75 195,82" fill="#FFA726" stroke="#FFA726" stroke-width="1"/>
-    <rect x="180" y="82" width="8" height="8" fill="#FFA726" rx="1"/>
-    <text x="187" y="100" class="pipe-label" fill="#FFA726" style="font-size:7px">UV-102</text>
-    <path d="M 210 75 L 215 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="223" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="248" y="76" class="pipe-label" fill="#4fc3f7">Ø40-PW-102</text>
-
-    <!-- WT-103到砂滤阀门 -->
-    <path d="M 245 75 L 275 75" class="water-line"/>
-    <polygon points="275,68 290,75 275,82" fill="#FFA726" stroke="#FFA726" stroke-width="1"/>
-    <rect x="260" y="82" width="8" height="8" fill="#FFA726" rx="1"/>
-    <text x="267" y="100" class="pipe-label" fill="#FFA726" style="font-size:7px">UV-103</text>
-    <path d="M 290 75 L 335 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="303" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="328" y="76" class="pipe-label" fill="#4fc3f7">Ø40-PW-103</text>
-
-    <!-- 砂滤到碳滤阀门 -->
-    <path d="M 335 75 L 365 75" class="water-line"/>
-    <polygon points="365,68 380,75 365,82" fill="#FFA726" stroke="#FFA726" stroke-width="1"/>
-    <rect x="350" y="82" width="8" height="8" fill="#FFA726" rx="1"/>
-    <text x="357" y="100" class="pipe-label" fill="#FFA726" style="font-size:7px">UV-104</text>
-    <path d="M 380 75 L 415 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="393" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="418" y="76" class="pipe-label" fill="#4fc3f7">Ø50-RO-104</text>
-
-    <!-- 碳滤到RO阀门 -->
-    <path d="M 415 75 L 445 75" class="water-line"/>
-    <polygon points="445,68 460,75 445,82" fill="#FFA726" stroke="#FFA726" stroke-width="1"/>
-    <rect x="430" y="82" width="8" height="8" fill="#FFA726" rx="1"/>
-    <text x="437" y="100" class="pipe-label" fill="#FFA726" style="font-size:7px">UV-105</text>
-    <path d="M 460 75 L 485 75" class="water-line" marker-end="url(#waterArrow)"/>
-    <rect x="469" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-    <text x="494" y="76" class="pipe-label" fill="#4fc3f7">Ø40-DW-105</text>
+    <!-- WT内部连接 -->
+    <path d="M 80 60 L 115 60" class="water-line" marker-end="url(#waterArrow)"/>
+    <path d="M 165 60 L 195 60" class="water-line" marker-end="url(#waterArrow)"/>
+    <path d="M 245 60 L 275 60" class="water-line" marker-end="url(#waterArrow)"/>
+    <path d="M 335 60 L 365 60" class="water-line" marker-end="url(#waterArrow)"/>
+    <path d="M 415 60 L 445 60" class="water-line" marker-end="url(#waterArrow)"/>
+    <path d="M 485 60 L 515 60" class="water-line" marker-end="url(#waterArrow)"/>
   </g>
 
   <!-- ====== CIP清洗系统 CP ====== -->
@@ -381,30 +178,23 @@
     <!-- CIP碱液罐 CP-101 -->
     <rect x="10" y="15" width="70" height="75" rx="3" fill="url(#vesselGrad)" stroke="#c0c0c0" stroke-width="2"/>
     <rect x="15" y="40" width="60" height="45" rx="0" fill="#4169E1" opacity="0.5"/>
-    <use href="#TT" x="15" y="-10" width="28" height="28"/>
-    <text x="30" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-901</text>
-    <use href="#CT" x="45" y="-10" width="28" height="28"/>
-    <text x="60" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">CT-901</text>
     <text x="45" y="115" class="tag-label">CP-101</text>
-    <text x="45" y="130" class="equipment-label" style="font-size:9px">CIP碱液罐 TK-901 2m³ 85°C</text>
+    <text x="45" y="130" class="equipment-label" style="font-size:9px">CIP碱液罐 2m³</text>
+    <text x="45" y="35" class="param-label" style="font-size:9px">85°C 2%</text>
 
     <!-- CIP酸液罐 CP-102 -->
     <rect x="110" y="15" width="70" height="75" rx="3" fill="url(#vesselGrad)" stroke="#c0c0c0" stroke-width="2"/>
     <rect x="115" y="40" width="60" height="45" rx="0" fill="#FFFF00" opacity="0.4"/>
-    <use href="#TT" x="115" y="-10" width="28" height="28"/>
-    <text x="130" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-902</text>
     <text x="145" y="115" class="tag-label">CP-102</text>
-    <text x="145" y="130" class="equipment-label" style="font-size:9px">CIP酸液罐 TK-902 1m³ 60°C</text>
+    <text x="145" y="130" class="equipment-label" style="font-size:9px">CIP酸液罐 1m³</text>
+    <text x="145" y="35" class="param-label" style="font-size:9px">60°C 1%</text>
 
     <!-- CIP热水罐 CP-103 -->
     <rect x="210" y="15" width="70" height="75" rx="3" fill="url(#vesselGrad)" stroke="#c0c0c0" stroke-width="2"/>
     <rect x="215" y="40" width="60" height="45" rx="0" fill="#4fc3f7" opacity="0.4"/>
-    <use href="#TT" x="215" y="-10" width="28" height="28"/>
-    <text x="230" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-903</text>
-    <use href="#LT" x="245" y="-10" width="28" height="28"/>
-    <text x="260" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-901</text>
     <text x="245" y="115" class="tag-label">CP-103</text>
-    <text x="245" y="130" class="equipment-label" style="font-size:9px">CIP热水罐 TK-903 3m³ 85°C</text>
+    <text x="245" y="130" class="equipment-label" style="font-size:9px">CIP热水罐 3m³</text>
+    <text x="245" y="35" class="param-label" style="font-size:9px">85°C</text>
 
     <!-- CIP泵1 CP-104 -->
     <rect x="310" y="25" width="60" height="50" rx="3" fill="url(#vesselGrad)" stroke="#c0c0c0" stroke-width="1.5"/>
@@ -420,10 +210,9 @@
 
     <!-- 电导率仪 CP-105 -->
     <rect x="485" y="30" width="55" height="45" rx="3" fill="url(#vesselGrad)" stroke="#c0c0c0" stroke-width="1.5"/>
-    <use href="#CT" x="495" y="5" width="28" height="28"/>
-    <text x="512" y="22" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">CT-902</text>
+    <text x="512" y="52" class="equipment-label" style="font-size:8px;color:#c0c0c0">CP-105</text>
+    <text x="512" y="63" class="equipment-label" style="font-size:8px;color:#c0c0c0">电导率仪</text>
     <text x="512" y="90" class="tag-label">CP-105</text>
-    <text x="512" y="105" class="equipment-label" style="font-size:9px">电导率仪 AT-901</text>
   </g>
 
   <!-- ====== 茶叶前处理 TH ====== -->
@@ -435,38 +224,31 @@
     <ellipse cx="45" cy="45" rx="35" ry="22" fill="url(#tankGrad)" stroke="#deb887" stroke-width="2"/>
     <rect x="10" y="45" width="70" height="70" rx="5" fill="url(#tankGrad)" stroke="#deb887" stroke-width="2"/>
     <rect x="15" y="55" width="60" height="55" rx="0" fill="#8B4513" opacity="0.5"/>
-    <use href="#LT" x="25" y="10" width="28" height="28"/>
-    <text x="40" y="25" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-201</text>
     <text x="45" y="130" class="tag-label">TH-101</text>
-    <text x="45" y="145" class="equipment-label" style="font-size:9px">茶叶储罐 TK-201 2m³</text>
+    <text x="45" y="145" class="equipment-label" style="font-size:9px">茶叶储罐 2m³</text>
+    <text x="45" y="28" class="param-label" style="font-size:9px">LT: 60%</text>
 
     <!-- 茶叶储罐2 TH-101b -->
     <ellipse cx="145" cy="45" rx="35" ry="22" fill="url(#tankGrad)" stroke="#deb887" stroke-width="2"/>
     <rect x="110" y="45" width="70" height="70" rx="5" fill="url(#tankGrad)" stroke="#deb887" stroke-width="2"/>
     <rect x="115" y="55" width="60" height="55" rx="0" fill="#8B4513" opacity="0.5"/>
-    <use href="#LT" x="125" y="10" width="28" height="28"/>
-    <text x="140" y="25" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-202</text>
     <text x="145" y="130" class="tag-label">TH-101b</text>
-    <text x="145" y="145" class="equipment-label" style="font-size:9px">茶叶储罐 TK-202 2m³</text>
+    <text x="145" y="145" class="equipment-label" style="font-size:9px">茶叶储罐 2m³</text>
+    <text x="145" y="28" class="param-label" style="font-size:9px">LT: 60%</text>
 
     <!-- 茶叶粉碎机 TH-102 -->
     <rect x="15" y="160" width="70" height="70" rx="5" fill="url(#vesselGrad)" stroke="#deb887" stroke-width="2"/>
     <circle cx="50" cy="188" r="18" fill="none" stroke="#deb887" stroke-width="2"/>
     <circle cx="50" cy="188" r="10" fill="none" stroke="#deb887" stroke-width="1"/>
     <text x="50" y="248" class="tag-label">TH-102</text>
-    <text x="50" y="263" class="equipment-label" style="font-size:9px">茶叶粉碎机 M-201 200kg/h</text>
+    <text x="50" y="263" class="equipment-label" style="font-size:9px">茶叶粉碎机</text>
+    <text x="50" y="278" class="param-label" style="font-size:9px">200kg/h</text>
 
     <!-- 茶叶暂存斗 TH-103 -->
     <rect x="120" y="165" width="55" height="60" rx="3" fill="url(#vesselGrad)" stroke="#deb887" stroke-width="2"/>
     <polygon points="135,175 155,195 135,215 115,195" fill="#deb887" opacity="0.3"/>
     <text x="147" y="245" class="tag-label">TH-103</text>
     <text x="147" y="260" class="equipment-label" style="font-size:9px">茶叶暂存斗</text>
-
-    <!-- TH内部连接管道标签 -->
-    <!-- 茶叶→萃取 -->
-    <path d="M 270 385 L 300 385" class="process-line" stroke="#deb887" marker-end="url(#flowArrow)"/>
-    <rect x="270" y="373" width="55" height="14" rx="2" fill="#1a2535" stroke="#deb887" stroke-width="0.5" opacity="0.8"/>
-    <text x="297" y="384" class="pipe-label" fill="#deb887">Ø40-TC-201</text>
   </g>
 
   <!-- ====== 萃取系统 EX ====== -->
@@ -478,34 +260,28 @@
     <rect x="5" y="20" width="85" height="110" rx="5" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="10" y="60" width="75" height="65" rx="0" fill="url(#teaGrad)"/>
     <rect x="5" y="15" width="85" height="15" fill="#404040" stroke="#90EE90"/>
-    <use href="#TT" x="25" y="-10" width="28" height="28"/>
-    <text x="40" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-301</text>
-    <use href="#LT" x="60" y="-10" width="28" height="28"/>
-    <text x="75" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-301</text>
     <text x="47" y="165" class="tag-label">EX-101</text>
-    <text x="47" y="180" class="equipment-label" style="font-size:9px">萃取罐1 V-301 2m³</text>
+    <text x="47" y="180" class="equipment-label" style="font-size:9px">萃取罐1 2m³</text>
+    <text x="47" y="40" class="param-label" style="font-size:9px">TT: 95°C</text>
+    <text x="47" y="53" class="param-label" style="font-size:9px">LT: 85%</text>
 
     <!-- 萃取罐2 EX-102 -->
     <rect x="135" y="20" width="85" height="110" rx="5" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="140" y="60" width="75" height="65" rx="0" fill="url(#teaGrad)"/>
     <rect x="135" y="15" width="85" height="15" fill="#404040" stroke="#90EE90"/>
-    <use href="#TT" x="155" y="-10" width="28" height="28"/>
-    <text x="170" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-302</text>
-    <use href="#LT" x="190" y="-10" width="28" height="28"/>
-    <text x="205" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-302</text>
     <text x="177" y="165" class="tag-label">EX-102</text>
-    <text x="177" y="180" class="equipment-label" style="font-size:9px">萃取罐2 V-302 2m³</text>
+    <text x="177" y="180" class="equipment-label" style="font-size:9px">萃取罐2 2m³</text>
+    <text x="177" y="40" class="param-label" style="font-size:9px">TT: 90°C</text>
+    <text x="177" y="53" class="param-label" style="font-size:9px">LT: 80%</text>
 
     <!-- 萃取罐3 EX-103 -->
     <rect x="265" y="20" width="85" height="110" rx="5" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="270" y="60" width="75" height="65" rx="0" fill="url(#teaGrad)"/>
     <rect x="265" y="15" width="85" height="15" fill="#404040" stroke="#90EE90"/>
-    <use href="#TT" x="285" y="-10" width="28" height="28"/>
-    <text x="300" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-303</text>
-    <use href="#LT" x="320" y="-10" width="28" height="28"/>
-    <text x="335" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-303</text>
     <text x="307" y="165" class="tag-label">EX-103</text>
-    <text x="307" y="180" class="equipment-label" style="font-size:9px">萃取罐3 V-303 2m³</text>
+    <text x="307" y="180" class="equipment-label" style="font-size:9px">萃取罐3 2m³</text>
+    <text x="307" y="40" class="param-label" style="font-size:9px">TT: 85°C</text>
+    <text x="307" y="53" class="param-label" style="font-size:9px">LT: 75%</text>
 
     <!-- 茶渣分离器 EX-104 -->
     <rect x="395" y="40" width="55" height="75" rx="3" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="2"/>
@@ -520,10 +296,9 @@
     <!-- 茶汁冷却器 EX-105 -->
     <rect x="475" y="40" width="55" height="75" rx="3" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="2"/>
     <path d="M 485 55 Q 502 63 485 72 Q 502 80 485 88 Q 502 96 485 105" stroke="#90EE90" stroke-width="1" fill="none"/>
-    <use href="#TT" x="492" y="15" width="28" height="28"/>
-    <text x="507" y="30" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-304</text>
     <text x="502" y="135" class="tag-label">EX-105</text>
-    <text x="502" y="150" class="equipment-label" style="font-size:9px">茶汁冷却器 E-301</text>
+    <text x="502" y="150" class="equipment-label" style="font-size:9px">茶汁冷却器</text>
+    <text x="502" y="35" class="param-label" style="font-size:9px">TT: 25°C</text>
 
     <!-- 萃取液储罐 EX-106 -->
     <rect x="555" y="20" width="80" height="100" rx="5" fill="url(#tankGrad)" stroke="#90EE90" stroke-width="2" filter="url(#tankShadow)"/>
@@ -532,57 +307,21 @@
     <text x="595" y="155" class="equipment-label" style="font-size:9px">萃取液储罐 3m³</text>
     <text x="595" y="40" class="param-label" style="font-size:9px">LT: 70%</text>
 
-    <!-- 萃取泵 P-EX01 - 泵入口在顶部，出料在底部 -->
+    <!-- 萃取泵 P-EX01 -->
     <rect x="555" y="130" width="60" height="40" rx="3" fill="url(#vesselGrad)" stroke="#90EE90" stroke-width="1.5"/>
-    <!-- 入口（从EX-106来） -->
-    <path d="M 585 130 L 585 100 L 555 100 L 555 78" class="process-line" marker-end="url(#flowArrow)"/>
-    <!-- 出口（向过滤系统） -->
-    <path d="M 585 170 L 585 200 L 555 200 L 555 295" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="530" y="185" width="60" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="560" y="196" class="pipe-label" fill="#90EE90">Ø40-TC-401</text>
     <text x="585" y="153" class="equipment-label" style="font-size:8px;color:#90EE90">P-EX01</text>
     <text x="585" y="180" class="tag-label">P-EX01</text>
 
     <!-- 萃取内部连接 -->
-    <!-- 茶叶→萃取罐1 (顶部进料) -->
     <path d="M 70 75 L 135 75" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="92" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="120" y="74" class="pipe-label" fill="#90EE90">Ø25-HC-301</text>
-
-    <!-- 萃取罐1→萃取罐2 (底部出料到顶部进料) -->
     <path d="M 177 20 L 177 10 L 265 10 L 265 20" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="208" y="2" width="50" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="233" y="13" class="pipe-label" fill="#90EE90">Ø25-PS-302</text>
-
-    <!-- 萃取罐2→萃取罐3 (底部出料到顶部进料) -->
     <path d="M 200 75 L 265 75" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="222" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="250" y="74" class="pipe-label" fill="#90EE90">Ø25-HC-303</text>
-
-    <!-- 萃取罐3→茶渣分离器 (顶部进料到侧面) -->
     <path d="M 307 20 L 307 10 L 395 10 L 395 40" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="338" y="2" width="50" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="363" y="13" class="pipe-label" fill="#90EE90">Ø25-PS-304</text>
-
-    <!-- 萃取罐3→茶渣分离器 (底部出料到侧面进料) -->
     <path d="M 307 75 L 350 75 L 350 75 L 395 75" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="340" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="368" y="74" class="pipe-label" fill="#90EE90">Ø25-HC-305</text>
-
-    <!-- 茶渣分离器→茶汁冷却器 (底部出料到侧面) -->
     <path d="M 422 115 L 422 160 L 475 160 L 475 78" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="435" y="155" width="50" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="460" y="166" class="pipe-label" fill="#90EE90">Ø40-HC-306</text>
-
-    <!-- 冷却器→萃取液储罐 (侧面到侧面) -->
     <path d="M 530 78 L 555 78" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="535" y="65" width="50" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="560" y="76" class="pipe-label" fill="#90EE90">Ø40-HC-307</text>
-
-    <!-- 茶渣排放 (底部) -->
-    <path d="M 450 115 L 450 160" class="process-line" stroke="#8B4513" marker-end="url(#flowArrow)"/>
-    <rect x="428" y="155" width="40" height="14" rx="2" fill="#1a2535" stroke="#8B4513" stroke-width="0.5" opacity="0.8"/>
-    <text x="448" y="166" class="pipe-label" fill="#8B4513">固废</text>
+    <!-- 茶渣排放 -->
+    <path d="M 422 115 L 422 160" class="process-line" stroke="#8B4513" marker-end="url(#flowArrow)"/>
   </g>
 
   <!-- ====== 过滤净化系统 FL ====== -->
@@ -595,10 +334,9 @@
     <ellipse cx="50" cy="65" rx="28" ry="28" fill="none" stroke="#87CEEB" stroke-width="2"/>
     <ellipse cx="50" cy="65" rx="18" ry="18" fill="none" stroke="#87CEEB" stroke-width="1"/>
     <ellipse cx="50" cy="65" rx="8" ry="8" fill="#87CEEB" opacity="0.5"/>
-    <use href="#FT" x="55" y="0" width="28" height="28"/>
-    <text x="68" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">FT-401</text>
     <text x="50" y="140" class="tag-label">FL-101</text>
-    <text x="50" y="155" class="equipment-label" style="font-size:9px">碟式离心机 CT-401 6000L/h</text>
+    <text x="50" y="155" class="equipment-label" style="font-size:9px">碟式离心机</text>
+    <text x="50" y="35" class="param-label" style="font-size:9px">6000L/h</text>
 
     <!-- 超滤膜组件 FL-102 -->
     <rect x="115" y="20" width="80" height="100" rx="5" fill="url(#vesselGrad)" stroke="#87CEEB" stroke-width="2" filter="url(#tankShadow)"/>
@@ -607,43 +345,25 @@
     <circle cx="135" cy="72" r="9" fill="none" stroke="#87CEEB" stroke-width="1"/>
     <circle cx="160" cy="72" r="9" fill="none" stroke="#87CEEB" stroke-width="1"/>
     <circle cx="147" cy="61" r="9" fill="none" stroke="#87CEEB" stroke-width="1"/>
-    <use href="#PT" x="140" y="-5" width="28" height="28"/>
-    <text x="155" y="12" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">PT-401</text>
     <text x="155" y="140" class="tag-label">FL-102</text>
-    <text x="155" y="155" class="equipment-label" style="font-size:9px">超滤膜组件 F-401 0.1μm</text>
+    <text x="155" y="155" class="equipment-label" style="font-size:9px">超滤膜组件</text>
+    <text x="155" y="35" class="param-label" style="font-size:9px">0.1μm</text>
 
-    <!-- 超滤循环泵 FL-103 - 泵入口在顶部，出料在底部 -->
+    <!-- 超滤循环泵 FL-103 -->
     <rect x="220" y="25" width="60" height="50" rx="3" fill="url(#vesselGrad)" stroke="#87CEEB" stroke-width="1.5"/>
-    <!-- 入口（从膜组件来） -->
-    <path d="M 250 25 L 250 10 L 155 10 L 155 55" class="process-line" marker-end="url(#flowArrow)"/>
-    <!-- 出口（回到膜组件） -->
-    <path d="M 250 75 L 250 90 L 195 90 L 195 70" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="210" y="45" width="55" height="14" rx="2" fill="#1a2535" stroke="#87CEEB" stroke-width="0.5" opacity="0.8"/>
-    <text x="237" y="56" class="pipe-label" fill="#87CEEB">Ø40-FL-401</text>
     <text x="250" y="48" class="equipment-label" style="font-size:8px;color:#87CEEB">FL-103</text>
     <text x="250" y="59" class="equipment-label" style="font-size:8px;color:#87CEEB">超滤循环泵</text>
     <text x="250" y="90" class="tag-label">FL-103</text>
 
-    <!-- 膜组件清洗罐 FL-104 - 入口在顶部 -->
+    <!-- 膜组件清洗罐 FL-104 -->
     <rect x="305" y="20" width="65" height="80" rx="3" fill="url(#vesselGrad)" stroke="#87CEEB" stroke-width="1.5"/>
     <rect x="310" y="50" width="55" height="45" rx="0" fill="#4fc3f7" opacity="0.3"/>
-    <!-- 入口在顶部 -->
-    <path d="M 337 20 L 337 5 L 380 5 L 380 20" class="cip-line"/>
     <text x="337" y="120" class="tag-label">FL-104</text>
     <text x="337" y="135" class="equipment-label" style="font-size:9px">膜组件清洗罐</text>
 
     <!-- FL内部连接 -->
-    <!-- 离心机→超滤膜 -->
     <path d="M 90 70 L 115 70" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="90" y="58" width="50" height="14" rx="2" fill="#1a2535" stroke="#87CEEB" stroke-width="0.5" opacity="0.8"/>
-    <text x="115" y="69" class="pipe-label" fill="#87CEEB">Ø50-FL-401</text>
-
-    <!-- 超滤膜→循环泵（已在上方定义） -->
-
-    <!-- 循环泵→调配系统 -->
     <path d="M 195 70 L 220 50" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="195" y="58" width="55" height="14" rx="2" fill="#1a2535" stroke="#DDA0DD" stroke-width="0.5" opacity="0.8"/>
-    <text x="222" y="69" class="pipe-label" fill="#DDA0DD">Ø40-FL-501</text>
   </g>
 
   <!-- ====== 调配系统 BL ====== -->
@@ -657,14 +377,10 @@
     <circle cx="55" cy="95" r="14" fill="none" stroke="#DDA0DD" stroke-width="1"/>
     <line x1="55" y1="81" x2="55" y2="109" stroke="#DDA0DD" stroke-width="1"/>
     <line x1="41" y1="95" x2="69" y2="95" stroke="#DDA0DD" stroke-width="1"/>
-    <use href="#pH" x="10" y="-5" width="28" height="28"/>
-    <text x="25" y="10" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">pH-501</text>
-    <use href="#BX" x="40" y="-5" width="28" height="28"/>
-    <text x="55" y="10" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">BX-501</text>
-    <use href="#TT" x="70" y="-5" width="28" height="28"/>
-    <text x="85" y="10" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-501</text>
     <text x="55" y="160" class="tag-label">BL-101</text>
-    <text x="55" y="175" class="equipment-label" style="font-size:9px">调配罐1 V-501 5m³</text>
+    <text x="55" y="175" class="equipment-label" style="font-size:9px">调配罐1 5m³</text>
+    <text x="55" y="40" class="param-label" style="font-size:9px">pH: 5.5</text>
+    <text x="55" y="52" class="param-label" style="font-size:9px">Brix: 10°</text>
 
     <!-- 调配罐2 BL-102 -->
     <rect x="130" y="20" width="100" height="115" rx="5" fill="url(#vesselGrad)" stroke="#DDA0DD" stroke-width="2" filter="url(#tankShadow)"/>
@@ -672,53 +388,37 @@
     <circle cx="180" cy="95" r="14" fill="none" stroke="#DDA0DD" stroke-width="1"/>
     <line x1="180" y1="81" x2="180" y2="109" stroke="#DDA0DD" stroke-width="1"/>
     <line x1="166" y1="95" x2="194" y2="95" stroke="#DDA0DD" stroke-width="1"/>
-    <use href="#pH" x="135" y="-5" width="28" height="28"/>
-    <text x="150" y="10" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">pH-502</text>
-    <use href="#BX" x="165" y="-5" width="28" height="28"/>
-    <text x="180" y="10" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">BX-502</text>
     <text x="180" y="160" class="tag-label">BL-102</text>
-    <text x="180" y="175" class="equipment-label" style="font-size:9px">调配罐2 V-502 5m³</text>
+    <text x="180" y="175" class="equipment-label" style="font-size:9px">调配罐2 5m³</text>
+    <text x="180" y="40" class="param-label" style="font-size:9px">pH: 5.5</text>
+    <text x="180" y="52" class="param-label" style="font-size:9px">Brix: 10°</text>
 
     <!-- 糖浆溶解罐 BL-103 -->
     <rect x="255" y="25" width="70" height="90" rx="5" fill="url(#tankGrad)" stroke="#DDA0DD" stroke-width="2"/>
     <rect x="260" y="60" width="60" height="50" rx="0" fill="#f5deb3" opacity="0.7"/>
-    <use href="#BX" x="275" y="0" width="28" height="28"/>
-    <text x="290" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">BX-503</text>
     <text x="290" y="135" class="tag-label">BL-103</text>
-    <text x="290" y="150" class="equipment-label" style="font-size:9px">糖浆溶解罐 TK-503 2m³</text>
+    <text x="290" y="150" class="equipment-label" style="font-size:9px">糖浆溶解罐 2m³</text>
+    <text x="290" y="45" class="param-label" style="font-size:9px">Brix: 65°</text>
 
     <!-- 糖浆储罐 BL-104 -->
     <rect x="345" y="25" width="65" height="90" rx="5" fill="url(#tankGrad)" stroke="#DDA0DD" stroke-width="2"/>
     <rect x="350" y="60" width="55" height="50" rx="0" fill="#f5deb3" opacity="0.7"/>
-    <use href="#BX" x="362" y="0" width="28" height="28"/>
-    <text x="377" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">BX-504</text>
     <text x="377" y="135" class="tag-label">BL-104</text>
-    <text x="377" y="150" class="equipment-label" style="font-size:9px">糖浆储罐 TK-504 2m³</text>
+    <text x="377" y="150" class="equipment-label" style="font-size:9px">糖浆储罐 2m³</text>
+    <text x="377" y="45" class="param-label" style="font-size:9px">Brix: 65°</text>
 
     <!-- 酸液罐 BL-105 -->
     <rect x="430" y="35" width="55" height="70" rx="5" fill="url(#tankGrad)" stroke="#DDA0DD" stroke-width="2"/>
     <rect x="435" y="60" width="45" height="40" rx="0" fill="#ffff00" opacity="0.4"/>
-    <use href="#PH" x="442" y="0" width="28" height="28"/>
-    <text x="457" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">pH-505</text>
     <text x="457" y="125" class="tag-label">BL-105</text>
-    <text x="457" y="140" class="equipment-label" style="font-size:9px">酸液罐 TK-505 0.5m³</text>
+    <text x="457" y="140" class="equipment-label" style="font-size:9px">酸液罐 0.5m³</text>
+    <text x="457" y="50" class="param-label" style="font-size:9px">柠檬酸</text>
 
     <!-- BL内部连接 -->
     <path d="M 105 75 L 130 75" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="105" y="63" width="50" height="14" rx="2" fill="#1a2535" stroke="#DDA0DD" stroke-width="0.5" opacity="0.8"/>
-    <text x="130" y="74" class="pipe-label" fill="#DDA0DD">Ø50-BL-501</text>
-
     <path d="M 230 75 L 255 75" class="process-line" stroke="#f5deb3" marker-end="url(#flowArrow)"/>
-    <rect x="230" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#f5deb3" stroke-width="0.5" opacity="0.8"/>
-    <text x="257" y="74" class="pipe-label" fill="#f5deb3">Ø25-SY-502</text>
-
     <path d="M 325 75 L 345 75" class="process-line" stroke="#f5deb3" marker-end="url(#flowArrow)"/>
-    <rect x="325" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#f5deb3" stroke-width="0.5" opacity="0.8"/>
-    <text x="352" y="74" class="pipe-label" fill="#f5deb3">Ø25-SY-503</text>
-
     <path d="M 410 75 L 430 75" class="process-line" stroke="#ffff00" marker-end="url(#flowArrow)"/>
-    <rect x="410" y="63" width="55" height="14" rx="2" fill="#1a2535" stroke="#ffff00" stroke-width="0.5" opacity="0.8"/>
-    <text x="437" y="74" class="pipe-label" fill="#ffff00">Ø15-AC-504</text>
   </g>
 
   <!-- ====== 均质系统 HM ====== -->
@@ -731,12 +431,10 @@
     <rect x="15" y="25" width="110" height="25" fill="#404040"/>
     <text x="70" y="42" class="equipment-label" style="font-size:9px;color:#FFB6C1">HOMOGENIZER</text>
     <text x="70" y="65" class="equipment-label" style="font-size:11px;color:#FFB6C1">20-25 MPa</text>
-    <use href="#TT" x="15" y="-10" width="28" height="28"/>
-    <text x="30" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-601</text>
-    <use href="#PT" x="45" y="-10" width="28" height="28"/>
-    <text x="60" y="5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">PT-601</text>
     <text x="70" y="120" class="tag-label">HM-101</text>
-    <text x="70" y="135" class="equipment-label" style="font-size:9px">高压均质机 HN-601 20-25MPa</text>
+    <text x="70" y="135" class="equipment-label" style="font-size:9px">高压均质机 GYB-3000</text>
+    <text x="70" y="80" class="param-label" style="font-size:9px">TT: 65°C</text>
+    <text x="70" y="93" class="param-label" style="font-size:9px">PT: 22MPa</text>
 
     <!-- 均质阀组 HM-102 -->
     <rect x="5" y="110" width="60" height="45" rx="3" fill="url(#vesselGrad)" stroke="#FFB6C1" stroke-width="1.5"/>
@@ -747,11 +445,6 @@
     <rect x="85" y="110" width="60" height="45" rx="3" fill="url(#vesselGrad)" stroke="#FFB6C1" stroke-width="1.5"/>
     <text x="115" y="135" class="equipment-label" style="font-size:8px;color:#FFB6C1">HM-103</text>
     <text x="115" y="165" class="tag-label">HM-103</text>
-
-    <!-- HM内部连接管道标签 -->
-    <path d="M 130 60 L 150 60" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="130" y="48" width="50" height="14" rx="2" fill="#1a2535" stroke="#FFB6C1" stroke-width="0.5" opacity="0.8"/>
-    <text x="155" y="59" class="pipe-label" fill="#FFB6C1">Ø40-BL-601</text>
   </g>
 
   <!-- ====== UHT杀菌系统 UH ====== -->
@@ -762,24 +455,18 @@
     <!-- 预热器 UH-102 -->
     <rect x="5" y="25" width="80" height="70" rx="3" fill="url(#vesselGrad)" stroke="#FF6B6B" stroke-width="2"/>
     <path d="M 15 40 Q 45 50 75 40 Q 45 60 15 50 Q 45 70 75 60" stroke="#FF6B6B" stroke-width="1" fill="none"/>
-    <use href="#TT" x="30" y="0" width="28" height="28"/>
-    <text x="45" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-701</text>
     <text x="45" y="115" class="tag-label">UH-102</text>
-    <text x="45" y="130" class="equipment-label" style="font-size:9px">预热器 E-701 80°C</text>
+    <text x="45" y="130" class="equipment-label" style="font-size:9px">预热器 80°C</text>
+    <text x="45" y="40" class="param-label" style="font-size:9px">TT: 80°C</text>
 
     <!-- UHT杀菌锅 UH-101 -->
     <rect x="120" y="5" width="130" height="105" rx="5" fill="url(#vesselGrad)" stroke="#FF6B6B" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="130" y="15" width="110" height="30" fill="#8b0000" opacity="0.5"/>
     <text x="185" y="35" class="equipment-label" style="font-size:10px;color:#FF6B6B">UHT</text>
     <text x="185" y="55" class="equipment-label" style="font-size:10px;color:#FF6B6B">135°C/15s</text>
-    <use href="#FT" x="220" y="-20" width="28" height="28"/>
-    <text x="235" y="-5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">FT-701</text>
-    <use href="#TT" x="130" y="-20" width="28" height="28"/>
-    <text x="145" y="-5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-702</text>
-    <use href="#PT" x="175" y="-20" width="28" height="28"/>
-    <text x="190" y="-5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">PT-701</text>
+    <text x="185" y="75" class="param-label" style="font-size:9px">FT: 3000L/h</text>
     <text x="185" y="130" class="tag-label">UH-101</text>
-    <text x="185" y="145" class="equipment-label" style="font-size:9px">UHT杀菌锅 ST-701 3000L/h</text>
+    <text x="185" y="145" class="equipment-label" style="font-size:9px">UHT杀菌锅 KNU-3000</text>
 
     <!-- 保温管 UH-103 -->
     <rect x="275" y="30" width="50" height="60" rx="3" fill="url(#vesselGrad)" stroke="#FF6B6B" stroke-width="1.5"/>
@@ -793,64 +480,31 @@
     <!-- 冷却器 UH-104 -->
     <rect x="350" y="25" width="80" height="70" rx="3" fill="url(#vesselGrad)" stroke="#87CEEB" stroke-width="2"/>
     <path d="M 360 40 Q 390 50 420 40 Q 390 60 360 50 Q 390 70 420 60" stroke="#87CEEB" stroke-width="1" fill="none"/>
-    <use href="#TT" x="375" y="0" width="28" height="28"/>
-    <text x="390" y="15" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-703</text>
     <text x="390" y="115" class="tag-label">UH-104</text>
-    <text x="390" y="130" class="equipment-label" style="font-size:9px">冷却器 C-701 25°C</text>
+    <text x="390" y="130" class="equipment-label" style="font-size:9px">冷却器 25°C</text>
+    <text x="390" y="40" class="param-label" style="font-size:9px">TT: 25°C</text>
 
-    <!-- 无菌储罐 UH-105 - 入口在侧面，出料在底部 -->
+    <!-- 无菌储罐 UH-105 -->
     <rect x="455" y="5" width="80" height="105" rx="5" fill="url(#tankGrad)" stroke="#90EE90" stroke-width="2" filter="url(#tankShadow)"/>
     <rect x="460" y="45" width="70" height="60" rx="0" fill="url(#milkGrad)"/>
-    <use href="#LT" x="470" y="-20" width="28" height="28"/>
-    <text x="485" y="-5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">LT-701</text>
-    <use href="#TT" x="500" y="-20" width="28" height="28"/>
-    <text x="515" y="-5" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-704</text>
-    <!-- 进料口在侧面 -->
-    <path d="M 430 60 L 455 60" class="process-line" marker-end="url(#flowArrow)"/>
     <text x="495" y="130" class="tag-label">UH-105</text>
-    <text x="495" y="145" class="equipment-label" style="font-size:9px">无菌储罐 TK-701 3m³</text>
+    <text x="495" y="145" class="equipment-label" style="font-size:9px">无菌储罐 AS-3000 3m³</text>
+    <text x="495" y="30" class="param-label" style="font-size:9px">LT: 65%</text>
+    <text x="495" y="43" class="param-label" style="font-size:9px">TT: 25°C</text>
 
-    <!-- UHT产品泵 P-UH01 - 泵入口在顶部，出料在底部 -->
+    <!-- UHT产品泵 P-UH01 -->
     <rect x="455" y="120" width="55" height="40" rx="3" fill="url(#vesselGrad)" stroke="#FF6B6B" stroke-width="1.5"/>
-    <!-- 入口（从UH-105来） -->
-    <path d="M 482 120 L 482 105 L 455 105 L 455 85" class="process-line" marker-end="url(#flowArrow)"/>
-    <!-- 出口（向灌装系统） -->
-    <path d="M 482 160 L 482 200 L 350 200 L 350 480" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="455" y="175" width="55" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="482" y="186" class="pipe-label" fill="#90EE90">Ø50-UH-801</text>
     <text x="482" y="143" class="equipment-label" style="font-size:8px;color:#FF6B6B">P-UH01</text>
     <text x="482" y="170" class="tag-label">P-UH01</text>
 
-    <!-- UH内部连接管道标签 -->
-    <!-- 调配→预热器 -->
-    <path d="M 1710 385 L 1770 385 L 1770 60 L 1805 60" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="1725" y="375" width="60" height="14" rx="2" fill="#1a2535" stroke="#FFB6C1" stroke-width="0.5" opacity="0.8"/>
-    <text x="1755" y="386" class="pipe-label" fill="#FFB6C1">Ø40-BL-601</text>
-
-    <!-- 预热器→UHT锅 -->
+    <!-- UH内部连接 -->
     <path d="M 85 60 L 120 55" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="88" y="48" width="55" height="14" rx="2" fill="#1a2535" stroke="#FF6B6B" stroke-width="0.5" opacity="0.8"/>
-    <text x="115" y="59" class="pipe-label" fill="#FF6B6B">Ø40-UH-701</text>
-
-    <!-- UHT锅→保温管 -->
     <path d="M 250 55 L 275 60" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="250" y="43" width="55" height="14" rx="2" fill="#1a2535" stroke="#FF6B6B" stroke-width="0.5" opacity="0.8"/>
-    <text x="277" y="54" class="pipe-label" fill="#FF6B6B">Ø40-UH-702</text>
-
-    <!-- 保温管→冷却器 -->
     <path d="M 325 60 L 350 60" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="325" y="48" width="55" height="14" rx="2" fill="#1a2535" stroke="#FF6B6B" stroke-width="0.5" opacity="0.8"/>
-    <text x="352" y="59" class="pipe-label" fill="#FF6B6B">Ø40-UH-703</text>
-
-    <!-- 冷却器→无菌储罐 -->
-    <path d="M 430 60 L 455 60" class="process-line" marker-end="url(#flowArrow)"/>
-    <rect x="430" y="48" width="55" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-    <text x="457" y="59" class="pipe-label" fill="#90EE90">Ø50-UH-704</text>
-
+    <path d="M 430 60 L 455 55" class="process-line" marker-end="url(#flowArrow)"/>
     <!-- 蒸汽管道 -->
     <path d="M 185 5 L 185 -15 L 260 -15 L 260 5" class="steam-line" marker-end="url(#steamArrow)"/>
-    <rect x="205" y="-30" width="70" height="14" rx="2" fill="#1a2535" stroke="#FF6B6B" stroke-width="0.5" opacity="0.8"/>
-    <text x="240" y="-19" class="pipe-label" fill="#FF6B6B">Ø25-ST-001</text>
+    <text x="222" y="-20" class="param-label" style="font-size:9px" fill="#FF6B6B">Steam 0.8MPa</text>
   </g>
 
   <!-- ====== 制瓶系统 BF ====== -->
@@ -894,11 +548,11 @@
     <rect x="115" y="20" width="85" height="50" fill="#90EE90" opacity="0.15"/>
     <text x="157" y="42" class="equipment-label" style="font-size:9px;color:#FFD700">FILL</text>
     <text x="157" y="56" class="equipment-label" style="font-size:9px;color:#FFD700">72HEAD</text>
-    <use href="#TT" x="85" y="-15" width="28" height="28"/>
-    <text x="100" y="0" fill="#f0ad4e" font-size="7" font-family="Arial" text-anchor="middle">TT-801</text>
     <text x="110" y="90" class="equipment-label" style="font-size:9px;color:#FFD700">PF-101</text>
+    <text x="110" y="105" class="param-label" style="font-size:9px">TT: 87°C</text>
     <text x="110" y="150" class="tag-label">PF-101</text>
-    <text x="110" y="165" class="equipment-label" style="font-size:9px">吹灌一体机 FG-801 54000B/H</text>
+    <text x="110" y="165" class="equipment-label" style="font-size:9px">吹灌一体机 SBL-FG54000</text>
+    <text x="110" y="180" class="param-label" style="font-size:9px">54000B/H 500ml PET</text>
 
     <!-- 瓶盖消毒器 PF-102 -->
     <rect x="230" y="25" width="55" height="60" rx="3" fill="url(#vesselGrad)" stroke="#FFD700" stroke-width="1.5"/>
@@ -1154,152 +808,71 @@
   </g>
 
   <!-- ====== 跨系统连接管道 ====== -->
-  <!-- 水处理→调配 (纯水) - 有关键阀门 -->
-  <path d="M 550 265 L 550 295 L 980 295" class="water-line"/>
-  <polygon points="550,260 540,275 550,290" fill="#4fc3f7" stroke="#4fc3f7" stroke-width="1"/>
-  <rect x="540" y="255" width="20" height="10" fill="#4fc3f7" rx="2"/>
-  <text x="550" y="280" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-801</text>
-  <path d="M 550 295 L 980 295" class="water-line" marker-end="url(#waterArrow)"/>
-  <rect x="720" y="283" width="90" height="14" rx="2" fill="#1a2535" stroke="#4fc3f7" stroke-width="0.5" opacity="0.8"/>
-  <text x="765" y="294" class="pipe-label" fill="#4fc3f7">Ø50-PW-801</text>
+  <!-- 水处理→调配 (纯水) -->
+  <path d="M 550 265 L 550 295 L 980 295" class="water-line" marker-end="url(#waterArrow)"/>
+  <text x="765" y="290" class="param-label" style="font-size:9px">纯水 5m³/h</text>
 
   <!-- 茶叶→萃取 -->
-  <path d="M 270 385 L 300 385" class="process-line" stroke="#deb887"/>
-  <polygon points="270,380 260,395 270,410" fill="#deb887" stroke="#deb887" stroke-width="1"/>
-  <rect x="260" y="375" width="20" height="10" fill="#deb887" rx="2"/>
-  <text x="270" y="400" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-201</text>
-  <path d="M 300 385 L 980 385" class="process-line" stroke="#deb887" marker-end="url(#flowArrow)"/>
-  <rect x="620" y="373" width="55" height="14" rx="2" fill="#1a2535" stroke="#deb887" stroke-width="0.5" opacity="0.8"/>
-  <text x="647" y="384" class="pipe-label" fill="#deb887">Ø40-TC-201</text>
+  <path d="M 270 385 L 300 385" class="process-line" stroke="#deb887" marker-end="url(#flowArrow)"/>
 
   <!-- 萃取→过滤 -->
-  <path d="M 950 370 L 980 370 L 980 205 L 980 205" class="process-line" stroke="#90EE90"/>
-  <polygon points="950,365 940,380 950,395" fill="#90EE90" stroke="#90EE90" stroke-width="1"/>
-  <rect x="940" y="360" width="20" height="10" fill="#90EE90" rx="2"/>
-  <text x="950" y="385" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-401</text>
-  <path d="M 980 370 L 980 205 L 980 205" class="process-line" stroke="#90EE90" marker-end="url(#flowArrow)"/>
-  <rect x="955" y="358" width="65" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-  <text x="987" y="369" class="pipe-label" fill="#90EE90">Ø50-FL-401</text>
-
-  <path d="M 950 390 L 980 390" class="process-line" stroke="#8B4513" marker-end="url(#flowArrow)"/>
-  <rect x="955" y="378" width="65" height="14" rx="2" fill="#1a2535" stroke="#8B4513" stroke-width="0.5" opacity="0.8"/>
-  <text x="987" y="389" class="pipe-label" fill="#8B4513">Ø25-WA-402</text>
+  <path d="M 950 370 L 980 370 L 980 205 L 980 205" class="process-line" marker-end="url(#flowArrow)"/>
+  <path d="M 950 390 L 980 390" class="process-line" marker-end="url(#flowArrow)"/>
 
   <!-- 过滤→调配 -->
-  <path d="M 1360 185 L 1360 295" class="process-line" stroke="#87CEEB"/>
-  <polygon points="1360,180 1350,195 1360,210" fill="#87CEEB" stroke="#87CEEB" stroke-width="1"/>
-  <rect x="1350" y="175" width="20" height="10" fill="#87CEEB" rx="2"/>
-  <text x="1360" y="200" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-501</text>
-  <path d="M 1360 185 L 1360 295" class="process-line" stroke="#87CEEB" marker-end="url(#flowArrow)"/>
-  <rect x="1345" y="235" width="65" height="14" rx="2" fill="#1a2535" stroke="#87CEEB" stroke-width="0.5" opacity="0.8"/>
-  <text x="1377" y="246" class="pipe-label" fill="#87CEEB">Ø50-FL-501</text>
-
-  <path d="M 1380 185 L 1380 295" class="process-line" stroke="#DDA0DD"/>
-  <polygon points="1380,180 1370,195 1380,210" fill="#DDA0DD" stroke="#DDA0DD" stroke-width="1"/>
-  <rect x="1370" y="175" width="20" height="10" fill="#DDA0DD" rx="2"/>
-  <text x="1380" y="200" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-502</text>
-  <path d="M 1380 185 L 1380 295" class="process-line" stroke="#DDA0DD" marker-end="url(#flowArrow)"/>
-  <rect x="1365" y="235" width="65" height="14" rx="2" fill="#1a2535" stroke="#DDA0DD" stroke-width="0.5" opacity="0.8"/>
-  <text x="1397" y="246" class="pipe-label" fill="#DDA0DD">Ø40-FL-502</text>
+  <path d="M 1360 185 L 1360 295" class="process-line" marker-end="url(#flowArrow)"/>
+  <path d="M 1380 185 L 1380 295" class="process-line" marker-end="url(#flowArrow)"/>
+  <text x="1400" y="240" class="param-label" style="font-size:9px">茶汁→BL</text>
 
   <!-- 调配→均质 -->
-  <path d="M 1480 385 L 1510 385" class="process-line" stroke="#DDA0DD"/>
-  <polygon points="1480,380 1470,395 1480,410" fill="#DDA0DD" stroke="#DDA0DD" stroke-width="1"/>
-  <rect x="1470" y="375" width="20" height="10" fill="#DDA0DD" rx="2"/>
-  <text x="1480" y="400" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-601</text>
-  <path d="M 1510 385 L 1740 385" class="process-line" stroke="#DDA0DD" marker-end="url(#flowArrow)"/>
-  <rect x="1600" y="373" width="65" height="14" rx="2" fill="#1a2535" stroke="#DDA0DD" stroke-width="0.5" opacity="0.8"/>
-  <text x="1632" y="384" class="pipe-label" fill="#DDA0DD">Ø40-BL-601</text>
+  <path d="M 1480 385 L 1510 385" class="process-line" marker-end="url(#flowArrow)"/>
 
   <!-- 均质→UHT -->
-  <path d="M 1710 385 L 1740 385" class="process-line" stroke="#FFB6C1"/>
-  <polygon points="1710,380 1700,395 1710,410" fill="#FFB6C1" stroke="#FFB6C1" stroke-width="1"/>
-  <rect x="1700" y="375" width="20" height="10" fill="#FFB6C1" rx="2"/>
-  <text x="1710" y="400" class="pipe-label" fill="#FFA726" style="font-size:7px">FV-701</text>
-  <path d="M 1740 385 L 1850 385" class="process-line" stroke="#FFB6C1" marker-end="url(#flowArrow)"/>
-  <rect x="1775" y="373" width="65" height="14" rx="2" fill="#1a2535" stroke="#FFB6C1" stroke-width="0.5" opacity="0.8"/>
-  <text x="1807" y="384" class="pipe-label" fill="#FFB6C1">Ø40-HM-701</text>
+  <path d="M 1710 385 L 1740 385" class="process-line" marker-end="url(#flowArrow)"/>
 
   <!-- UHT→灌装(产品) -->
   <path d="M 2270 350 L 2270 480 L 460 480 L 460 840" class="process-line" stroke="#90EE90" marker-end="url(#flowArrow)"/>
-  <rect x="1350" y="448" width="80" height="14" rx="2" fill="#1a2535" stroke="#90EE90" stroke-width="0.5" opacity="0.8"/>
-  <text x="1390" y="459" class="pipe-label" fill="#90EE90">Ø50-UH-801</text>
+  <text x="1360" y="460" class="param-label" style="font-size:9px">UHT产品→PF</text>
 
   <!-- 空瓶→灌装 -->
   <path d="M 345 920 L 460 920 L 460 840" class="process-line" stroke="#FFD700" marker-end="url(#flowArrow)"/>
-  <rect x="365" y="908" width="80" height="14" rx="2" fill="#1a2535" stroke="#FFD700" stroke-width="0.5" opacity="0.8"/>
-  <text x="405" y="919" class="pipe-label" fill="#FFD700">Ø50-BF-P01</text>
+  <text x="380" y="910" class="param-label" style="font-size:9px">空瓶→PF</text>
 
   <!-- 灌装→旋盖 -->
   <path d="M 730 835 L 760 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="730" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#FFD700" stroke-width="0.5" opacity="0.8"/>
-  <text x="760" y="834" class="pipe-label" fill="#FFD700">Ø50-PF-C01</text>
 
   <!-- 旋盖→灯检 -->
   <path d="M 990 835 L 1020 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="990" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#00CED1" stroke-width="0.5" opacity="0.8"/>
-  <text x="1020" y="834" class="pipe-label" fill="#00CED1">Ø50-CG-L01</text>
 
   <!-- 灯检→喷码 -->
   <path d="M 1240 835 L 1270 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="1240" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#00CED1" stroke-width="0.5" opacity="0.8"/>
-  <text x="1270" y="834" class="pipe-label" fill="#00CED1">Ø50-LI-C01</text>
 
   <!-- 喷码→贴标 -->
   <path d="M 1540 835 L 1570 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="1540" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#FFA500" stroke-width="0.5" opacity="0.8"/>
-  <text x="1570" y="834" class="pipe-label" fill="#FFA500">Ø50-CI-L01</text>
 
   <!-- 贴标→装箱 -->
   <path d="M 1780 835 L 1810 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="1780" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#98FB98" stroke-width="0.5" opacity="0.8"/>
-  <text x="1810" y="834" class="pipe-label" fill="#98FB98">Ø50-LB-C01</text>
 
   <!-- 装箱→膜包 -->
   <path d="M 2160 835 L 2190 835" class="process-line" marker-end="url(#flowArrow)"/>
-  <rect x="2160" y="823" width="60" height="14" rx="2" fill="#1a2535" stroke="#DDA0DD" stroke-width="0.5" opacity="0.8"/>
-  <text x="2190" y="834" class="pipe-label" fill="#DDA0DD">Ø50-CA-P01</text>
 
   <!-- CIP→各工段连接 -->
   <!-- CIP到WT -->
   <path d="M 797 580 L 797 300 L 797 265" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="785" y="400" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="815" y="411" class="pipe-label" fill="#c0c0c0">Ø40-CP-WT</text>
-
   <!-- CIP到TH -->
   <path d="M 872 580 L 872 400 L 872 385" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="860" y="470" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="890" y="481" class="pipe-label" fill="#c0c0c0">Ø40-CP-TH</text>
-
   <!-- CIP到EX -->
   <path d="M 947 580 L 947 400 L 947 385" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="935" y="470" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="965" y="481" class="pipe-label" fill="#c0c0c0">Ø40-CP-EX</text>
-
   <!-- CIP到FL -->
   <path d="M 1022 580 L 1022 300 L 1022 265" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="1010" y="400" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="1040" y="411" class="pipe-label" fill="#c0c0c0">Ø40-CP-FL</text>
-
   <!-- CIP到BL -->
   <path d="M 1097 580 L 1097 400 L 1097 385" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="1085" y="470" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="1115" y="481" class="pipe-label" fill="#c0c0c0">Ø40-CP-BL</text>
-
   <!-- CIP到HM -->
   <path d="M 1172 580 L 1172 400 L 1172 385" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="1160" y="470" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="1190" y="481" class="pipe-label" fill="#c0c0c0">Ø40-CP-HM</text>
-
   <!-- CIP到UH -->
   <path d="M 1247 580 L 1247 400 L 1247 385" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="1235" y="470" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="1265" y="481" class="pipe-label" fill="#c0c0c0">Ø40-CP-UH</text>
-
   <!-- CIP到PF -->
   <path d="M 1322 580 L 1322 840 L 1322 920" class="cip-line" marker-end="url(#cipArrow)"/>
-  <rect x="1310" y="730" width="60" height="14" rx="2" fill="#1a2535" stroke="#c0c0c0" stroke-width="0.5" opacity="0.8"/>
-  <text x="1340" y="741" class="pipe-label" fill="#c0c0c0">Ø40-CP-PF</text>
 
   <!-- ====== 图例 ====== -->
   <g id="legend" transform="translate(30, 1150)">
@@ -1330,32 +903,11 @@
     <polygon points="460,52 475,59 460,67 445,59" fill="#5a9ab8"/>
     <text x="485" y="63" class="legend-text">阀门</text>
 
-    <!-- 阀门类型 -->
-    <use href="#FCV" x="555" y="50" width="24" height="16"/>
-    <text x="585" y="62" class="legend-text">FCV</text>
+    <text x="555" y="28" class="tag-label" style="font-size:10px">TT</text>
+    <text x="575" y="28" class="legend-text">温度传感器</text>
 
-    <use href="#CV" x="620" y="50" width="24" height="16"/>
-    <text x="650" y="62" class="legend-text">CV</text>
-
-    <use href="#GV" x="685" y="51" width="20" height="14"/>
-    <text x="712" y="62" class="legend-text">GV</text>
-
-    <use href="#BV" x="745" y="51" width="20" height="14"/>
-    <text x="772" y="62" class="legend-text">BV</text>
-
-    <use href="#SV" x="805" y="50" width="20" height="16"/>
-    <text x="832" y="62" class="legend-text">SV</text>
-
-    <use href="#PRV" x="865" y="50" width="24" height="16"/>
-    <text x="895" y="62" class="legend-text" style="font-size:9px">PRV</text>
-
-    <!-- 管道编号示例 -->
-    <rect x="555" y="20" width="65" height="16" rx="2" fill="#1a2535" stroke="#5a9ab8" stroke-width="0.5" opacity="0.8"/>
-    <text x="587" y="32" class="pipe-label" fill="#5a9ab8">Ø50-PW-101</text>
-    <text x="630" y="32" class="legend-text" style="font-size:9px">管道编号: Ø尺寸-流体代码-管线号</text>
-
-    <text x="555" y="58" class="tag-label" style="font-size:10px">TT</text>
-    <text x="575" y="58" class="legend-text">温度传感器</text>
+    <text x="555" y="58" class="tag-label" style="font-size:10px">LT</text>
+    <text x="575" y="58" class="legend-text">液位传感器</text>
 
     <text x="660" y="28" class="tag-label" style="font-size:10px">FT</text>
     <text x="680" y="28" class="legend-text">流量传感器</text>
@@ -1365,9 +917,6 @@
 
     <text x="780" y="28" class="tag-label" style="font-size:10px">CT</text>
     <text x="800" y="28" class="legend-text">电导率</text>
-
-    <text x="860" y="28" class="tag-label" style="font-size:10px">pH</text>
-    <text x="880" y="28" class="legend-text">pH传感器</text>
   </g>
 
   <!-- ====== 公用工程图例 ====== -->
