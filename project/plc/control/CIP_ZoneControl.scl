@@ -1,0 +1,327 @@
+// ============================================================================
+// CIP清洗系统 - 区域清洗控制
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+
+// ============================================================================
+// FC_ZoneControl : 区域清洗控制 (通用函数)
+// ============================================================================
+FUNCTION "FC_ZoneControl" : Void
+TITLE = "区域清洗控制"
+AUTHOR : "SCADA"
+VERSION : "2.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    CurrentMedia, NextMedia : "Enum_MediaType";
+END_VAR
+
+    CASE "DB_Zone"[ZoneID].State OF
+        // ===================================================================
+        // 待机状态
+        // ===================================================================
+        "Enum_CleanState".IDLE:
+            // 无动作
+
+        // ===================================================================
+        // 准备就绪
+        // ===================================================================
+        "Enum_CleanState".READY:
+            // 校验清洗序列
+            IF NOT "FC_ValidateSequence"(ZoneID) THEN
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".FAULT;
+                RETURN;
+            END_IF;
+
+            // 申请当前步骤所需的介质
+            IF NOT "FC_RequestMedia"(ZoneID, "DB_Zone"[ZoneID].Recipe.Steps[1].MediaID) THEN
+                RETURN;
+            END_IF;
+
+            // 介质申请成功，执行第一步
+            "DB_Zone"[ZoneID].CurrentStep := 1;
+            "FC_ExecuteStep"(ZoneID, 1);
+            "DB_Zone"[ZoneID].State := "Enum_CleanState".STEP_EXEC;
+
+        // ===================================================================
+        // 步骤执行中
+        // ===================================================================
+        "Enum_CleanState".STEP_EXEC:
+            "FC_StepMonitor"(ZoneID);
+
+        // ===================================================================
+        // 步骤切换中
+        // ===================================================================
+        "Enum_CleanState".STEP_TRANSITION:
+            CurrentMedia := "DB_Zone"[ZoneID].CurrentMedia;
+            IF "DB_Zone"[ZoneID].CurrentStep < "DB_Zone"[ZoneID].Recipe.StepCount THEN
+                NextMedia := "DB_Zone"[ZoneID].Recipe.Steps["DB_Zone"[ZoneID].CurrentStep + 1].MediaID;
+
+                // 检查是否需要在化学介质之间插入冲洗
+                IF "FC_IsChemicalMedia"(CurrentMedia)
+                AND "FC_IsChemicalMedia"(NextMedia) THEN
+                    // 设置插入步骤参数
+                    "DB_Zone"[ZoneID].InsertedStep := TRUE;
+                    "DB_Zone"[ZoneID].InsertedMedia := "Enum_MediaType".PURE_WATER;
+                    "DB_Zone"[ZoneID].InsertedTemp := 60;
+                    "DB_Zone"[ZoneID].InsertedTime := 300;
+                    "DB_Zone"[ZoneID].InsertedStepIndex := "DB_Zone"[ZoneID].CurrentStep + 1;
+
+                    // 执行插入步骤
+                    "FC_ExecuteInsertedStep"(ZoneID);
+
+                    // 切换到STEP_EXEC执行插入步骤
+                    "DB_Zone"[ZoneID].State := "Enum_CleanState".STEP_EXEC;
+                ELSE
+                    // 直接执行下一步
+                    "DB_Zone"[ZoneID].CurrentStep := "DB_Zone"[ZoneID].CurrentStep + 1;
+                    "DB_Zone"[ZoneID].InsertedStep := FALSE;
+                    "FC_ExecuteStep"(ZoneID, "DB_Zone"[ZoneID].CurrentStep);
+                    "DB_Zone"[ZoneID].State := "Enum_CleanState".STEP_EXEC;
+                END_IF;
+            ELSE
+                // 最后一步完成，清洗结束
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".COMPLETE;
+            END_IF;
+
+        // ===================================================================
+        // 清洗完成
+        // ===================================================================
+        "Enum_CleanState".COMPLETE:
+            "DB_Zone"[ZoneID].PumpCmd := FALSE;
+            "FC200_MediaSelect"(ZoneID, "Enum_MediaType".PURE_WATER);
+            "FC_ReleaseAllMedia"(ZoneID);
+            "FC_LogHistory"(ZoneID);
+            "DB_Zone"[ZoneID].State := "Enum_CleanState".IDLE;
+
+        // ===================================================================
+        // 暂停
+        // ===================================================================
+        "Enum_CleanState".PAUSE:
+            IF "DB_Zone"[ZoneID].Command = "Enum_ControlCmd".CMD_RESUME THEN
+                "DB_Zone"[ZoneID].Command := "Enum_ControlCmd".CMD_NONE;
+                "DB_Zone"[ZoneID].State := "DB_Zone"[ZoneID].PreviousState;
+            END_IF;
+
+            IF "DB_Zone"[ZoneID].Command = "Enum_ControlCmd".CMD_STOP THEN
+                "DB_Zone"[ZoneID].Command := "Enum_ControlCmd".CMD_NONE;
+                "DB_Zone"[ZoneID].PumpCmd := FALSE;
+                "FC_CloseAllValves"();
+                "FC_ReleaseAllMedia"(ZoneID);
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".IDLE;
+            END_IF;
+
+        // ===================================================================
+        // 故障
+        // ===================================================================
+        "Enum_CleanState".FAULT:
+            "DB_Zone"[ZoneID].PumpCmd := FALSE;
+            "FC_CloseAllValves"();
+
+            IF "DB_Zone"[ZoneID].Command = "Enum_ControlCmd".CMD_RESET THEN
+                "DB_Zone"[ZoneID].Command := "Enum_ControlCmd".CMD_NONE;
+                "FC_ReleaseAllMedia"(ZoneID);
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".IDLE;
+                "DB_Zone"[ZoneID].ResultCode := 0;
+            END_IF;
+
+    END_CASE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_ExecuteStep : 执行步骤
+// ============================================================================
+FUNCTION "FC_ExecuteStep" : Void
+TITLE = "执行清洗步骤"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+    StepIndex : Int;
+END_VAR
+VAR
+    StepData : "UDT_StepData";
+END_VAR
+
+    // 获取步骤数据
+    StepData := "DB_Zone"[ZoneID].Recipe.Steps[StepIndex];
+
+    // 选择介质
+    "FC200_MediaSelect"(ZoneID, StepData.MediaID);
+
+    // 启动泵
+    "DB_Zone"[ZoneID].PumpCmd := TRUE;
+    "DB_Zone"[ZoneID].PumpSpeed := (StepData.TargetFlow / 6.0) * 100.0;
+
+    // 设置温度控制
+    IF StepData.TargetTemp > 30 THEN
+        "DB_Zone"[ZoneID].TempControl := TRUE;
+        "DB_Zone"[ZoneID].TempSP := StepData.TargetTemp;
+    ELSE
+        "DB_Zone"[ZoneID].TempControl := FALSE;
+    END_IF;
+
+    // 启动计时
+    "DB_Zone"[ZoneID].StepTimer := 0;
+    "DB_Zone"[ZoneID].TempReached := FALSE;
+    "DB_Zone"[ZoneID].InsertedStep := FALSE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_StepMonitor : 步骤监控 - 支持插入步骤
+// ============================================================================
+FUNCTION "FC_StepMonitor" : Void
+TITLE = "步骤监控"
+AUTHOR : "SCADA"
+VERSION : "2.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    StepTime : Int;
+END_VAR
+
+    // ========================================================================
+    // 判断当前是原生步骤还是插入步骤
+    // ========================================================================
+    IF "DB_Zone"[ZoneID].InsertedStepRunning THEN
+        // 插入步骤正在执行
+        StepTime := "DB_Zone"[ZoneID].InsertedTime;
+
+        // 温度监测
+        IF "DB_Zone"[ZoneID].TempControl THEN
+            IF "DB_Zone"[ZoneID].TT_Outlet >= "DB_Zone"[ZoneID].TempSP - 5 THEN
+                "DB_Zone"[ZoneID].TempReached := TRUE;
+            END_IF;
+        ELSE
+            "DB_Zone"[ZoneID].TempReached := TRUE;
+        END_IF;
+
+        // =====================================================================
+        // 插入步骤完成判定
+        // =====================================================================
+        IF "DB_Zone"[ZoneID].StepTimer >= StepTime THEN
+            "DB_Zone"[ZoneID].InsertedStepRunning := FALSE;
+            "DB_Zone"[ZoneID].InsertedStep := FALSE;
+
+            // 边界检查
+            IF "DB_Zone"[ZoneID].InsertedStepIndex > 0
+            AND "DB_Zone"[ZoneID].InsertedStepIndex <= "DB_Zone"[ZoneID].Recipe.StepCount THEN
+                "FC_ExecuteStep"(ZoneID, "DB_Zone"[ZoneID].InsertedStepIndex);
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".STEP_EXEC;
+            ELSE
+                "DB_Zone"[ZoneID].State := "Enum_CleanState".COMPLETE;
+            END_IF;
+        END_IF;
+    ELSE
+        // 原生步骤执行中
+        StepTime := "DB_Zone"[ZoneID].Recipe.Steps["DB_Zone"[ZoneID].CurrentStep].TargetTime;
+
+        // 温度监测
+        IF "DB_Zone"[ZoneID].TempControl THEN
+            IF "DB_Zone"[ZoneID].TT_Outlet >= "DB_Zone"[ZoneID].TempSP - 5 THEN
+                "DB_Zone"[ZoneID].TempReached := TRUE;
+            END_IF;
+        ELSE
+            "DB_Zone"[ZoneID].TempReached := TRUE;
+        END_IF;
+
+        // =====================================================================
+        // 原生步骤完成判定
+        // =====================================================================
+        IF "DB_Zone"[ZoneID].StepTimer >= StepTime THEN
+            "DB_Zone"[ZoneID].State := "Enum_CleanState".STEP_TRANSITION;
+        END_IF;
+    END_IF;
+
+    // ========================================================================
+    // 无流量检测
+    // ========================================================================
+    IF NOT "DB_Zone"[ZoneID].FS THEN
+        IF "DB_Zone"[ZoneID].NoFlowTimer >= 30 THEN
+            "DB_Zone"[ZoneID].PreviousState := "DB_Zone"[ZoneID].State;
+            "DB_Zone"[ZoneID].State := "Enum_CleanState".PAUSE;
+            "FC_TriggerAlarm"(11 + ZoneID, "Enum_AlarmLevel".L1_WARNING, ZoneID);
+        END_IF;
+    END_IF;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_ExecuteInsertedStep : 执行插入的冲洗步骤
+// ============================================================================
+FUNCTION "FC_ExecuteInsertedStep" : Void
+TITLE = "执行插入的冲洗步骤"
+AUTHOR : "SCADA"
+VERSION : "2.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+
+    // 选择插入的介质(纯水冲洗)
+    "FC200_MediaSelect"(ZoneID, "DB_Zone"[ZoneID].InsertedMedia);
+
+    // 启动泵
+    "DB_Zone"[ZoneID].PumpCmd := TRUE;
+
+    // 设置温度控制
+    IF "DB_Zone"[ZoneID].InsertedTemp > 30 THEN
+        "DB_Zone"[ZoneID].TempControl := TRUE;
+        "DB_Zone"[ZoneID].TempSP := "DB_Zone"[ZoneID].InsertedTemp;
+    ELSE
+        "DB_Zone"[ZoneID].TempControl := FALSE;
+    END_IF;
+
+    // 重置计时器
+    "DB_Zone"[ZoneID].StepTimer := 0;
+    "DB_Zone"[ZoneID].TempReached := FALSE;
+
+    // 标记为正在执行插入步骤
+    "DB_Zone"[ZoneID].InsertedStepRunning := TRUE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_ValidateSequence : 校验清洗序列
+// ============================================================================
+FUNCTION "FC_ValidateSequence" : Bool
+TITLE = "校验清洗序列"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    i : Int;
+    CurrentMedia, PrevMedia : "Enum_MediaType";
+END_VAR
+
+    "FC_ValidateSequence" := TRUE;
+
+    FOR i := 1 TO "DB_Zone"[ZoneID].Recipe.StepCount DO
+        CurrentMedia := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+
+        IF i > 1 THEN
+            PrevMedia := "DB_Zone"[ZoneID].Recipe.Steps[i-1].MediaID;
+
+            // 化学介质直接切换 = 非法
+            IF "FC_IsChemicalMedia"(CurrentMedia)
+            AND "FC_IsChemicalMedia"(PrevMedia) THEN
+                "FC_ValidateSequence" := FALSE;
+                "FC_TriggerAlarm"(18, "Enum_AlarmLevel".L1_WARNING, ZoneID);
+                RETURN;
+            END_IF;
+        END_IF;
+    END_FOR;
+
+END_FUNCTION

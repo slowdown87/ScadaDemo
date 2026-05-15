@@ -1,4 +1,4 @@
-***
+---
 
 name: "planning"
 description: "任务规划技能。用于复杂任务拆解、ReAct循环执行、自我纠错。激活后AI会像最先进的Agent一样：理解目标→拆解子任务→执行验证→自我反思→迭代优化。"
@@ -274,6 +274,16 @@ Thought → Action → Observation → Thought → ... → Final Answer
 - 系统架构设计
 - 技术选型决策
 - 任何需要规划的长任务
+
+***
+
+## 进阶内容
+
+如需更先进的规划技术（如 ReAct、Plan-Execute、Reflexion、DAG 任务分解等），请激活 **advanced-planning** 技能。
+
+```
+激活 advanced-planning 技能
+```
 
 ***
 

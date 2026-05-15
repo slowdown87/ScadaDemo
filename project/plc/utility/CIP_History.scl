@@ -1,0 +1,98 @@
+// ============================================================================
+// CIP清洗系统 - 历史记录
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v2.0
+// ============================================================================
+
+
+// ============================================================================
+// FC_LogHistory : 记录清洗历史
+// 支持100条记录环形存储，满时覆盖最早的记录
+// ============================================================================
+FUNCTION "FC_LogHistory" : Void
+TITLE = "记录清洗历史"
+AUTHOR : "SCADA"
+VERSION : "2.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    HistoryPtr : Int;
+    i : Int;
+END_VAR
+
+    // ========================================================================
+    // 获取历史记录写入指针
+    // ========================================================================
+    HistoryPtr := "Global".HistoryWriteIndex;
+
+    // 边界检查
+    IF HistoryPtr < 1 OR HistoryPtr > 100 THEN
+        HistoryPtr := 1;
+    END_IF;
+
+    // ========================================================================
+    // 填充历史记录
+    // ========================================================================
+    "Global".History[HistoryPtr].RecordID := CONCAT('H', INT_TO_STRING(HistoryPtr));
+    "Global".History[HistoryPtr].ZoneID := ZoneID;
+    "Global".History[HistoryPtr].ZoneName := "DB_Zone"[ZoneID].ZoneName;
+    "Global".History[HistoryPtr].RecipeID := "DB_Zone"[ZoneID].Recipe.RecipeID;
+    "Global".History[HistoryPtr].RecipeName := "DB_Zone"[ZoneID].Recipe.RecipeName;
+    "Global".History[HistoryPtr].StartTime := "DB_Zone"[ZoneID].StartTime;
+    "Global".History[HistoryPtr].EndTime := "Global".System.SystemTime;
+    "Global".History[HistoryPtr].Result := "DB_Zone"[ZoneID].Result;
+    "Global".History[HistoryPtr].FinalConduct := "DB_Zone"[ZoneID].CD;
+
+    // 记录各步骤详情
+    FOR i := 1 TO "DB_Zone"[ZoneID].Recipe.StepCount DO
+        CASE i OF
+            1:
+                "Global".History[HistoryPtr].Step1_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step1_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            2:
+                "Global".History[HistoryPtr].Step2_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step2_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            3:
+                "Global".History[HistoryPtr].Step3_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step3_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            4:
+                "Global".History[HistoryPtr].Step4_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step4_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            5:
+                "Global".History[HistoryPtr].Step5_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step5_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            6:
+                "Global".History[HistoryPtr].Step6_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step6_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            7:
+                "Global".History[HistoryPtr].Step7_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step7_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            8:
+                "Global".History[HistoryPtr].Step8_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step8_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            9:
+                "Global".History[HistoryPtr].Step9_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step9_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+            10:
+                "Global".History[HistoryPtr].Step10_Media := "DB_Zone"[ZoneID].Recipe.Steps[i].MediaID;
+                "Global".History[HistoryPtr].Step10_Time := "DB_Zone"[ZoneID].Recipe.Steps[i].TargetTime;
+        END_CASE;
+    END_FOR;
+
+    // ========================================================================
+    // 更新历史记录指针(环形缓冲区，1-100循环)
+    // ========================================================================
+    IF HistoryPtr >= 100 THEN
+        "Global".HistoryWriteIndex := 1;
+    ELSE
+        "Global".HistoryWriteIndex := HistoryPtr + 1;
+    END_IF;
+
+    // 更新历史记录计数(不超过100)
+    IF "Global".HistoryCount < 100 THEN
+        "Global".HistoryCount := "Global".HistoryCount + 1;
+    END_IF;
+
+END_FUNCTION

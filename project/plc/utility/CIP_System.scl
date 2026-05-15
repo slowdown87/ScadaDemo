@@ -1,0 +1,558 @@
+// ============================================================================
+// CIP清洗系统 - 系统功能
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+
+// ============================================================================
+// FC_EmergencyStop : 急停处理
+// ============================================================================
+FUNCTION "FC_EmergencyStop" : Void
+TITLE = "急停处理"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+END_VAR
+
+    // 停止所有泵
+    FOR i := 1 TO 5 DO
+        "DB_Zone"[i].PumpCmd := FALSE;
+    END_FOR;
+
+    // 关闭所有阀门
+    "Global".Valve.Alkali := FALSE;
+    "Global".Valve.Acid := FALSE;
+    "Global".Valve.HotWater := FALSE;
+    "Global".Valve.PureWater := FALSE;
+    "Global".Valve.Disinfect := FALSE;
+    "Global".Valve.Drain := FALSE;
+    "Global".Valve.Circulate := FALSE;
+
+    // 关闭蒸汽阀
+    "Global".Output.SteamValve := 0;
+
+    // 所有区域进入故障状态
+    FOR i := 1 TO 5 DO
+        "DB_Zone"[i].State := "Enum_CleanState".FAULT;
+    END_FOR;
+
+    // 触发急停报警
+    "Global".System.EStop := TRUE;
+    "Global".AlarmCount := "Global".AlarmCount + 1;
+    "Global".AlarmActive[1].AlarmID := 17;  // CP-017
+    "Global".AlarmActive[1].Level := "Enum_AlarmLevel".L0_CRITICAL;
+    "Global".AlarmActive[1].TriggerTime := "Global".System.SystemTime;
+
+    // 系统未就绪
+    "Global".System.SystemReady := FALSE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_InitGlobalData : 初始化全局数据
+// ============================================================================
+FUNCTION "FC_InitGlobalData" : Void
+TITLE = "初始化全局数据"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+
+    // 系统状态
+    "Global".System.HandsMode := "Enum_HandsMode".REMOTE;
+    "Global".System.AutoMode := TRUE;
+    "Global".System.ManualMode := FALSE;
+    "Global".System.SystemReady := FALSE;
+    "Global".System.EStop := FALSE;
+    "Global".System.Running := FALSE;
+    "Global".System.AllIdle := TRUE;
+    "Global".System.PLCConnected := TRUE;
+    "Global".System.HMIConnected := TRUE;
+    "Global".System.ActiveZones := 0;
+    "Global".System.AlarmCount := 0;
+    "Global".System.QueueCount := 0;
+
+    // 初始化介质状态
+    "Global".MediaAlkali.InUse := FALSE;
+    "Global".MediaAlkali.UsingZone := 0;
+    "Global".MediaAlkali.QueueCount := 0;
+    "Global".MediaAcid.InUse := FALSE;
+    "Global".MediaAcid.UsingZone := 0;
+    "Global".MediaHotWater.InUse := FALSE;
+    "Global".MediaHotWater.UsingZone := 0;
+    "Global".MediaPureWater.InUse := FALSE;
+    "Global".MediaPureWater.UsingZone := 0;
+
+    // 初始化罐区状态
+    "FC_InitTankData"(1);
+    "FC_InitTankData"(2);
+    "FC_InitTankData"(3);
+    "FC_InitTankData"(4);
+
+    // 初始化报警
+    "Global".AlarmCount := 0;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_InitZoneData : 初始化区域数据
+// ============================================================================
+FUNCTION "FC_InitZoneData" : Void
+TITLE = "初始化区域数据"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+
+    "DB_Zone"[ZoneID].ZoneID := ZoneID;
+    "DB_Zone"[ZoneID].State := "Enum_CleanState".IDLE;
+    "DB_Zone"[ZoneID].PreviousState := "Enum_CleanState".IDLE;
+    "DB_Zone"[ZoneID].CurrentStep := 0;
+    "DB_Zone"[ZoneID].StepTimer := 0;
+    "DB_Zone"[ZoneID].Result := FALSE;
+    "DB_Zone"[ZoneID].CurrentMedia := "Enum_MediaType".PURE_WATER;
+    "DB_Zone"[ZoneID].TempControl := FALSE;
+    "DB_Zone"[ZoneID].TempSP := 0;
+    "DB_Zone"[ZoneID].TempReached := FALSE;
+    "DB_Zone"[ZoneID].InsertedStep := FALSE;
+    "DB_Zone"[ZoneID].NoFlowTimer := 0;
+    "DB_Zone"[ZoneID].LowTempTimer := 0;
+
+    // 传感器数据初始化
+    "DB_Zone"[ZoneID].TT_Outlet := 0;
+    "DB_Zone"[ZoneID].TT_Return := 0;
+    "DB_Zone"[ZoneID].CD := 0;
+    "DB_Zone"[ZoneID].PT := 0;
+    "DB_Zone"[ZoneID].FT := 0;
+    "DB_Zone"[ZoneID].FS := FALSE;
+
+    // 设备状态初始化
+    "DB_Zone"[ZoneID].PumpState := "Enum_PumpState".PUMP_STOP;
+    "DB_Zone"[ZoneID].ValveState := "Enum_ValveState".VALVE_CLOSED;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_InitRecipeData : 初始化配方数据
+// ============================================================================
+FUNCTION "FC_InitRecipeData" : Void
+TITLE = "初始化配方数据"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+
+    // 配方1: 纯水冲洗
+    "Global".RecipeList[1].RecipeID := 1;
+    "Global".RecipeList[1].RecipeName := 'PureWaterRinse';
+    "Global".RecipeList[1].StepCount := 1;
+    "Global".RecipeList[1].Steps[1].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[1].Steps[1].MediaName := '纯水冲洗';
+    "Global".RecipeList[1].Steps[1].TargetTemp := 25;
+    "Global".RecipeList[1].Steps[1].TargetTime := 600;
+    "Global".RecipeList[1].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[1].Enable := TRUE;
+
+    // 配方2: 热水冲洗
+    "Global".RecipeList[2].RecipeID := 2;
+    "Global".RecipeList[2].RecipeName := 'HotWaterRinse';
+    "Global".RecipeList[2].StepCount := 1;
+    "Global".RecipeList[2].Steps[1].MediaID := "Enum_MediaType".HOT_WATER;
+    "Global".RecipeList[2].Steps[1].MediaName := '热水冲洗';
+    "Global".RecipeList[2].Steps[1].TargetTemp := 85;
+    "Global".RecipeList[2].Steps[1].TargetTime := 600;
+    "Global".RecipeList[2].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[2].Enable := TRUE;
+
+    // 配方3: 碱洗+冲洗 (3步)
+    "Global".RecipeList[3].RecipeID := 3;
+    "Global".RecipeList[3].RecipeName := 'AlkaliRinse';
+    "Global".RecipeList[3].StepCount := 3;
+    "Global".RecipeList[3].Steps[1].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[3].Steps[1].MediaName := '纯水冲洗';
+    "Global".RecipeList[3].Steps[1].TargetTemp := 85;
+    "Global".RecipeList[3].Steps[1].TargetTime := 900;
+    "Global".RecipeList[3].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[3].Steps[2].MediaID := "Enum_MediaType".ALKALI;
+    "Global".RecipeList[3].Steps[2].MediaName := '碱洗';
+    "Global".RecipeList[3].Steps[2].TargetTemp := 85;
+    "Global".RecipeList[3].Steps[2].TargetTime := 1500;
+    "Global".RecipeList[3].Steps[2].TargetFlow := 5.0;
+    "Global".RecipeList[3].Steps[3].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[3].Steps[3].MediaName := '纯水冲洗';
+    "Global".RecipeList[3].Steps[3].TargetTemp := 25;
+    "Global".RecipeList[3].Steps[3].TargetTime := 600;
+    "Global".RecipeList[3].Steps[3].TargetFlow := 3.0;
+    "Global".RecipeList[3].Enable := TRUE;
+
+    // 配方4: 酸洗+冲洗 (3步)
+    "Global".RecipeList[4].RecipeID := 4;
+    "Global".RecipeList[4].RecipeName := 'AcidRinse';
+    "Global".RecipeList[4].StepCount := 3;
+    "Global".RecipeList[4].Steps[1].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[4].Steps[1].MediaName := '纯水冲洗';
+    "Global".RecipeList[4].Steps[1].TargetTemp := 60;
+    "Global".RecipeList[4].Steps[1].TargetTime := 600;
+    "Global".RecipeList[4].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[4].Steps[2].MediaID := "Enum_MediaType".ACID;
+    "Global".RecipeList[4].Steps[2].MediaName := '酸洗';
+    "Global".RecipeList[4].Steps[2].TargetTemp := 60;
+    "Global".RecipeList[4].Steps[2].TargetTime := 1200;
+    "Global".RecipeList[4].Steps[2].TargetFlow := 5.0;
+    "Global".RecipeList[4].Steps[3].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[4].Steps[3].MediaName := '纯水冲洗';
+    "Global".RecipeList[4].Steps[3].TargetTemp := 25;
+    "Global".RecipeList[4].Steps[3].TargetTime := 600;
+    "Global".RecipeList[4].Steps[3].TargetFlow := 3.0;
+    "Global".RecipeList[4].Enable := TRUE;
+
+    // 配方5: 碱洗+酸洗+冲洗 (5步)
+    "Global".RecipeList[5].RecipeID := 5;
+    "Global".RecipeList[5].RecipeName := 'AlkaliAcidWash';
+    "Global".RecipeList[5].StepCount := 5;
+    "Global".RecipeList[5].Steps[1].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[5].Steps[1].TargetTemp := 85;
+    "Global".RecipeList[5].Steps[1].TargetTime := 600;
+    "Global".RecipeList[5].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[5].Steps[2].MediaID := "Enum_MediaType".ALKALI;
+    "Global".RecipeList[5].Steps[2].MediaName := '碱洗';
+    "Global".RecipeList[5].Steps[2].TargetTemp := 85;
+    "Global".RecipeList[5].Steps[2].TargetTime := 1500;
+    "Global".RecipeList[5].Steps[2].TargetFlow := 5.0;
+    "Global".RecipeList[5].Steps[3].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[5].Steps[3].MediaName := '纯水冲洗';
+    "Global".RecipeList[5].Steps[3].TargetTemp := 70;
+    "Global".RecipeList[5].Steps[3].TargetTime := 600;
+    "Global".RecipeList[5].Steps[3].TargetFlow := 3.0;
+    "Global".RecipeList[5].Steps[4].MediaID := "Enum_MediaType".ACID;
+    "Global".RecipeList[5].Steps[4].MediaName := '酸洗';
+    "Global".RecipeList[5].Steps[4].TargetTemp := 60;
+    "Global".RecipeList[5].Steps[4].TargetTime := 1200;
+    "Global".RecipeList[5].Steps[4].TargetFlow := 5.0;
+    "Global".RecipeList[5].Steps[5].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[5].Steps[5].MediaName := '纯水冲洗';
+    "Global".RecipeList[5].Steps[5].TargetTemp := 25;
+    "Global".RecipeList[5].Steps[5].TargetTime := 600;
+    "Global".RecipeList[5].Steps[5].TargetFlow := 3.0;
+    "Global".RecipeList[5].Enable := TRUE;
+
+    // 配方6: 消毒液清洗 (3步)
+    "Global".RecipeList[6].RecipeID := 6;
+    "Global".RecipeList[6].RecipeName := 'DisinfectWash';
+    "Global".RecipeList[6].Description := '消毒液清洗';
+    "Global".RecipeList[6].StepCount := 3;
+    "Global".RecipeList[6].Steps[1].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[6].Steps[1].MediaName := '纯水预洗';
+    "Global".RecipeList[6].Steps[1].TargetTemp := 40;
+    "Global".RecipeList[6].Steps[1].TargetTime := 300;
+    "Global".RecipeList[6].Steps[1].TargetFlow := 3.0;
+    "Global".RecipeList[6].Steps[2].MediaID := "Enum_MediaType".DISINFECT;
+    "Global".RecipeList[6].Steps[2].MediaName := '消毒液清洗';
+    "Global".RecipeList[6].Steps[2].TargetTemp := 40;
+    "Global".RecipeList[6].Steps[2].TargetTime := 600;
+    "Global".RecipeList[6].Steps[2].TargetFlow := 3.0;
+    "Global".RecipeList[6].Steps[3].MediaID := "Enum_MediaType".PURE_WATER;
+    "Global".RecipeList[6].Steps[3].MediaName := '纯水冲洗';
+    "Global".RecipeList[6].Steps[3].TargetTemp := 25;
+    "Global".RecipeList[6].Steps[3].TargetTime := 600;
+    "Global".RecipeList[6].Steps[3].TargetFlow := 3.0;
+    "Global".RecipeList[6].Enable := TRUE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_InitTankData : 初始化罐区数据
+// ============================================================================
+FUNCTION "FC_InitTankData" : Void
+TITLE = "初始化罐区数据"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    TankID : Int;
+END_VAR
+VAR
+    TankData : "UDT_TankStatus";
+END_VAR
+
+    CASE TankID OF
+        1:  // 碱液罐
+            TankData.LevelMin := 20.0;
+            TankData.LevelMax := 95.0;
+            TankData.TempMin := 60.0;
+            TankData.TempMax := 90.0;
+            TankData.TempSP := 85.0;
+            TankData.TargetConc := 2.0;
+            TankData.Ready := TRUE;
+
+        2:  // 酸液罐
+            TankData.LevelMin := 20.0;
+            TankData.LevelMax := 95.0;
+            TankData.TempMin := 50.0;
+            TankData.TempMax := 70.0;
+            TankData.TempSP := 60.0;
+            TankData.TargetConc := 1.0;
+            TankData.Ready := TRUE;
+
+        3:  // 热水罐
+            TankData.LevelMin := 20.0;
+            TankData.LevelMax := 95.0;
+            TankData.TempMin := 75.0;
+            TankData.TempMax := 90.0;
+            TankData.TempSP := 85.0;
+            TankData.Ready := TRUE;
+
+        4:  // 纯水罐
+            TankData.LevelMin := 20.0;
+            TankData.LevelMax := 95.0;
+            TankData.TempMin := 20.0;
+            TankData.TempMax := 30.0;
+            TankData.TempSP := 25.0;
+            TankData.Ready := TRUE;
+    END_CASE;
+
+    CASE TankID OF
+        1: "Global".TankAlkali := TankData;
+        2: "Global".TankAcid := TankData;
+        3: "Global".TankHotWater := TankData;
+        4: "Global".TankPureWater := TankData;
+    END_CASE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_ManageMediaResources : 介质资源管理
+// ============================================================================
+FUNCTION "FC_ManageMediaResources" : Void
+TITLE = "介质资源管理"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+END_VAR
+
+    FOR i := 1 TO 5 DO
+        IF "DB_Zone"[i].State = "Enum_CleanState".STEP_TRANSITION THEN
+            // 在步骤切换时申请下一步介质
+        END_IF;
+    END_FOR;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_RequestMedia : 请求介质资源
+// ============================================================================
+FUNCTION "FC_RequestMedia" : Bool
+TITLE = "请求介质资源"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+    MediaID : "Enum_MediaType";
+END_VAR
+VAR
+    MediaPtr : Int;
+END_VAR
+
+    "FC_RequestMedia" := FALSE;
+
+    // 纯水不需要独占，可以被多区同时使用
+    IF MediaID = "Enum_MediaType".PURE_WATER THEN
+        "FC_RequestMedia" := TRUE;
+        RETURN;
+    END_IF;
+
+    // 获取介质指针
+    CASE MediaID OF
+        "Enum_MediaType".ALKALI:  MediaPtr := 1;
+        "Enum_MediaType".ACID:    MediaPtr := 2;
+        "Enum_MediaType".HOT_WATER: MediaPtr := 3;
+        "Enum_MediaType".DISINFECT: MediaPtr := 4;
+    ELSE
+        RETURN;
+    END_CASE;
+
+    // 检查介质是否已被占用
+    CASE MediaPtr OF
+        1:
+            IF NOT "Global".MediaAlkali.InUse THEN
+                "Global".MediaAlkali.InUse := TRUE;
+                "Global".MediaAlkali.UsingZone := ZoneID;
+                "FC_RequestMedia" := TRUE;
+            END_IF;
+        2:
+            IF NOT "Global".MediaAcid.InUse THEN
+                "Global".MediaAcid.InUse := TRUE;
+                "Global".MediaAcid.UsingZone := ZoneID;
+                "FC_RequestMedia" := TRUE;
+            END_IF;
+        3:
+            IF NOT "Global".MediaHotWater.InUse THEN
+                "Global".MediaHotWater.InUse := TRUE;
+                "Global".MediaHotWater.UsingZone := ZoneID;
+                "FC_RequestMedia" := TRUE;
+            END_IF;
+        4:
+            IF NOT "Global".MediaDisinfect.InUse THEN
+                "Global".MediaDisinfect.InUse := TRUE;
+                "Global".MediaDisinfect.UsingZone := ZoneID;
+                "FC_RequestMedia" := TRUE;
+            END_IF;
+    END_CASE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_ReleaseAllMedia : 释放区域占用的所有介质资源
+// ============================================================================
+FUNCTION "FC_ReleaseAllMedia" : Void
+TITLE = "释放所有介质资源"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+
+    IF "Global".MediaAlkali.UsingZone = ZoneID THEN
+        "Global".MediaAlkali.InUse := FALSE;
+        "Global".MediaAlkali.UsingZone := 0;
+    END_IF;
+
+    IF "Global".MediaAcid.UsingZone = ZoneID THEN
+        "Global".MediaAcid.InUse := FALSE;
+        "Global".MediaAcid.UsingZone := 0;
+    END_IF;
+
+    IF "Global".MediaHotWater.UsingZone = ZoneID THEN
+        "Global".MediaHotWater.InUse := FALSE;
+        "Global".MediaHotWater.UsingZone := 0;
+    END_IF;
+
+    IF "Global".MediaDisinfect.UsingZone = ZoneID THEN
+        "Global".MediaDisinfect.InUse := FALSE;
+        "Global".MediaDisinfect.UsingZone := 0;
+    END_IF;
+
+    // 关闭所有介质阀门
+    "Global".Valve.Alkali := FALSE;
+    "Global".Valve.Acid := FALSE;
+    "Global".Valve.HotWater := FALSE;
+    "Global".Valve.PureWater := FALSE;
+    "Global".Valve.Disinfect := FALSE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_UpdateZoneData : 更新区域数据
+// ============================================================================
+FUNCTION "FC_UpdateZoneData" : Void
+TITLE = "更新区域数据"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+
+    IF ZoneID < 1 OR ZoneID > 5 THEN
+        RETURN;
+    END_IF;
+
+    // 更新泵状态
+    IF "DB_Zone"[ZoneID].PumpCmd THEN
+        "DB_Zone"[ZoneID].PumpState := "Enum_PumpState".PUMP_RUN;
+    ELSE
+        "DB_Zone"[ZoneID].PumpState := "Enum_PumpState".PUMP_STOP;
+    END_IF;
+
+    // 更新阀门状态
+    IF "Global".Valve.Alkali OR "Global".Valve.Acid OR "Global".Valve.HotWater
+        OR "Global".Valve.PureWater OR "Global".Valve.Disinfect THEN
+        "DB_Zone"[ZoneID].ValveState := "Enum_ValveState".VALVE_OPEN;
+    ELSE
+        "DB_Zone"[ZoneID].ValveState := "Enum_ValveState".VALVE_CLOSED;
+    END_IF;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_UpdateSystemStatus : 更新系统状态
+// ============================================================================
+FUNCTION "FC_UpdateSystemStatus" : Void
+TITLE = "更新系统状态"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+    IdleCount : Int;
+    RunningCount : Int;
+END_VAR
+
+    IdleCount := 0;
+    RunningCount := 0;
+
+    FOR i := 1 TO 5 DO
+        IF "DB_Zone"[i].State = "Enum_CleanState".IDLE THEN
+            IdleCount := IdleCount + 1;
+        ELSIF "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC
+            OR "DB_Zone"[i].State = "Enum_CleanState".STEP_TRANSITION
+            OR "DB_Zone"[i].State = "Enum_CleanState".READY THEN
+            RunningCount := RunningCount + 1;
+        END_IF;
+    END_FOR;
+
+    "Global".System.AllIdle := (IdleCount = 5);
+    "Global".System.Running := (RunningCount > 0);
+    "Global".System.ActiveZones := RunningCount;
+    "Global".System.SystemTime := LDT#2026-01-01-00:00:00;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_UpdateSecondTimers : 秒级计时更新
+// ============================================================================
+FUNCTION "FC_UpdateSecondTimers" : Void
+TITLE = "秒级计时更新"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+END_VAR
+
+    FOR i := 1 TO 5 DO
+        // 步骤计时
+        IF "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC THEN
+            "DB_Zone"[i].StepTimer := "DB_Zone"[i].StepTimer + 1;
+        END_IF;
+
+        // 无流量计时
+        IF NOT "DB_Zone"[i].FS AND "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC THEN
+            "DB_Zone"[i].NoFlowTimer := "DB_Zone"[i].NoFlowTimer + 1;
+        ELSE
+            "DB_Zone"[i].NoFlowTimer := 0;
+        END_IF;
+
+        // 低温计时
+        IF "DB_Zone"[i].TempControl
+        AND NOT "DB_Zone"[i].TempReached
+        AND "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC THEN
+            "DB_Zone"[i].LowTempTimer := "DB_Zone"[i].LowTempTimer + 1;
+        ELSE
+            "DB_Zone"[i].LowTempTimer := 0;
+        END_IF;
+
+        // 超时计时
+        IF "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC THEN
+            "DB_Zone"[i].OverTimeTimer := "DB_Zone"[i].OverTimeTimer + 1;
+        END_IF;
+    END_FOR;
+
+END_FUNCTION

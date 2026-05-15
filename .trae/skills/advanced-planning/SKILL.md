@@ -1,3 +1,8 @@
+---
+name: "advanced-planning"
+description: "先进规划技能。整合ReAct、Plan-Execute、Reflexion等前沿Agent Planning技术。适用于复杂长任务、多阶段项目、自我纠错等场景。当用户需要深度规划、复杂任务分解或迭代优化时激活。"
+---
+
 # Advanced Planning Skill (先进规划技能)
 
 > 本文档整合了2025-2026年最新的Agent Planning技术，包括ReAct、Plan-Execute、Reflexion、Task Decomposition等前沿范式。

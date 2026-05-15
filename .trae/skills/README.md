@@ -55,6 +55,14 @@
 | 技能 | 说明 | 激活词 |
 |-----|------|-------|
 | **documentation** | 文档生成与维护 | "写文档" |
+| **generators** | SCADA文档自动生成 | "生成文档" |
+| **config-yaml** | YAML配置管理 | "读取配置" |
+
+### 规划类 - 进阶
+
+| 技能 | 说明 | 激活词 |
+|-----|------|-------|
+| **advanced-planning** | 先进规划技术(ReAct/Reflexion) | "深度规划" |
 
 ---
 
@@ -70,6 +78,9 @@
 | 写测试 | testing |
 | 重构 | refactoring + testing |
 | 写文档 | documentation |
+| 生成SCADA文档 | generators |
+| 管理配置文件 | config-yaml |
+| 复杂任务规划 | advanced-planning |
 
 ## 激活方式
 

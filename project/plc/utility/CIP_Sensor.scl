@@ -1,0 +1,114 @@
+// ============================================================================
+// CIP清洗系统 - 传感器与返回温度监测
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+
+// ============================================================================
+// FC_ReadSensorData : 读取传感器数据 (模拟，实际应从硬件读取)
+// ============================================================================
+FUNCTION "FC_ReadSensorData" : Void
+TITLE = "读取传感器数据"
+AUTHOR : "SCADA"
+VERSION : "1.1"
+VAR_TEMP
+    i : Int;
+END_VAR
+
+    FOR i := 1 TO 5 DO
+        // 温度传感器 (实际从AI通道读取)
+        "DB_Zone"[i].TT_Outlet := "Global".AI_TT_Outlet[i];
+        "DB_Zone"[i].TT_Return := "Global".AI_TT_Return[i];
+
+        // 电导率 (仅用于最终冲洗判定)
+        "DB_Zone"[i].CD := "Global".AI_Conductivity[i];
+
+        // 压力传感器
+        "DB_Zone"[i].PT := "Global".AI_Pressure[i];
+
+        // 流量计
+        "DB_Zone"[i].FT := "Global".AI_Flow[i];
+
+        // 流动开关
+        "DB_Zone"[i].FS := "Global".DI_FlowSwitch[i];
+    END_FOR;
+
+    // ========================================================================
+    // 返回温度监测(所有区域)
+    // ========================================================================
+    FOR i := 1 TO 5 DO
+        "FC_MonitorReturnTemp"(i);
+    END_FOR;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_MonitorReturnTemp : 返回温度监测
+// 功能：监测清洗回路的进出口温差，检测换热器效率和传感器故障
+// ============================================================================
+FUNCTION "FC_MonitorReturnTemp" : Void
+TITLE = "返回温度监测"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    TempDiff : Real;
+    TempDiffLimit : Real := 25.0;  // 温差报警阈值
+    TempDiffWarn : Real := 20.0;   // 温差警告阈值
+END_VAR
+
+    // 边界检查
+    IF ZoneID < 1 OR ZoneID > 5 THEN
+        RETURN;
+    END_IF;
+
+    // ========================================================================
+    // 计算温差 = 出口温度 - 返回温度
+    // ========================================================================
+    "DB_Zone"[ZoneID].TempDiff := "DB_Zone"[ZoneID].TT_Outlet - "DB_Zone"[ZoneID].TT_Return;
+    TempDiff := "DB_Zone"[ZoneID].TempDiff;
+
+    // ========================================================================
+    // 温差过大检测
+    // 规格: CP-031 返回温度过低 L1 温差>30℃
+    // ========================================================================
+    IF TempDiff > TempDiffLimit THEN
+        "DB_Zone"[ZoneID].TempDiffAlarm := TRUE;
+        "FC_TriggerAlarm"(31, "Enum_AlarmLevel".L1_WARNING, ZoneID);
+    ELSIF TempDiff > TempDiffWarn THEN
+        "DB_Zone"[ZoneID].TempDiffAlarm := TRUE;
+        "FC_TriggerAlarm"(30, "Enum_AlarmLevel".L2_INFO, ZoneID);
+    ELSE
+        "DB_Zone"[ZoneID].TempDiffAlarm := FALSE;
+    END_IF;
+
+    // ========================================================================
+    // 返回温度过高检测
+    // 规格: CP-032 返回温度过高 L1 TT_Return > TT_Outlet + 5℃
+    // ========================================================================
+    IF "DB_Zone"[ZoneID].TT_Return > "DB_Zone"[ZoneID].TT_Outlet + 5.0 THEN
+        "DB_Zone"[ZoneID].ReturnTempHigh := TRUE;
+        "FC_TriggerAlarm"(32, "Enum_AlarmLevel".L1_WARNING, ZoneID);
+    ELSE
+        "DB_Zone"[ZoneID].ReturnTempHigh := FALSE;
+    END_IF;
+
+    // ========================================================================
+    // 温度传感器故障检测
+    // 规格: CP-033 温度传感器故障 L1
+    // ========================================================================
+    IF ABS(TempDiff) < 0.5
+    AND "DB_Zone"[ZoneID].PumpCmd = TRUE
+    AND "DB_Zone"[ZoneID].TempControl = TRUE THEN
+        "DB_Zone"[ZoneID].TempSensorFault := TRUE;
+        "FC_TriggerAlarm"(33, "Enum_AlarmLevel".L1_WARNING, ZoneID);
+    ELSE
+        "DB_Zone"[ZoneID].TempSensorFault := FALSE;
+    END_IF;
+
+END_FUNCTION

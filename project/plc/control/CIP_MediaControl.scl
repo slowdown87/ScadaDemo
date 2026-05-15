@@ -1,0 +1,140 @@
+// ============================================================================
+// CIP清洗系统 - 介质选择控制
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v2.0
+// 说明：支持分区阀门控制，每区5个独立阀门
+// ============================================================================
+
+
+// ============================================================================
+// FC200_MediaSelect : 介质选择 - 分区版
+// 说明：每区有独立的分区阀门(Zx-V-01~05)，公用介质阀门(M-V-01~05)可共享
+// ============================================================================
+FUNCTION "FC200_MediaSelect" : Void
+TITLE = "介质选择控制(分区版)"
+AUTHOR : "SCADA"
+VERSION : "2.0"
+VAR_INPUT
+    ZoneID : Int;
+    MediaID : "Enum_MediaType";
+END_VAR
+VAR
+    ZoneOffset : Int;
+END_VAR
+
+    // 边界检查
+    IF ZoneID < 1 OR ZoneID > 5 THEN
+        RETURN;
+    END_IF;
+
+    // 计算该区在全局阀门数组中的偏移量
+    // 每区5个阀门：进液(Zx-V-01)、回流(Zx-V-02)、排放(Zx-V-03)、循环(Zx-V-04)、介质(Zx-V-05)
+    ZoneOffset := (ZoneID - 1) * 5;
+
+    // ========================================================================
+    // 1. 先关闭该区所有分区阀门
+    // ========================================================================
+    "Global".Valve.ZoneValve[ZoneOffset + 1] := FALSE;  // 进液阀
+    "Global".Valve.ZoneValve[ZoneOffset + 2] := FALSE;  // 回流阀
+    "Global".Valve.ZoneValve[ZoneOffset + 3] := FALSE;  // 排放阀
+    "Global".Valve.ZoneValve[ZoneOffset + 4] := FALSE;  // 循环阀
+    "Global".Valve.ZoneValve[ZoneOffset + 5] := FALSE;  // 介质选择阀
+
+    // ========================================================================
+    // 2. 关闭所有公用介质阀门
+    // ========================================================================
+    "Global".Valve.Alkali := FALSE;
+    "Global".Valve.Acid := FALSE;
+    "Global".Valve.HotWater := FALSE;
+    "Global".Valve.PureWater := FALSE;
+    "Global".Valve.Disinfect := FALSE;
+
+    // ========================================================================
+    // 3. 根据介质类型打开对应的公用介质阀门
+    // ========================================================================
+    CASE MediaID OF
+        "Enum_MediaType".ALKALI:
+            "Global".Valve.Alkali := TRUE;
+        "Enum_MediaType".ACID:
+            "Global".Valve.Acid := TRUE;
+        "Enum_MediaType".HOT_WATER:
+            "Global".Valve.HotWater := TRUE;
+        "Enum_MediaType".PURE_WATER:
+            "Global".Valve.PureWater := TRUE;
+        "Enum_MediaType".DISINFECT:
+            "Global".Valve.Disinfect := TRUE;
+    END_CASE;
+
+    // ========================================================================
+    // 4. 根据介质类型打开该区的分区阀门组合
+    // 说明：
+    //   - 进液阀(Zx-V-01): 介质进入清洗管路
+    //   - 回流阀(Zx-V-02): 介质返回换热器(清洗中循环)
+    //   - 排放阀(Zx-V-03): 介质直接排放(预冲洗/最终冲洗)
+    //   - 循环阀(Zx-V-04): 介质循环回公用管路(化学清洗时)
+    // ========================================================================
+    CASE MediaID OF
+        "Enum_MediaType".PURE_WATER:
+            // 纯水冲洗：进液 + 排放
+            "Global".Valve.ZoneValve[ZoneOffset + 1] := TRUE;  // 进液阀
+            "Global".Valve.ZoneValve[ZoneOffset + 3] := TRUE;  // 排放阀
+
+        "Enum_MediaType".ALKALI,
+        "Enum_MediaType".ACID,
+        "Enum_MediaType".HOT_WATER,
+        "Enum_MediaType".DISINFECT:
+            // 化学介质清洗：进液 + 循环
+            "Global".Valve.ZoneValve[ZoneOffset + 1] := TRUE;  // 进液阀
+            "Global".Valve.ZoneValve[ZoneOffset + 4] := TRUE;  // 循环阀
+    END_CASE;
+
+    // ========================================================================
+    // 5. 更新当前介质状态
+    // ========================================================================
+    "DB_Zone"[ZoneID].CurrentMedia := MediaID;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_IsChemicalMedia : 判断是否为化学介质
+// ============================================================================
+FUNCTION "FC_IsChemicalMedia" : Bool
+TITLE = "判断化学介质"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    MediaID : "Enum_MediaType";
+END_VAR
+
+    CASE MediaID OF
+        "Enum_MediaType".ALKALI,
+        "Enum_MediaType".ACID,
+        "Enum_MediaType".HOT_WATER,
+        "Enum_MediaType".DISINFECT:
+            "FC_IsChemicalMedia" := TRUE;
+        ELSE
+            "FC_IsChemicalMedia" := FALSE;
+    END_CASE;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_CloseAllValves : 关闭所有阀门
+// ============================================================================
+FUNCTION "FC_CloseAllValves" : Void
+TITLE = "关闭所有阀门"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+
+    "Global".Valve.Alkali := FALSE;
+    "Global".Valve.Acid := FALSE;
+    "Global".Valve.HotWater := FALSE;
+    "Global".Valve.PureWater := FALSE;
+    "Global".Valve.Disinfect := FALSE;
+    "Global".Valve.Drain := FALSE;
+    "Global".Valve.Circulate := FALSE;
+
+END_FUNCTION

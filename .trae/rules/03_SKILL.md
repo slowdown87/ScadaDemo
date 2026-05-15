@@ -1,21 +1,24 @@
 # 技能与协作
 
-## 技能选择
+## 技能索引
 
-| 条件 | 技能 | 说明 |
-|------|------|------|
-| Bug/Issue | swe-agent-mode | 自动修复模式 |
-| 子任务>3/需执行顺序 | planning | 任务规划技能 |
-| 安全/认证/敏感数据 | security | 安全审计技能 |
-| 代码修改 | code-review | 代码审查技能 |
-| 深度分析/新技术 | guided-ai | 引导性AI技能 |
-| 复杂多视角决策 | multi-agent-sim | 多角色模拟技能 |
-| 架构设计/技术选型 | architecture | 架构设计技能 |
-| 出错/不工作 | debug | 调试技能 |
-| 重构代码 | refactoring | 重构技能 |
-| 设计测试 | testing | 测试策略技能 |
-| 写文档 | documentation | 文档编写技能 |
-| 创建新技能 | skill-creator | 技能创建技能 |
+| 技能 | 触发词 | 适用条件 |
+|------|--------|----------|
+| swe-agent-mode | "修复Bug"、"解决Issue"、"自动修复" | Bug/Issue修复 |
+| planning | "规划"、"计划"、"拆解任务" | 子任务>3/需执行顺序 |
+| advanced-planning | "深度规划"、"先进规划"、"ReAct"、"自我纠错" | 复杂长任务/自我纠错 |
+| security | "安全"、"认证"、"权限"、"密钥" | 安全/认证/敏感数据 |
+| code-review | "审查代码"、"评审"、"看代码" | 代码修改审查 |
+| guided-ai | "分析"、"思考"、"深度分析" | 深度分析/新技术 |
+| multi-agent-sim | "多角色"、"模拟分析" | 复杂多视角决策 |
+| architecture | "架构"、"设计系统"、"技术选型" | 架构设计/技术选型 |
+| debug | "调试"、"出错"、"不工作" | 出错/不工作 |
+| refactoring | "重构"、"优化代码"、"重写" | 重构代码 |
+| testing | "测试"、"测试用例"、"覆盖率" | 设计测试 |
+| documentation | "写文档"、"文档"、"注释" | 写文档 |
+| generators | "生成文档"、"运行生成器"、"批量生成" | 生成SCADA文档 |
+| config-yaml | "读取配置"、"验证配置"、"修改配置" | YAML配置管理 |
+| skill-creator | "创建技能"、"新建技能" | 创建新技能 |
 
 ## 常用组合
 
@@ -25,6 +28,9 @@
 | Bug修复 | debug → swe-agent-mode → testing |
 | 重构 | code-review → refactoring → testing |
 | 架构决策 | architecture → guided-ai |
+| 复杂长任务 | advanced-planning → planning → execution |
+| SCADA文档生成 | generators → config-yaml |
+| 配置管理 | config-yaml → documentation |
 
 ## 激活流程
 
@@ -87,6 +93,8 @@
 |------|----------|
 | 复杂调试 | debug + planning |
 | 架构决策 | architecture + guided-ai |
+| 文档生成 | generators + config-yaml |
+| 深度分析 | guided-ai + advanced-planning |
 
 ### 切换规则
 
@@ -95,6 +103,8 @@
 | 需要系统性规划 | planning |
 | 发现安全风险 | security |
 | 需要验证 | testing |
+| 需要生成文档 | generators |
+| 需要配置管理 | config-yaml |
 
 ## 判断标准
 
@@ -104,18 +114,3 @@
 | 修改 | <50行/单文件 | >50行/多文件 |
 | 调试 | 添加日志/打印变量 | 跨进程/并发问题 |
 | 审查 | 单文件/<200行 | 多文件/核心模块 |
-
-## 技能触发词
-
-| 技能 | 触发词 |
-|------|---------|
-| swe-agent-mode | "修复Bug"、"解决Issue"、"自动修复" |
-| planning | "规划"、"计划"、"拆解任务" |
-| security | "安全"、"认证"、"权限"、"密钥" |
-| code-review | "审查代码"、"评审"、"看代码" |
-| guided-ai | "分析"、"思考"、"深度分析" |
-| architecture | "架构"、"设计系统"、"技术选型" |
-| debug | "调试"、"出错"、"不工作" |
-| refactoring | "重构"、"优化代码"、"重写" |
-| testing | "测试"、"测试用例"、"覆盖率" |
-| documentation | "写文档"、"文档"、"注释" |

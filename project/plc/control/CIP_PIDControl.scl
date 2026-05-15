@@ -1,0 +1,174 @@
+// ============================================================================
+// CIP清洗系统 - PID控制
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v2.1
+// ============================================================================
+
+
+// ============================================================================
+// FC_TempPIDControl : 温度PID控制 - 完整PID实现
+// 支持：独立PID参数、死区、积分限幅、多区协调
+// ============================================================================
+FUNCTION "FC_TempPIDControl" : Void
+TITLE = "温度PID控制(完整版)"
+AUTHOR : "SCADA"
+VERSION : "2.1"
+VAR_TEMP
+    i : Int;
+    TempError : Real;
+    TempOutput : Real;
+    DeadBand : Real;
+    Kp : Real;
+    Ti : Real;
+    Td : Real;
+    Integral : Real;
+    Derivative : Real;
+    TempRate : Real;
+END_VAR
+VAR
+    SteamDemand : Bool;
+    MaxSteamOutput : Real;
+END_VAR
+
+    // ========================================================================
+    // 初始化
+    // ========================================================================
+    MaxSteamOutput := 0.0;
+    SteamDemand := FALSE;
+
+    // ========================================================================
+    // 第一遍：遍历所有区域，找出需要温度控制的区域
+    // ========================================================================
+    FOR i := 1 TO 5 DO
+        IF "DB_Zone"[i].TempControl
+        AND "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC THEN
+
+            // 获取该区PID参数
+            Kp := "Global".PID_Temp[i].Kp;
+            Ti := "Global".PID_Temp[i].Ti;
+            Td := "Global".PID_Temp[i].Td;
+            DeadBand := "Global".PID_Temp[i].DeadBand;
+
+            // 默认参数
+            IF Kp <= 0.0 THEN Kp := 2.0; END_IF;
+            IF Ti <= 0.0 THEN Ti := 60.0; END_IF;
+            IF Td <= 0.0 THEN Td := 10.0; END_IF;
+            IF DeadBand <= 0.0 THEN DeadBand := 2.0; END_IF;
+
+            // 计算温度偏差
+            TempError := "DB_Zone"[i].TempSP - "DB_Zone"[i].TT_Outlet;
+
+            // =================================================================
+            // 完整PID计算
+            // =================================================================
+            // 1. 死区处理
+            IF ABS(TempError) <= DeadBand THEN
+                TempError := 0.0;
+            END_IF;
+
+            // 2. 比例项
+            TempOutput := Kp * TempError;
+
+            // 3. 积分项 (带限幅)
+            Integral := "Global".PID_Temp[i].Integral;
+            Integral := Integral + TempError * 0.1 / Ti;
+            Integral := LIMIT(-20.0, Integral, 20.0);
+            "Global".PID_Temp[i].Integral := Integral;
+            TempOutput := TempOutput + Integral;
+
+            // 4. 微分项 - 基于温度变化率
+            TempRate := "DB_Zone"[i].TT_Outlet - "Global".PID_Temp[i].LastPV;
+            "Global".PID_Temp[i].LastPV := "DB_Zone"[i].TT_Outlet;
+            Derivative := Td * TempRate / 0.1;
+            TempOutput := TempOutput + Derivative;
+
+            // 5. 输出限幅
+            TempOutput := LIMIT(0.0, TempOutput, 100.0);
+
+            // =================================================================
+            // 更新各区蒸汽需求(多区协调)
+            // =================================================================
+            IF TempError > 0 AND TempOutput > 5.0 THEN
+                IF TempOutput > MaxSteamOutput THEN
+                    MaxSteamOutput := TempOutput;
+                END_IF;
+                SteamDemand := TRUE;
+            END_IF;
+
+            // 保存偏差
+            "DB_Zone"[i].TempDeviation := TempError;
+        END_IF;
+    END_FOR;
+
+    // ========================================================================
+    // 输出蒸汽阀命令(单一蒸汽阀，多区协调取最大值)
+    // ========================================================================
+    IF SteamDemand THEN
+        "Global".Output.SteamValve := REAL_TO_INT(MaxSteamOutput);
+    ELSE
+        "Global".Output.SteamValve := 0;
+    END_IF;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_FlowPIDControl : 流量PID控制 (各区独立)
+// ============================================================================
+FUNCTION "FC_FlowPIDControl" : Void
+TITLE = "流量PID控制"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+END_VAR
+VAR
+    FlowError : Real;
+    FlowOutput : Real;
+    Kp : Real;
+    Integral : Real;
+    Derivative : Real;
+    LastError : Real;
+END_VAR
+
+    // 边界检查
+    IF ZoneID < 1 OR ZoneID > 5 THEN
+        RETURN;
+    END_IF;
+
+    // 获取PID参数
+    Kp := "Global".PID_Flow[ZoneID].Kp;
+    IF Kp <= 0.0 THEN
+        Kp := 2.0;
+    END_IF;
+
+    // 检查是否需要流量控制
+    IF "DB_Zone"[ZoneID].PumpCmd THEN
+        // 获取目标流量
+        FlowOutput := "DB_Zone"[ZoneID].Recipe.Steps["DB_Zone"[ZoneID].CurrentStep].TargetFlow;
+
+        // 计算流量偏差
+        FlowError := FlowOutput - "DB_Zone"[ZoneID].FT;
+
+        // 简化PID计算
+        Integral := Integral + FlowError * 0.1;
+        Derivative := FlowError - LastError;
+        LastError := FlowError;
+
+        // PID输出
+        FlowOutput := Kp * FlowError
+                    + 1.0 * Integral
+                    + 0.5 * Derivative;
+
+        // 限幅
+        FlowOutput := LIMIT(0.0, FlowOutput, 100.0);
+
+        // 输出泵速命令
+        "DB_Zone"[ZoneID].PumpSpeed := FlowOutput;
+    ELSE
+        Integral := 0.0;
+        LastError := 0.0;
+    END_IF;
+
+END_FUNCTION

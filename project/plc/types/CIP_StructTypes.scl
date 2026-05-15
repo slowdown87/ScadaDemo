@@ -1,0 +1,308 @@
+// ============================================================================
+// CIP清洗系统 - 结构体类型定义
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+// ---------------------------------------------------------------------------
+// 2.1 单个清洗步骤数据
+// ---------------------------------------------------------------------------
+TYPE "UDT_StepData"
+    STRUCT
+        // 介质选择
+        MediaID      : "Enum_MediaType";  // 介质ID
+        MediaName    : String[20];          // 介质名称
+
+        // 温度参数
+        TargetTemp   : Real;                // 目标温度 (℃)
+        MinTemp      : Real;                // 最低温度 (℃)
+        MaxTemp      : Real;                // 最高温度 (℃)
+
+        // 时间参数
+        TargetTime   : Int;                 // 目标时间 (秒)
+        ElapsedTime  : Int;                 // 已用时间 (秒)
+
+        // 流量参数
+        TargetFlow   : Real;                // 目标流量 (m³/h)
+
+        // 电导率参数 (仅最终冲洗有效)
+        PassConduct  : Real;                // 合格电导率 (μS/cm)
+        CurrentConduct : Real;              // 当前电导率
+
+        // 状态标志
+        TempReached  : Bool;                // 温度是否达标
+        TimeReached  : Bool;                // 时间是否达标
+        ConductOK    : Bool;                // 电导率是否合格
+
+        // 冲洗插入标记
+        IsInsertedStep : Bool;             // 是否为插入的冲洗步骤
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.2 清洗配方数据
+// ---------------------------------------------------------------------------
+TYPE "UDT_RecipeData"
+    STRUCT
+        // 配方基本信息
+        RecipeID     : Int;                 // 配方ID
+        RecipeName   : String[20];          // 配方名称
+        Description  : String[50];          // 配方描述
+
+        // 步骤配置
+        StepCount    : Int;                 // 步骤数量 (1-10)
+        Steps        : Array[1..10] of "UDT_StepData";  // 步骤序列
+
+        // 时间统计
+        TotalTime    : Int;                 // 总时间 (分钟)
+        RemainTime   : Int;                 // 剩余时间 (分钟)
+
+        // 序列校验
+        SequenceValid : Bool;               // 序列是否合法
+        ValidationMsg : String[50];         // 校验信息
+
+        // 使能标志
+        Enable       : Bool;               // 配方使能
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.3 单区状态数据
+// ---------------------------------------------------------------------------
+TYPE "UDT_ZoneData"
+    STRUCT
+        // ========== 基本信息 ==========
+        ZoneID       : Int;                 // 区域ID (1-5)
+        ZoneName     : String[20];          // 区域名称
+
+        // ========== 状态机 ==========
+        State        : "Enum_CleanState";   // 当前状态
+        PreviousState : "Enum_CleanState";  // 上一状态
+        CurrentStep  : Int;                 // 当前步骤索引
+        StepTimer    : Int;                 // 步骤计时 (秒)
+
+        // ========== 控制命令 ==========
+        Command      : "Enum_ControlCmd";   // 控制命令
+
+        // ========== 清洗结果 ==========
+        Result       : Bool;                // 清洗结果 TRUE=合格
+        ResultCode   : Int;                 // 结果代码
+        ResultMsg    : String[50];         // 结果信息
+
+        // ========== 介质控制 ==========
+        CurrentMedia : "Enum_MediaType";   // 当前介质
+        MediaChangeReq : Bool;             // 介质切换请求
+        SequenceValidated : Bool;          // 序列已校验
+
+        // ========== 温度控制 ==========
+        TempControl  : Bool;                // 温度控制使能
+        TempSP       : Real;                // 温度设定值
+        TempReached  : Bool;                // 温度达标
+        TempDeviation : Real;               // 温度偏差
+
+        // ========== 插入步骤 ==========
+        InsertedStep : Bool;                // 是否插入冲洗步骤
+        InsertedMedia : "Enum_MediaType"; // 插入的冲洗介质
+        InsertedTemp : Real;                // 插入的冲洗温度
+        InsertedTime : Int;                 // 插入的冲洗时间
+        InsertedStepRunning : Bool;         // 插入步骤执行标记
+        InsertedStepIndex : Int;            // 保存的原生步骤索引
+
+        // ========== 返回温度监测 ==========
+        TempDiff : Real;                    // 进出口温差
+        TempDiffAlarm : Bool;               // 温差报警
+        ReturnTempHigh : Bool;               // 返回温度过高
+        TempSensorFault : Bool;              // 温度传感器故障
+
+        // ========== 传感器数据 ==========
+        TT_Outlet   : Real;                 // 出口温度 (℃)
+        TT_Return   : Real;                 // 回流温度 (℃)
+        CD          : Real;                 // 电导率 (μS/cm)
+        PT          : Real;                 // 管路压力 (MPa)
+        FT          : Real;                 // 清洗流量 (m³/h)
+        FS          : Bool;                 // 流动开关
+
+        // ========== 设备状态 ==========
+        PumpState   : "Enum_PumpState";    // 泵状态
+        ValveState  : "Enum_ValveState";   // 阀门状态
+        PumpSpeed   : Real;                 // 泵速 (%)
+
+        // ========== 报警计时 ==========
+        NoFlowTimer : Int;                  // 无流量计时
+        LowTempTimer : Int;                 // 低温计时
+        OverTimeTimer : Int;               // 超时计时
+
+        // ========== 配方引用 ==========
+        Recipe      : "UDT_RecipeData";     // 当前配方
+
+        // ========== 时间戳 ==========
+        StartTime   : LDT;                  // 开始时间
+        EndTime     : LDT;                  // 结束时间
+        PauseTime   : LDT;                  // 暂停时间
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.4 介质状态
+// ---------------------------------------------------------------------------
+TYPE "UDT_MediaStatus"
+    STRUCT
+        InUse       : Bool;                // 是否被使用
+        UsingZone   : Int;                 // 使用中的区域 (1-5)
+        RequestQueue : Array[1..5] of Int; // 请求队列
+        QueueCount  : Int;                  // 队列长度
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.5 罐区状态
+// ---------------------------------------------------------------------------
+TYPE "UDT_TankStatus"
+    STRUCT
+        // 液位
+        Level       : Real;                // 当前液位 (%)
+        LevelMin    : Real;                // 低液位报警值
+        LevelMax    : Real;                // 高液位报警值
+        LevelLSH    : Bool;                // 高液位开关
+        LevelLSM    : Bool;                // 中液位开关
+        LevelLSL    : Bool;                // 低液位开关
+
+        // 温度
+        Temp        : Real;                // 当前温度 (℃)
+        TempMin     : Real;                // 低温报警值
+        TempMax     : Real;                // 高温报警值
+        TempSP      : Real;                // 温度设定值
+
+        // 电导率
+        Conductivity : Real;               // 当前电导率 (mS/cm)
+        TargetConc   : Real;                // 目标浓度 (%)
+
+        // 状态
+        LevelAlarm  : Bool;                // 液位报警
+        TempAlarm   : Bool;                // 温度报警
+        Ready       : Bool;                // 就绪标志
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.6 报警信息
+// ---------------------------------------------------------------------------
+TYPE "UDT_AlarmInfo"
+    STRUCT
+        AlarmID     : Int;                 // 报警ID
+        AlarmCode   : Int;                 // 报警代码
+        AlarmText   : String[50];         // 报警文本
+        Level       : "Enum_AlarmLevel";  // 报警等级
+        ZoneID      : Int;                 // 相关区域 (0=全局)
+        TriggerTime : LDT;                  // 触发时间
+        AckTime     : LDT;                  // 确认时间
+        AckUser     : String[20];         // 确认用户
+        Status      : Int;                 // 状态 (0=激活,1=确认,2=恢复)
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.7 历史记录 (支持10步)
+// ---------------------------------------------------------------------------
+TYPE "UDT_HistoryRecord"
+    STRUCT
+        RecordID    : String[20];         // 记录ID
+        ZoneID      : Int;                 // 区域ID
+        ZoneName    : String[20];          // 区域名称
+        RecipeID    : Int;                 // 配方ID
+        RecipeName  : String[20];          // 配方名称
+
+        // 时间
+        StartTime   : LDT;                  // 开始时间
+        EndTime     : LDT;                  // 结束时间
+        TotalTime   : Int;                 // 总时间 (分钟)
+
+        // 步骤详情 (支持10步)
+        Step1_Media : "Enum_MediaType";   // 步骤1介质
+        Step1_Time  : Int;                 // 步骤1时间
+        Step2_Media : "Enum_MediaType";
+        Step2_Time  : Int;
+        Step3_Media : "Enum_MediaType";
+        Step3_Time  : Int;
+        Step4_Media : "Enum_MediaType";
+        Step4_Time  : Int;
+        Step5_Media : "Enum_MediaType";
+        Step5_Time  : Int;
+        Step6_Media : "Enum_MediaType";
+        Step6_Time  : Int;
+        Step7_Media : "Enum_MediaType";
+        Step7_Time  : Int;
+        Step8_Media : "Enum_MediaType";
+        Step8_Time  : Int;
+        Step9_Media : "Enum_MediaType";
+        Step9_Time  : Int;
+        Step10_Media : "Enum_MediaType";
+        Step10_Time  : Int;
+
+        // 结果
+        FinalConduct : Real;               // 最终电导率
+        Result      : Bool;                // 合格/不合格
+        FailReason  : String[50];         // 失败原因
+
+        // 操作员
+        Operator    : String[20];          // 操作员
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.8 PID参数 (用于温度/流量控制)
+// ---------------------------------------------------------------------------
+TYPE "UDT_PIDParams"
+    STRUCT
+        Enable      : Bool;                // PID使能
+        // PID参数
+        Kp          : Real;                // 比例系数
+        Ki          : Real;                // 积分系数
+        Kd          : Real;                // 微分系数
+        // 设定值
+        SP          : Real;                // 设定值
+        PV          : Real;                // 当前值
+        MV          : Real;                // 操作值
+        // 限幅
+        MV_Min      : Real;                // 操作值下限
+        MV_Max      : Real;                // 操作值上限
+        // 偏差
+        DeadBand    : Real;                // 死区
+        Deviation   : Real;                // 当前偏差
+        // 内部状态
+        Integral    : Real;                // 积分项
+        Derivative  : Real;                // 微分项
+        LastPV      : Real;                // 上次过程变量
+    END_STRUCT
+END_TYPE
+
+// ---------------------------------------------------------------------------
+// 2.9 系统状态
+// ---------------------------------------------------------------------------
+TYPE "UDT_SystemStatus"
+    STRUCT
+        // 运行模式
+        HandsMode   : "Enum_HandsMode";   // 就地/远程
+        AutoMode    : Bool;               // 自动模式
+        ManualMode  : Bool;               // 手动模式
+
+        // 系统状态
+        SystemReady : Bool;               // 系统就绪
+        EStop      : Bool;                // 急停
+        Running     : Bool;                // 运行中
+        AllIdle    : Bool;                // 全部待机
+
+        // 连接状态
+        PLCConnected : Bool;              // PLC连接
+        HMIConnected : Bool;              // HMI连接
+
+        // 统计数据
+        ActiveZones : Int;                // 活跃区域数
+        AlarmCount  : Int;                 // 激活报警数
+        QueueCount  : Int;                 // 队列长度
+
+        // 时间
+        SystemTime  : LDT;                  // 系统时间
+    END_STRUCT
+END_TYPE

@@ -53,6 +53,11 @@ categories:
     desc: "BOM、端子、电缆、仪表清单"
     edit_mode: "模板生成+手动"
     priority: 7
+  "08_project_tutorial":
+    name: "教程文档"
+    desc: "项目开发教程、学习指南"
+    edit_mode: "手动"
+    priority: 8
 
 # 根目录文件定义
 root_files:
@@ -324,3 +329,6 @@ version_history:
   - version: "v4.1"
     date: "2026-05-07"
     desc: "配置文件重构：分离设备基础数据(system_config.yaml)和工艺详细数据(process_recipe_templates.yaml)，修复BL pH/Brix数据冲突"
+  - version: "v4.2"
+    date: "2026-05-14"
+    desc: "新增08_project_tutorial目录，支持项目教程文档索引"

@@ -1,0 +1,80 @@
+.cip-dashboard {
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.dashboard-header {
+  background: #001529;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-content {
+  padding: 16px 24px;
+}
+
+.zones-card,
+.zone-detail-card,
+.alarms-card,
+.system-card {
+  border-radius: 8px;
+}
+
+.zone-card {
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.zone-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.zone-card.selected {
+  box-shadow: 0 0 0 2px #1890ff;
+}
+
+.zone-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.zone-progress {
+  margin-bottom: 8px;
+}
+
+.zone-info {
+  display: flex;
+  justify-content: space-around;
+}
+
+.alarm-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alarm-item:last-child {
+  border-bottom: none;
+}
+
+.dashboard-footer {
+  background: #fff;
+  text-align: center;
+  padding: 12px 24px;
+  border-top: 1px solid #f0f0f0;
+}

@@ -1,0 +1,150 @@
+// ============================================================================
+// CIP清洗系统 - 报警处理
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+
+// ============================================================================
+// FC300_AlarmHandler : 报警处理
+// ============================================================================
+FUNCTION "FC300_AlarmHandler" : Void
+TITLE = "报警处理"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+
+    // ========================================================================
+    // 1. 处理待确认的报警
+    // ========================================================================
+
+    // ========================================================================
+    // 2. 蜂鸣器控制
+    // ========================================================================
+    IF "Global".AlarmCount > 0 THEN
+        "Global".Output.Buzzer := TRUE;
+    ELSE
+        "Global".Output.Buzzer := FALSE;
+    END_IF;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_CheckAlarms : 报警检测
+// ============================================================================
+FUNCTION "FC_CheckAlarms" : Void
+TITLE = "报警检测"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+END_VAR
+
+    // ========================================================================
+    // 罐区液位检测
+    // ========================================================================
+    IF NOT "Global".TankAlkali.LevelLSL THEN
+        "FC_TriggerAlarm"(1, "Enum_AlarmLevel".L2_INFO, 0);
+    END_IF;
+    IF NOT "Global".TankAcid.LevelLSL THEN
+        "FC_TriggerAlarm"(2, "Enum_AlarmLevel".L2_INFO, 0);
+    END_IF;
+    IF NOT "Global".TankHotWater.LevelLSL THEN
+        "FC_TriggerAlarm"(3, "Enum_AlarmLevel".L2_INFO, 0);
+    END_IF;
+    IF NOT "Global".TankPureWater.LevelLSL THEN
+        "FC_TriggerAlarm"(4, "Enum_AlarmLevel".L2_INFO, 0);
+    END_IF;
+
+    // ========================================================================
+    // 温度不达标检测
+    // ========================================================================
+    FOR i := 1 TO 5 DO
+        IF "DB_Zone"[i].TempControl
+        AND "DB_Zone"[i].State = "Enum_CleanState".STEP_EXEC
+        AND "DB_Zone"[i].LowTempTimer >= 300 THEN
+            "FC_TriggerAlarm"(5, "Enum_AlarmLevel".L1_WARNING, i);
+        END_IF;
+    END_FOR;
+
+    // ========================================================================
+    // 泵过载检测
+    // ========================================================================
+    FOR i := 1 TO 5 DO
+        IF "Global".DI_PumpOverload[i] THEN
+            "FC_TriggerAlarm"(9, "Enum_AlarmLevel".L0_CRITICAL, i);
+            "DB_Zone"[i].PumpState := "Enum_PumpState".PUMP_FAULT;
+        END_IF;
+    END_FOR;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_TriggerAlarm : 触发报警
+// ============================================================================
+FUNCTION "FC_TriggerAlarm" : Void
+TITLE = "触发报警"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    AlarmID : Int;
+    Level : "Enum_AlarmLevel";
+    ZoneID : Int;
+END_VAR
+VAR
+    i : Int;
+    Slot : Int;
+    AlreadyActive : Bool;
+END_VAR
+
+    Slot := 0;
+    AlreadyActive := FALSE;
+
+    // ========================================================================
+    // 1. 检查该报警是否已经激活(去重)
+    // ========================================================================
+    FOR i := 1 TO 50 DO
+        IF "Global".AlarmActive[i].AlarmID = AlarmID
+        AND "Global".AlarmActive[i].ZoneID = ZoneID
+        AND "Global".AlarmActive[i].Status = 0 THEN
+            AlreadyActive := TRUE;
+            EXIT;
+        END_IF;
+    END_FOR;
+
+    IF AlreadyActive THEN
+        RETURN;
+    END_IF;
+
+    // ========================================================================
+    // 2. 查找空闲报警槽
+    // ========================================================================
+    FOR i := 1 TO 50 DO
+        IF "Global".AlarmActive[i].Status <> 0 THEN
+            Slot := i;
+            EXIT;
+        END_IF;
+    END_FOR;
+
+    IF Slot = 0 THEN
+        Slot := 1;
+    END_IF;
+
+    // ========================================================================
+    // 3. 填充报警信息
+    // ========================================================================
+    "Global".AlarmActive[Slot].AlarmID := AlarmID;
+    "Global".AlarmActive[Slot].Level := Level;
+    "Global".AlarmActive[Slot].ZoneID := ZoneID;
+    "Global".AlarmActive[Slot].TriggerTime := "Global".System.SystemTime;
+    "Global".AlarmActive[Slot].Status := 0;
+
+    // ========================================================================
+    // 4. 增加报警计数
+    // ========================================================================
+    "Global".AlarmCount := "Global".AlarmCount + 1;
+    "Global".System.AlarmCount := "Global".AlarmCount;
+
+END_FUNCTION

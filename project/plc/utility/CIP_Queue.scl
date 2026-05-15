@@ -1,0 +1,106 @@
+// ============================================================================
+// CIP清洗系统 - 队列管理
+// ============================================================================
+// 适用于: S7-1500 (TIA Portal V17)
+// 版本: v1.0
+// ============================================================================
+
+
+// ============================================================================
+// FC400_QueueManager : 清洗队列管理
+// ============================================================================
+FUNCTION "FC400_QueueManager" : Void
+TITLE = "清洗队列管理"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_TEMP
+    i : Int;
+    j : Int;
+    IdleZone : Int;
+    RequestZone : Int;
+END_VAR
+
+    // ========================================================================
+    // 1. 检查是否有待机区域可以启动
+    // ========================================================================
+    IdleZone := 0;
+    FOR i := 1 TO 5 DO
+        IF "DB_Zone"[i].State = "Enum_CleanState".IDLE THEN
+            IdleZone := i;
+            EXIT;
+        END_IF;
+    END_FOR;
+
+    // ========================================================================
+    // 2. 处理队列中的清洗请求
+    // ========================================================================
+    IF IdleZone > 0 THEN
+        FOR j := 1 TO 5 DO
+            RequestZone := "Global".MediaAlkali.RequestQueue[j];
+            IF RequestZone > 0 THEN
+                IF "DB_Zone"[RequestZone].State = "Enum_CleanState".IDLE THEN
+                    "DB_Zone"[RequestZone].State := "Enum_CleanState".READY;
+
+                    // 更新队列
+                    FOR i := j TO 4 DO
+                        "Global".MediaAlkali.RequestQueue[i] := "Global".MediaAlkali.RequestQueue[i+1];
+                    END_FOR;
+                    "Global".MediaAlkali.RequestQueue[5] := 0;
+                    "Global".MediaAlkali.QueueCount := "Global".MediaAlkali.QueueCount - 1;
+
+                    EXIT;
+                END_IF;
+            END_IF;
+        END_FOR;
+    END_IF;
+
+    // ========================================================================
+    // 3. 更新队列状态
+    // ========================================================================
+    "Global".System.QueueCount := "Global".MediaAlkali.QueueCount
+                                 + "Global".MediaAcid.QueueCount
+                                 + "Global".MediaHotWater.QueueCount;
+
+END_FUNCTION
+
+
+// ============================================================================
+// FC_AddToQueue : 添加清洗请求到队列
+// ============================================================================
+FUNCTION "FC_AddToQueue" : Bool
+TITLE = "添加清洗请求到队列"
+AUTHOR : "SCADA"
+VERSION : "1.0"
+VAR_INPUT
+    ZoneID : Int;
+    RecipeID : Int;
+END_VAR
+VAR
+    i : Int;
+END_VAR
+
+    "FC_AddToQueue" := FALSE;
+
+    // 边界检查
+    IF ZoneID < 1 OR ZoneID > 5 THEN
+        RETURN;
+    END_IF;
+
+    // 检查队列是否已满
+    IF "Global".MediaAlkali.QueueCount >= 5 THEN
+        RETURN;
+    END_IF;
+
+    // 添加到队列
+    i := "Global".MediaAlkali.QueueCount + 1;
+    "Global".MediaAlkali.RequestQueue[i] := ZoneID;
+    "Global".MediaAlkali.QueueCount := i;
+
+    // 加载配方
+    IF RecipeID >= 1 AND RecipeID <= 10 THEN
+        "DB_Zone"[ZoneID].Recipe := "Global".RecipeList[RecipeID];
+    END_IF;
+
+    "FC_AddToQueue" := TRUE;
+
+END_FUNCTION

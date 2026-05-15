@@ -72,7 +72,7 @@ def scan_directory_structure(base_path, config):
         rel_path = root_path.relative_to(base_path)
         parts = str(rel_path).split(os.sep)
 
-        if len(parts) >= 2 and parts[0] in ['00_Index', '01_Spec', '02_Arch', '03_Device', '04_Process', '05_Product', '06_OM', '07_Engineering']:
+        if len(parts) >= 2 and parts[0] in ['00_Index', '01_Spec', '02_Arch', '03_Device', '04_Process', '05_Product', '06_OM', '07_Engineering', '08_project_tutorial']:
             category = parts[0]
         elif '_generators' in parts:
             category = '_generators'
