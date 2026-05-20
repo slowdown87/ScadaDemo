@@ -10,6 +10,7 @@ const ChemicalsPage = lazy(() => import('@/pages/ChemicalsPage'));
 const QueuePage = lazy(() => import('@/pages/QueuePage'));
 const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
 const AlarmPage = lazy(() => import('@/pages/AlarmPage'));
+const DigitalTwinPage = lazy(() => import('@/pages/DigitalTwinPage'));
 
 const LoadingFallback: React.FC = () => (
   <div style={{
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="queue" element={<QueuePage />} />
             <Route path="history" element={<HistoryPage />} />
             <Route path="alarms" element={<AlarmPage />} />
+            <Route path="digital-twin" element={<DigitalTwinPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

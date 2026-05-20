@@ -8,6 +8,7 @@ import {
   UnorderedListOutlined,
   HistoryOutlined,
   AlertOutlined,
+  CloudOutlined,
 } from '@ant-design/icons';
 import { useCIPStore } from '@/store';
 import './MainLayout.css';
@@ -24,6 +25,11 @@ const MainLayout: React.FC = () => {
       key: '/',
       icon: <DashboardOutlined />,
       label: <Link to="/">主监控</Link>,
+    },
+    {
+      key: '/digital-twin',
+      icon: <CloudOutlined />,
+      label: <Link to="/digital-twin">数字孪生</Link>,
     },
     {
       key: '/recipes',

@@ -1,0 +1,275 @@
+/* DigitalTwinPage 数字孪生页面样式 */
+
+.digital-twin-page {
+  height: 100vh;
+  background: #001529;
+}
+
+/* 顶部工具栏 */
+.digital-twin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #001529;
+  border-bottom: 1px solid #002140;
+  padding: 0 24px;
+  height: 64px;
+  line-height: 64px;
+}
+
+.digital-twin-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.digital-twin-header .header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.digital-twin-header .header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* 主内容区域 */
+.digital-twin-content {
+  padding: 0;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+}
+
+.digital-twin-container {
+  display: flex;
+  height: 100%;
+}
+
+/* 3D场景容器 */
+.scene-container {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+}
+
+/* 信息面板 */
+.info-panel {
+  width: 320px;
+  background: #fff;
+  border-left: 1px solid #f0f0f0;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info-card .ant-card-head {
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+.info-card .ant-card-head-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.info-card .ant-card-body {
+  padding: 12px;
+}
+
+/* 实时数据网格 */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+
+.data-item .ant-typography {
+  margin: 0;
+}
+
+/* 区域列表 */
+.zone-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background: #fafafa;
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.zone-item .ant-tag {
+  margin: 0;
+}
+
+/* 报警列表 */
+.alarm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alarm-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #fff2f0;
+  border-radius: 4px;
+}
+
+.alarm-item .ant-tag {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* 性能指标 */
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.perf-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: #fafafa;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.perf-item .ant-typography {
+  margin: 0;
+  font-size: 12px;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+  .info-panel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 992px) {
+  .digital-twin-container {
+    flex-direction: column;
+  }
+
+  .info-panel {
+    width: 100%;
+    height: 300px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+
+  .info-card {
+    min-width: 280px;
+    flex: 1;
+  }
+}
+
+/* 全屏模式 */
+.digital-twin-page:-webkit-full-screen {
+  background: #001529;
+}
+
+.digital-twin-page:-moz-full-screen {
+  background: #001529;
+}
+
+.digital-twin-page:-ms-fullscreen {
+  background: #001529;
+}
+
+.digital-twin-page:fullscreen {
+  background: #001529;
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* 3D场景提示框样式覆盖 */
+.digital-twin-page .ant-popover-inner {
+  padding: 0;
+}
+
+.digital-twin-page .ant-popover-title {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 按钮样式 */
+.digital-twin-header .ant-btn-text {
+  color: #fff;
+}
+
+.digital-twin-header .ant-btn-text:hover {
+  color: #1890ff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 模态框样式 */
+.digital-twin-page .ant-modal-content {
+  border-radius: 8px;
+}
+
+.digital-twin-page .ant-modal-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* 标签页样式 */
+.digital-twin-page .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
+/* Select下拉框 */
+.digital-twin-header .ant-select-selector {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #fff !important;
+}
+
+.digital-twin-header .ant-select-arrow {
+  color: #fff;
+}
+
+.digital-twin-header .ant-select-selection-placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
+}

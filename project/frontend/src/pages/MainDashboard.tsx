@@ -1,10 +1,13 @@
-import React, { useEffect } from 'react';
-import { Layout, Typography, Card, Row, Col, Statistic, Badge, Space, Tag, Progress } from 'antd';
-import { AlertOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useEffect, lazy, Suspense } from 'react';
+import { Layout, Typography, Card, Row, Col, Statistic, Badge, Space, Tag, Progress, Tabs, Button } from 'antd';
+import { AlertOutlined, UserOutlined, CloudOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useCIPStore } from '@/store';
 import type { ZoneStatus, CleanState } from '@/types';
 import FlowDiagram from '@/components/FlowDiagram';
 import './MainDashboard.css';
+
+const { TabPane } = Tabs;
 
 const { Header, Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -36,6 +39,7 @@ const mediaText: Record<string, string> = {
 
 const MainDashboard: React.FC = () => {
   const { zones, alarms, systemStatus, wsConnected, selectedZones, toggleZone, initialize, cleanup } = useCIPStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     initialize();
@@ -43,6 +47,12 @@ const MainDashboard: React.FC = () => {
   }, [initialize, cleanup]);
 
   const selectedZone = zones.find((z) => z.zone_id === selectedZones[0]);
+
+  const handleViewChange = (key: string) => {
+    if (key === '3d') {
+      navigate('/digital-twin');
+    }
+  };
 
   return (
     <Layout className="cip-dashboard">
@@ -58,9 +68,27 @@ const MainDashboard: React.FC = () => {
       </Header>
 
       <Content className="dashboard-content">
-        {/* CIP 2D流程图 */}
+        {/* CIP 流程图视图切换 */}
         <Card className="flow-diagram-card" style={{ marginBottom: 16 }}>
-          <FlowDiagram />
+          <Tabs defaultActiveKey="2d" onChange={handleViewChange}>
+            <TabPane tab="2D流程图" key="2d">
+              <FlowDiagram />
+            </TabPane>
+            <TabPane tab="3D数字孪生" key="3d">
+              <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5', borderRadius: '8px' }}>
+                <Space direction="vertical" align="center">
+                  <Text type="secondary">点击切换到3D数字孪生视图</Text>
+                  <Button 
+                    type="primary" 
+                    onClick={() => navigate('/digital-twin')}
+                    icon={<CloudOutlined />}
+                  >
+                    打开3D数字孪生
+                  </Button>
+                </Space>
+              </div>
+            </TabPane>
+          </Tabs>
         </Card>
 
         <Row gutter={16}>
