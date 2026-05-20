@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Layout, Typography, Card, Row, Col, Statistic, Badge, Space, Tag, Progress } from 'antd';
-import { AlertOutlined, ApiOutlined, UserOutlined, SettingOutlined } from '@ant-design/icons';
+import { AlertOutlined, UserOutlined } from '@ant-design/icons';
 import { useCIPStore } from '@/store';
 import type { ZoneStatus, CleanState } from '@/types';
+import FlowDiagram from '@/components/FlowDiagram';
 import './MainDashboard.css';
 
 const { Header, Content, Footer } = Layout;
@@ -57,6 +58,11 @@ const MainDashboard: React.FC = () => {
       </Header>
 
       <Content className="dashboard-content">
+        {/* CIP 2D流程图 */}
+        <Card className="flow-diagram-card" style={{ marginBottom: 16 }}>
+          <FlowDiagram />
+        </Card>
+
         <Row gutter={16}>
           {/* 左侧：5区状态卡片 */}
           <Col span={16}>
@@ -82,7 +88,7 @@ const MainDashboard: React.FC = () => {
                     <Statistic 
                       title="当前状态" 
                       value={stateText[selectedZone.state]} 
-                      valueStyle={{ color: stateColors[selectedZone.state] }}
+                      styles={{ content: { color: stateColors[selectedZone.state] } }}
                     />
                   </Col>
                   <Col span={6}>
@@ -93,12 +99,11 @@ const MainDashboard: React.FC = () => {
                   </Col>
                   <Col span={6}>
                     <Statistic 
-                      title="温度" 
-                      value={selectedZone.temp_pv} 
-                      suffix="℃" 
+                      title="温度"
+                      value={selectedZone.temp_pv}
+                      suffix={selectedZone.temp_reached ? '℃ ✓' : '℃'}
                       precision={1}
-                      valueStyle={{ color: selectedZone.temp_reached ? '#52c41a' : '#faad14' }}
-                      suffix={selectedZone.temp_reached ? ' ✓' : ''}
+                      styles={{ content: { color: selectedZone.temp_reached ? '#52c41a' : '#faad14' } }}
                     />
                   </Col>
                 </Row>
@@ -116,7 +121,7 @@ const MainDashboard: React.FC = () => {
                     <Statistic 
                       title="泵运行" 
                       value={selectedZone.pump_running ? '运行中' : '停止'} 
-                      valueStyle={{ color: selectedZone.pump_running ? '#52c41a' : '#8c8c8c' }}
+                      styles={{ content: { color: selectedZone.pump_running ? '#52c41a' : '#8c8c8c' } }}
                     />
                   </Col>
                 </Row>
@@ -154,7 +159,7 @@ const MainDashboard: React.FC = () => {
               <Statistic 
                 title="运行状态" 
                 value={systemStatus?.running ? '运行中' : '待机'} 
-                valueStyle={{ color: systemStatus?.running ? '#52c41a' : '#8c8c8c' }}
+                styles={{ content: { color: systemStatus?.running ? '#52c41a' : '#8c8c8c' } }}
               />
               <Row gutter={16} style={{ marginTop: 16 }}>
                 <Col span={12}>

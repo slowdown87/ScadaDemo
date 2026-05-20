@@ -1,0 +1,23 @@
+.chemicals-page {
+  padding: 0;
+}
+
+.chemical-card {
+  margin-bottom: 16px;
+}
+
+.chemical-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.chemical-content {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+
+.chemical-progress {
+  text-align: center;
+}

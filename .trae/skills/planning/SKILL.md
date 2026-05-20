@@ -66,7 +66,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 3. 检测方案文档
    - 搜索项目中是否存在《xxx建设方案》《xxx规划》《xxx计划》文档
    - 如不存在 → **自动生成方案文档**
-     - 生成到：..\docs\规划方案.md
+     - 生成到：..\plan\规划方案.md
      - 使用标准模板（问题汇总 → 详细计划 → 风险分析 → 执行顺序）
    - 如存在，解析文档中的阶段定义，提取 phases 结构
    - 将 phases 结构纳入状态快照
@@ -155,7 +155,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 
 1. 找到方案文档 → 使用多阶段项目快照模板
 2. 未找到方案文档 → 停止并询问用户是否继续规划
-3. 快照路径：`..\docs\状态快照.json`
+3. 快照路径：`..\plan\状态快照.json`
 4. 快照中的 phases 数组必须包含**所有阶段**，即使某些阶段还未开始
 
 ### 状态转换规则
@@ -170,7 +170,7 @@ Thought → Action → Observation → Thought → ... → Final Answer
 
 ### 更新操作
 
-1. 打开 `..\docs\状态快照.json`
+1. 打开 `..\plan\状态快照.json`
 2. 按模板创建（如不存在）
 3. 如有方案文档，解析并填充完整的 `phases` 数组
 4. 按状态转换规则更新字段

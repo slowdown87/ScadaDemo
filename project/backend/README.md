@@ -29,10 +29,11 @@ backend/
 │       ├── plc_service.py   # PLC通讯服务
 │       └── data_service.py  # 数据服务
 ├── tests/                  # 测试文件
-├── docker-compose.yml       # Docker编排
-├── Dockerfile              # 容器镜像
 ├── requirements.txt         # Python依赖
-└── .env.example            # 环境变量示例
+├── .env.example            # 环境变量示例
+├── install_dependencies.ps1 # 依赖安装脚本
+├── start_backend.ps1       # 启动脚本
+└── LOCAL_DEPLOYMENT.md     # 本地部署指南
 ```
 
 ## 快速开始
@@ -40,43 +41,45 @@ backend/
 ### 1. 环境要求
 
 - Python 3.10+
-- Docker & Docker Compose
 - PostgreSQL 15+
 - Redis 7+
+- Mosquitto MQTT Broker
 
-### 2. 本地开发
+### 2. 安装中间件
+
+使用Chocolatey自动安装:
+
+```powershell
+# 以管理员身份运行
+.\install_dependencies.ps1
+```
+
+详细安装步骤请参考 [LOCAL_DEPLOYMENT.md](./LOCAL_DEPLOYMENT.md)
+
+### 3. 配置服务
+
+按照 LOCAL_DEPLOYMENT.md 中的说明配置:
+1. PostgreSQL数据库和用户
+2. Mosquitto认证
+3. Redis配置
+
+### 4. 启动应用
 
 ```bash
 cd backend
 
 # 创建虚拟环境
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or: venv\Scripts\activate  # Windows
+.\venv\Scripts\Activate.ps1
 
 # 安装依赖
 pip install -r requirements.txt
 
 # 复制环境变量
-cp .env.example .env
+copy .env.example .env
 
-# 启动本地服务(需要PostgreSQL和Redis)
-uvicorn app.main:app --reload
-```
-
-### 3. Docker部署
-
-```bash
-cd backend
-
-# 启动所有服务
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f backend
-
-# 停止服务
-docker-compose down
+# 启动服务
+.\start_backend.ps1
 ```
 
 ## API接口
@@ -182,6 +185,6 @@ pytest --cov=app tests/
 ### 生产环境
 
 1. 修改 `.env` 中的生产配置
-2. 使用Docker Compose部署
-3. 配置反向代理(Nginx)
-4. 启用HTTPS
+2. 配置反向代理(Nginx)
+3. 启用HTTPS
+4. 参考 [LOCAL_DEPLOYMENT.md](./LOCAL_DEPLOYMENT.md) 配置各服务

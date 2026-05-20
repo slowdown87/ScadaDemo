@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ZoneStatus, AlarmInfo, RecipeInfo, SystemStatus, CleanState } from '@/types';
+import type { ZoneStatus, AlarmInfo, RecipeInfo, SystemStatus } from '@/types';
 import { zoneApi, alarmApi, recipeApi, systemApi, wsService } from '@/services';
 import type { WSMessage } from '@/types';
 

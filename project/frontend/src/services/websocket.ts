@@ -1,4 +1,4 @@
-import type { WSMessage, ZoneStatus, AlarmInfo } from '@/types';
+import type { WSMessage } from '@/types';
 
 type MessageHandler = (message: WSMessage) => void;
 
