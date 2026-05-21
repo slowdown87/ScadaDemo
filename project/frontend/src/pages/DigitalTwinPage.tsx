@@ -15,6 +15,58 @@ import './DigitalTwinPage.css';
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
+// WebGL Error Boundary
+class WebGLErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError?: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('WebGL Error:', error);
+    this.props.onError?.();
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          fontFamily: 'system-ui, sans-serif',
+        }}>
+          <h2 style={{ marginBottom: '20px' }}>3D渲染暂时不可用</h2>
+          <p style={{ opacity: 0.8, marginBottom: '30px' }}>
+            您的浏览器可能不支持WebGL或GPU性能不足<br/>
+            请尝试刷新页面或使用其他浏览器
+          </p>
+          <Button 
+            type="primary" 
+            onClick={() => window.location.reload()}
+            icon={<ReloadOutlined />}
+          >
+            刷新页面
+          </Button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // 状态颜色映射
 const stateColors: Record<CleanState, string> = {
   IDLE: '#8c8c8c',
@@ -176,10 +228,12 @@ const DigitalTwinPage: React.FC = () => {
         <div className="digital-twin-container">
           {/* 3D场景 */}
           <div className="scene-container">
-            <DigitalTwinScene
-              onDeviceSelect={handleDeviceSelect}
-              selectedDevice={selectedDevice}
-            />
+            <WebGLErrorBoundary>
+              <DigitalTwinScene
+                onDeviceSelect={handleDeviceSelect}
+                selectedDevice={selectedDevice}
+              />
+            </WebGLErrorBoundary>
           </div>
 
           {/* 右侧信息面板 */}

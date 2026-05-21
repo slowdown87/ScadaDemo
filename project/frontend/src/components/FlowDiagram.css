@@ -808,6 +808,24 @@
   }
 }
 
+/* 操作提示 */
+.operation-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 11px;
+  color: #666;
+}
+
+.operation-hint span {
+  margin-right: 12px;
+}
+
 /* 打印样式 */
 @media print {
   .flow-diagram-container {
